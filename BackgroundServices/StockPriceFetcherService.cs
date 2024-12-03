@@ -1,13 +1,11 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Net.Http;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
+using StockLogger.Helpers;  // Import the new helper class
 using StockLogger.Models.DTO;
 
 namespace StockLogger.BackgroundServices
@@ -16,12 +14,13 @@ namespace StockLogger.BackgroundServices
     {
         private readonly HttpClient _httpClient;
         private readonly ILogger<StockPriceFetcherService> _logger;
-        private readonly string _baseDirectory = @"C:\Users\Admin\Desktop\Project";
+        private readonly StockDataLogger _stockDataLogger;
 
         public StockPriceFetcherService(HttpClient httpClient, ILogger<StockPriceFetcherService> logger)
         {
             _httpClient = httpClient;
             _logger = logger;
+            _stockDataLogger = new StockDataLogger(@"C:\Users\Admin\Desktop\Project");
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -65,7 +64,8 @@ namespace StockLogger.BackgroundServices
                             price = price
                         };
 
-                        LogStockData(ticker, stockData);
+                        _stockDataLogger.LogStockData(ticker, stockData);
+                        _stockDataLogger.LogStockDataInJSON(ticker, stockData);
                     }
                     else
                     {
@@ -82,39 +82,6 @@ namespace StockLogger.BackgroundServices
                 _logger.LogError(ex, $"An error occurred while fetching stock price for {ticker}.");
             }
         }
-
-        private void LogStockData(string ticker, StockDataDto stockData)
-        {
-            var currentDate = DateTime.Now.ToString("yyyy-MM-dd");
-            var directoryPath = _baseDirectory;
-
-            var dataDirectoryPath = Path.Combine(directoryPath, "Data");
-            if (!Directory.Exists(dataDirectoryPath))
-            {
-                Directory.CreateDirectory(dataDirectoryPath);
-            }
-
-            var filePath = Path.Combine(dataDirectoryPath, $"{ticker}_{currentDate}.txt");
-
-            var stockDataList = new List<StockDataDto>();
-
-            if (File.Exists(filePath))
-            {
-                var existingData = File.ReadAllText(filePath);
-                stockDataList = JsonSerializer.Deserialize<List<StockDataDto>>(existingData) ?? new List<StockDataDto>();
-            }
-
-            stockDataList.Add(stockData);
-
-            var jsonOptions = new JsonSerializerOptions
-            {
-                WriteIndented = true,
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-
-            var json = JsonSerializer.Serialize(stockDataList, jsonOptions);
-            File.WriteAllText(filePath, json);
-        }
-
     }
 }
+
