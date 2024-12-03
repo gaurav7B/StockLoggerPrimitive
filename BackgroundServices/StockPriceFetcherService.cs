@@ -16,7 +16,7 @@ namespace StockLogger.BackgroundServices
     {
         private readonly HttpClient _httpClient;
         private readonly ILogger<StockPriceFetcherService> _logger;
-        private readonly string _baseDirectory = @"C:\Users\Admin\Desktop\Project\Data";
+        private readonly string _baseDirectory = @"C:\Users\Admin\Desktop\Project";
 
         public StockPriceFetcherService(HttpClient httpClient, ILogger<StockPriceFetcherService> logger)
         {
@@ -86,7 +86,15 @@ namespace StockLogger.BackgroundServices
         private void LogStockData(string ticker, StockDataDto stockData)
         {
             var currentDate = DateTime.Now.ToString("yyyy-MM-dd");
-            var filePath = Path.Combine(_baseDirectory, $"{ticker}_{currentDate}.txt");
+            var directoryPath = _baseDirectory;
+
+            var dataDirectoryPath = Path.Combine(directoryPath, "Data");
+            if (!Directory.Exists(dataDirectoryPath))
+            {
+                Directory.CreateDirectory(dataDirectoryPath);
+            }
+
+            var filePath = Path.Combine(dataDirectoryPath, $"{ticker}_{currentDate}.txt");
 
             var stockDataList = new List<StockDataDto>();
 
@@ -107,5 +115,6 @@ namespace StockLogger.BackgroundServices
             var json = JsonSerializer.Serialize(stockDataList, jsonOptions);
             File.WriteAllText(filePath, json);
         }
+
     }
 }
