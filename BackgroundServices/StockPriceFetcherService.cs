@@ -5,7 +5,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
-using StockLogger.Helpers;  // Import the new helper class
+using StockLogger.Helpers;
 using StockLogger.Models.DTO;
 
 namespace StockLogger.BackgroundServices
@@ -38,43 +38,20 @@ namespace StockLogger.BackgroundServices
 
         private async Task FetchAndLogStockPriceAsync(string ticker, string exchange)
         {
-            var requestDto = new GetStockPriceRequestDto
-            {
-                Ticker = ticker,
-                Exchange = exchange
-            };
-
-            var url = $"https://www.google.com/finance/quote/{requestDto.Ticker}:{requestDto.Exchange}";
-
             try
             {
-                var response = await _httpClient.GetStringAsync(url);
-                var htmlDoc = new HtmlDocument();
-                htmlDoc.LoadHtml(response);
+                var response = await _httpClient.GetAsync($"https://localhost:44364/Stock/GetStockPriceByTicker?ticker={ticker}");
 
-                var priceNode = htmlDoc.DocumentNode.SelectSingleNode("//div[contains(@class, 'YMlKec fxKbKc')]");
-                if (priceNode != null)
+                if (response.IsSuccessStatusCode)
                 {
-                    var priceText = priceNode.InnerText.Trim();
-                    if (decimal.TryParse(priceText.Substring(1).Replace(",", ""), out var price))
-                    {
-                        var stockData = new StockDataDto
-                        {
-                            time = DateTime.Now.ToString("hh:mm:ss tt"),
-                            price = price
-                        };
+                    var stockData = await response.Content.ReadAsAsync<StockDataDto>();
 
-                        _stockDataLogger.LogStockData(ticker, stockData);
-                        _stockDataLogger.LogStockDataInJSON(ticker, stockData);
-                    }
-                    else
-                    {
-                        _logger.LogWarning("Failed to parse price.");
-                    }
+                    _stockDataLogger.LogStockDataTXT(ticker, stockData);
+                    _stockDataLogger.LogStockDataInJSON(ticker, stockData);
                 }
                 else
                 {
-                    _logger.LogWarning("Price not found.");
+                    _logger.LogWarning($"Failed to fetch stock price for {ticker}. Status code: {response.StatusCode}");
                 }
             }
             catch (Exception ex)

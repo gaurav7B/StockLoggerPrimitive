@@ -15,7 +15,7 @@ namespace StockLogger.Helpers
             _baseDirectory = baseDirectory;
         }
 
-        public void LogStockData(string ticker, StockDataDto stockData)
+        public void LogStockDataTXT(string ticker, StockDataDto stockData)
         {
             var currentDate = DateTime.Now.ToString("yyyy-MM-dd");
             var dataDirectoryPath = Path.Combine(_baseDirectory, "Data");

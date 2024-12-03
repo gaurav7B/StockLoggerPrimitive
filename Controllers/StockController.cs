@@ -7,7 +7,6 @@ using StockLogger.Models.DTO;
 
 namespace StockLogger.Controllers
 {
-
     public class StockController : Controller
     {
         private readonly HttpClient _httpClient;
