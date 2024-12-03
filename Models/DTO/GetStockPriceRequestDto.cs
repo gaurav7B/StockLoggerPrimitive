@@ -2,7 +2,7 @@
 {
   public class GetStockPriceRequestDto
   {
-    public string Ticker { get; set; } = "INFY";
-    public string Exchange { get; set; } = "NSE";
+    public string Ticker { get; set; }
+    public string Exchange { get; set; }
   }
 }
