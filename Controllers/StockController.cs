@@ -51,7 +51,7 @@ namespace StockLogger.Controllers
         price = price
       };
 
-      return View(stockData);
+      return View();
     }
   }
 }
