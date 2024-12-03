@@ -21,4 +21,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="wwwroot\Images\Imperium.jpg" />
+  </ItemGroup>
+
 </Project>

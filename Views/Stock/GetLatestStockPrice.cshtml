@@ -1,7 +1,35 @@
 ﻿@model StockLogger.Models.DTO.StockDataDto
 
-<h2>Latest Stock Price</h2>
-<p>Ticker: INFY</p>
-<p>Exchange: NSE</p>
-<p>Price: @Model.price</p>
-<p>Time: @Model.time</p>
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            background-image: url('@Url.Content("~/Images/Imperium.jpg")');
+            background-size: cover; /* Adjusts to cover the full page */
+            background-position: center;
+            background-repeat: no-repeat;
+            color: white; /* Ensures text visibility */
+            font-family: Arial, sans-serif;
+        }
+
+        .stock-info {
+            padding: 20px;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.6); /* Semi-transparent background for readability */
+            border-radius: 10px;
+            width: 50%;
+            margin: 50px auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="stock-info">
+        <h2>Latest Stock Price</h2>
+        <p>Ticker: INFY</p>
+        <p>Exchange: NSE</p>
+        <p>Price: @Model.price</p>
+        <p>Time: @Model.time</p>
+    </div>
+</body>
+</html>
