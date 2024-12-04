@@ -25,16 +25,21 @@ namespace StockLogger.BackgroundServices
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            var stocks = new[]
+            {
+              new { Ticker = "INFY", Exchange = "NSE" },
+              new { Ticker = "RELIANCE", Exchange = "NSE" }
+            };
+
             while (!stoppingToken.IsCancellationRequested)
             {
-                var infyTask = FetchAndLogStockPriceAsync("INFY", "NSE");
-                var relianceTask = FetchAndLogStockPriceAsync("RELIANCE", "NSE");
-
-                await Task.WhenAll(infyTask, relianceTask);
-
-                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+                
+                var stockTasks = stocks.Select(stock => FetchAndLogStockPriceAsync(stock.Ticker, stock.Exchange)); // Create tasks dynamically for each stock
+                                await Task.WhenAll(stockTasks); // Process all tasks in parallel
+                                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken); // Wait for 1 minute before the next iteration
             }
         }
+
 
         private async Task FetchAndLogStockPriceAsync(string ticker, string exchange)
         {
@@ -46,8 +51,8 @@ namespace StockLogger.BackgroundServices
                 {
                     var stockData = await response.Content.ReadAsAsync<StockDataDto>();
 
-                    _stockDataLogger.LogStockDataTXT(ticker, stockData);
-                    _stockDataLogger.LogStockDataInJSON(ticker, stockData);
+                    _stockDataLogger.LogStockDataTXT(ticker, exchange, stockData);
+                    _stockDataLogger.LogStockDataInJSON(ticker, exchange, stockData);
                 }
                 else
                 {

@@ -1,7 +1,12 @@
-﻿namespace StockLogger.Models.Candel
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace StockLogger.Models.Candel
 {
     public class Candel
     {
+        [Key]
+        public int Id { get; set; }  // Primary key
+
         // Core properties
         public decimal StartPrice { get; set; }
         public decimal HighestPrice { get; set; }

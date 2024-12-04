@@ -1,10 +1,17 @@
+using Microsoft.EntityFrameworkCore;
 using StockLogger.BackgroundServices;
+using StockLogger.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews()
     .AddRazorRuntimeCompilation();
+
+// Register DbContext with the connection string
+builder.Services.AddDbContext<StockLoggerDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("StockLoggerDbConnection")));
+
 
 builder.Services.AddHostedService<StockPriceFetcherService>();
 

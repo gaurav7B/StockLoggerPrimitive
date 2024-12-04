@@ -1,4 +1,5 @@
-﻿@model StockLogger.Models.DTO.StockDataDto
+﻿@page
+@model StockLogger.Models.DTO.StockDataDto
 
 <!DOCTYPE html>
 <html>
@@ -15,59 +16,18 @@
             display: flex;
         }
 
-        .sidebar {
-            width: 50px; 
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7); 
-            padding: 20px;
-            box-sizing: border-box;
-            color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            transition: width 0.3s ease; 
-        }
-
-            .sidebar.expanded {
-                width: 250px;
-            }
-
-            .sidebar h2 {
-                margin-top: 0;
-                text-align: center;
-                font-size: 18px;
-                transition: opacity 0.3s ease;
-            }
-
-            .sidebar.expanded h2 {
-                opacity: 1; 
-            }
-
-            .sidebar.collapsed h2 {
-                opacity: 0; 
-            }
-
-        .toggle-btn {
+        .signature {
             position: absolute;
-            top: 20px;
-            left: 100%;
-            margin-left: 10px;
-            background-color: transparent;
-            border: none;
-            padding: 0;
-            width: 30px;
-            height: 30px;
-            cursor: pointer;
-            border-radius: 5px;
-            background-image: url('@Url.Content("~/Images/Imperium.jpg")');
-            background-size: cover;
-            background-position: center;
+            cursor: default;
+            bottom: 20px;
+            right: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 18px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
         }
-
-            .toggle-btn:focus {
-                outline: none;
-            }
 
         .stock-info {
             padding: 20px;
@@ -79,54 +39,26 @@
             flex-grow: 1;
         }
 
-        .signature {
-            position: absolute;
-            bottom: 20px;
-            right: 20px;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 18px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-        }
-
         .content-area {
-            margin-left: 50px; 
+            margin-left: 50px;
             padding: 20px;
             flex-grow: 1;
-            transition: margin-left 0.3s ease; 
+            transition: margin-left 0.3s ease;
         }
 
-            .content-area.sidebar-expanded {
-                margin-left: 250px; 
-            }
     </style>
-    </head>
-    <body>
-        <div class="sidebar collapsed">
-            <button class="toggle-btn" onclick="toggleSidebar()"></button>
-            <h2>Stock Info</h2>
+</head>
+<body>
+
+    @* Render the Sidebar Partial View *@
+    @await Html.PartialAsync("_Sidebar")
+
+    <div class="content-area">
+        <div class="stock-info">
         </div>
-    
-        <div class="content-area">
-            <div class="stock-info">
-            </div>
-            <div class="signature">
-                SHALINI BALGUDE
-            </div>
+        <div class="signature">
+            SHALINI BALGUDE
         </div>
-    
-        <script>
-            function toggleSidebar() {
-                var sidebar = document.querySelector('.sidebar');
-                var contentArea = document.querySelector('.content-area');
-    
-                sidebar.classList.toggle('expanded');
-                sidebar.classList.toggle('collapsed');
-    
-                contentArea.classList.toggle('sidebar-expanded');
-            }
-        </script>
-    </body>
-    </html>
+    </div>
+</body>
+</html>

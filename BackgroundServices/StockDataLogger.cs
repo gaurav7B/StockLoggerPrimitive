@@ -15,7 +15,7 @@ namespace StockLogger.Helpers
             _baseDirectory = baseDirectory;
         }
 
-        public void LogStockDataTXT(string ticker, StockDataDto stockData)
+        public void LogStockDataTXT(string ticker, string exchange, StockDataDto stockData)
         {
             var currentDate = DateTime.Now.ToString("yyyy-MM-dd");
             var dataDirectoryPath = Path.Combine(_baseDirectory, "Data");
@@ -25,7 +25,7 @@ namespace StockLogger.Helpers
                 Directory.CreateDirectory(dataDirectoryPath);
             }
 
-            var filePath = Path.Combine(dataDirectoryPath, $"{ticker}_{currentDate}.txt");
+            var filePath = Path.Combine(dataDirectoryPath, $"{ticker}_{exchange}_{currentDate}.txt");
 
             var stockDataList = new List<StockDataDto>();
 
@@ -47,7 +47,7 @@ namespace StockLogger.Helpers
             File.WriteAllText(filePath, json);
         }
 
-        public void LogStockDataInJSON(string ticker, StockDataDto stockData)
+        public void LogStockDataInJSON(string ticker, string exchange, StockDataDto stockData)
         {
             var currentDate = DateTime.Now.ToString("yyyy-MM-dd");
             var jsonDataDirectoryPath = Path.Combine(_baseDirectory, "JSON DATA");
@@ -57,7 +57,7 @@ namespace StockLogger.Helpers
                 Directory.CreateDirectory(jsonDataDirectoryPath);
             }
 
-            var filePath = Path.Combine(jsonDataDirectoryPath, $"{ticker}_{currentDate}.json");
+            var filePath = Path.Combine(jsonDataDirectoryPath, $"{ticker}_{exchange}_{currentDate}.json");
 
             var stockDataList = new List<StockDataDto>();
 
