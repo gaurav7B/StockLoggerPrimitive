@@ -15,7 +15,7 @@
 <body>
 
     <div class="container mt-5">
-        <h1 class="text-center mb-4">@ViewData["Title"]</h1>
+        <h1 class="text-center mb-4" style="color:white">@ViewData["Title"]</h1>
 
         <div class="list-group">
             @foreach (var ticker in Model)
@@ -24,8 +24,10 @@
                     <div>
                         <h5 class="mb-1">@ticker.Ticker</h5>
                         <p class="mb-1 text-muted">@ticker.Exchange</p>
+                        <span class="badge bg-primary rounded-pill">EDIT</span>
+                        <span class="badge bg-primary rounded-pill">DELETE</span>
                     </div>
-                    <span class="badge bg-primary rounded-pill">Details</span>
+
                 </a>
             }
         </div>
