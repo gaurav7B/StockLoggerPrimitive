@@ -45,7 +45,7 @@ namespace StockLogger.Controllers
             }
 
             var existingStockTickerExchange = await _context.StockTickerExchanges
-                .FirstOrDefaultAsync(e => e.Ticker == stockTickerExchangeDto.Ticker);
+                .FirstOrDefaultAsync(e => e.Ticker == stockTickerExchangeDto.Ticker.Replace(" ", ""));
 
             if (existingStockTickerExchange != null)
             {
@@ -54,8 +54,8 @@ namespace StockLogger.Controllers
 
             var stockTickerExchange = new StockTickerExchange
             {
-                Ticker = stockTickerExchangeDto.Ticker,
-                Exchange = stockTickerExchangeDto.Exchange
+                Ticker = stockTickerExchangeDto.Ticker.Replace(" ", ""),
+                Exchange = stockTickerExchangeDto.Exchange.Replace(" ", "")
             };
 
             _context.StockTickerExchanges.Add(stockTickerExchange);
