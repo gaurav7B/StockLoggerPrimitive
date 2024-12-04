@@ -130,13 +130,13 @@
                     <i class="fas fa-chart-bar icon"></i>
                     <h2>3WS REPORT</h2>
                 </div>
-                <div class="sidebarMenuediv">
+                <div class="sidebarMenuediv" onclick="redirectToTAddTicker()">
                     <i class="fas fa-plus icon"></i>
                     <h2>ADD TICKER</h2>
                 </div>
-                <div class="sidebarMenuediv">
+                <div class="sidebarMenuediv" onclick="redirectToTickerList()">
                     <i class="fas fa-bars icon"></i>
-                    <h2>TICKER LIST</h2>
+                    <h2><a href="/StockTickerExchangeMVC/TickerList">TICKER LIST</a></h2>
                 </div>
                 <div class="sidebarMenuediv">
                     <i class="fas fa-download icon"></i>
@@ -147,6 +147,7 @@
     </div>
 
     <script>
+
         function toggleSidebar() {
             var sidebar = document.querySelector('.sidebar');
             var content = document.querySelector('.content');
@@ -161,6 +162,14 @@
             } else {
                 content.classList.remove('visible');
             }
+        }
+
+        function redirectToTickerList() {
+            window.location.href = '/StockTickerExchangeMVC/TickerList';
+        }
+
+        function redirectToTAddTicker() {
+            window.location.href = '/StockTickerExchangeMVC/AddTicker';
         }
     </script>
 

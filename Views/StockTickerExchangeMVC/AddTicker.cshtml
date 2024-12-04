@@ -1,0 +1,156 @@
+﻿@{
+    ViewData["Title"] = "Add Ticker";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f9fc;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-size: 14px;
+            color: #555;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            background-color: #f4f7f9;
+        }
+
+            input[type="text"]:focus {
+                outline: none;
+                border-color: #3498db;
+                background-color: #ffffff;
+            }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #3498db;
+            color: #ffffff;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+            button:hover {
+                background-color: #2980b9;
+            }
+
+        .alert {
+            color: #e74c3c;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .alert-success {
+            color: #2ecc71;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>@ViewData["Title"]</h2>
+
+        <form id="addTickerForm">
+            <div class="form-group">
+                <label for="ticker">Ticker:</label>
+                <input type="text" id="ticker" name="ticker" required />
+            </div>
+            <div class="form-group">
+                <label for="exchange">Exchange:</label>
+                <input type="text" id="exchange" name="exchange" required />
+            </div>
+            <div class="form-group">
+                <button type="submit">Submit</button>
+            </div>
+        </form>
+
+        <div id="alert" class="alert" style="display:none;"></div>
+    </div>
+
+    <script>
+        document.getElementById("addTickerForm").addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const ticker = document.getElementById("ticker").value;
+            const exchange = document.getElementById("exchange").value;
+
+            const requestData = {
+                ticker: ticker,
+                exchange: exchange
+            };
+
+            try {
+                const response = await fetch('https://localhost:44364/api/StockTickerExchange/Create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                const alertDiv = document.getElementById("alert");
+
+                if (response.ok) {
+                    alertDiv.textContent = 'Stock Ticker Exchange added successfully!';
+                    alertDiv.className = 'alert alert-success';
+                    alertDiv.style.display = 'block';
+                    document.getElementById("addTickerForm").reset();
+                } else {
+                    const errorData = await response.json();
+                    alertDiv.textContent = errorData.message;
+                    alertDiv.className = 'alert';
+                    alertDiv.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                const alertDiv = document.getElementById("alert");
+                alertDiv.textContent = 'An error occurred while adding the stock ticker exchange.';
+                alertDiv.className = 'alert';
+                alertDiv.style.display = 'block';
+            }
+        });
+    </script>
+
+</body>
+</html>

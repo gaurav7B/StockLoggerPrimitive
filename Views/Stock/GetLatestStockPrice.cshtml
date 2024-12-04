@@ -5,29 +5,6 @@
 <html>
 <head>
     <style>
-        body {
-            background-image: url('@Url.Content("~/Images/Imperium.jpg")');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            color: white;
-            font-family: Arial, sans-serif;
-            margin: 0;
-            display: flex;
-        }
-
-        .signature {
-            position: absolute;
-            cursor: default;
-            bottom: 20px;
-            right: 20px;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 18px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-        }
 
         .stock-info {
             padding: 20px;
@@ -50,14 +27,8 @@
 </head>
 <body>
 
-    @* Render the Sidebar Partial View *@
-    @await Html.PartialAsync("_Sidebar")
-
     <div class="content-area">
         <div class="stock-info">
-        </div>
-        <div class="signature">
-            SHALINI BALGUDE
         </div>
     </div>
 </body>

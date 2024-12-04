@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using StockLogger.Data;
 using StockLogger.Models.Candel;
+using StockLogger.Models.DTO;
 
 namespace StockLogger.Controllers
 {
@@ -16,14 +17,12 @@ namespace StockLogger.Controllers
             _context = context;
         }
 
-        //http://localhost:44364/api/StockTickerExchange/GetAll
         [HttpGet("GetAll")]
         public async Task<ActionResult<IEnumerable<StockTickerExchange>>> GetStockTickerExchanges()
         {
             return await _context.StockTickerExchanges.ToListAsync();
         }
 
-        //http://localhost:44364/api/StockTickerExchange/GetStockTickerExchange/{id}
         [HttpGet("GetStockTickerExchange/{id}")]
         public async Task<ActionResult<StockTickerExchange>> GetStockTickerExchange(int id)
         {
@@ -37,14 +36,27 @@ namespace StockLogger.Controllers
             return Ok(stockTickerExchange);
         }
 
-        //http://localhost:44364/api/StockTickerExchange/Create
         [HttpPost("Create")]
-        public async Task<ActionResult<StockTickerExchange>> PostStockTickerExchange(StockTickerExchange stockTickerExchange)
+        public async Task<ActionResult<StockTickerExchange>> PostStockTickerExchange(StockTickerExchangeDto stockTickerExchangeDto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
+
+            var existingStockTickerExchange = await _context.StockTickerExchanges
+                .FirstOrDefaultAsync(e => e.Ticker == stockTickerExchangeDto.Ticker);
+
+            if (existingStockTickerExchange != null)
+            {
+                return Conflict(new { message = "Ticker already exists" });
+            }
+
+            var stockTickerExchange = new StockTickerExchange
+            {
+                Ticker = stockTickerExchangeDto.Ticker,
+                Exchange = stockTickerExchangeDto.Exchange
+            };
 
             _context.StockTickerExchanges.Add(stockTickerExchange);
             await _context.SaveChangesAsync();
@@ -52,14 +64,11 @@ namespace StockLogger.Controllers
             return CreatedAtAction("GetStockTickerExchange", new { id = stockTickerExchange.Id }, stockTickerExchange);
         }
 
-        //http://localhost:44364/api/StockTickerExchange/Update/{id}
+
+
         [HttpPut("Update/{id}")]
-        public async Task<IActionResult> PutStockTickerExchange(int id, StockTickerExchange stockTickerExchange)
+        public async Task<IActionResult> PutStockTickerExchange(int id, StockTickerExchangeDto stockTickerExchangeDto)
         {
-            if (id != stockTickerExchange.Id)
-            {
-                return BadRequest("ID in the route does not match ID in the body.");
-            }
 
             var existingStockTickerExchange = await _context.StockTickerExchanges.FindAsync(id);
             if (existingStockTickerExchange == null)
@@ -67,7 +76,7 @@ namespace StockLogger.Controllers
                 return NotFound();
             }
 
-            _context.Entry(existingStockTickerExchange).CurrentValues.SetValues(stockTickerExchange);
+            _context.Entry(existingStockTickerExchange).CurrentValues.SetValues(stockTickerExchangeDto);
 
             try
             {
@@ -89,7 +98,6 @@ namespace StockLogger.Controllers
         }
 
 
-        //http://localhost:44364/api/StockTickerExchange/Delete/{id}
         [HttpDelete("Delete/{id}")]
         public async Task<IActionResult> DeleteStockTickerExchange(int id)
         {
