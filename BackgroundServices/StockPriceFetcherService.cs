@@ -25,18 +25,42 @@ namespace StockLogger.BackgroundServices
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            var stocks = new[]
-            {
-              new { Ticker = "INFY", Exchange = "NSE" },
-              new { Ticker = "RELIANCE", Exchange = "NSE" }
-            };
+            var stocks = (await GetStockTickerExchanges())
+                .Select(x => new { Ticker = (string)x.Ticker, Exchange = (string)x.Exchange })
+                .ToArray();
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                
+
                 var stockTasks = stocks.Select(stock => FetchAndLogStockPriceAsync(stock.Ticker, stock.Exchange)); // Create tasks dynamically for each stock
-                                await Task.WhenAll(stockTasks); // Process all tasks in parallel
-                                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken); // Wait for 1 minute before the next iteration
+                await Task.WhenAll(stockTasks); // Process all tasks in parallel
+                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken); // Wait for 1 minute before the next iteration
+            }
+        }
+
+        // Method to fetch stock ticker and exchange data from the API
+        private async Task<IEnumerable<dynamic>> GetStockTickerExchanges()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("https://localhost:44364/api/StockTickerExchange/GetStockTickerExchangesWithoutID");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var stockTickerExchanges = await response.Content.ReadAsAsync<IEnumerable<StockTickerExchangeDto>>();
+                    return stockTickerExchanges.Select(x => new { Ticker = x.Ticker, Exchange = x.Exchange });
+                }
+                else
+                {
+                    _logger.LogWarning($"Failed to fetch stock ticker exchanges. Status code: {response.StatusCode}");
+                    return new object[] { };
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while fetching stock ticker exchanges.");
+                return new object[] { };
+
             }
         }
 

@@ -24,11 +24,11 @@ namespace StockLogger.Migrations
 
             modelBuilder.Entity("StockLogger.Models.Candel.Candel", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<decimal?>("BollingerLower")
                         .HasColumnType("decimal(18,2)");
@@ -72,11 +72,11 @@ namespace StockLogger.Migrations
 
             modelBuilder.Entity("StockLogger.Models.Candel.StockTickerExchange", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
                     b.Property<string>("Exchange")
                         .IsRequired()

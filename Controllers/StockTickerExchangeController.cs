@@ -23,6 +23,20 @@ namespace StockLogger.Controllers
             return await _context.StockTickerExchanges.ToListAsync();
         }
 
+        [HttpGet("GetStockTickerExchangesWithoutID")]
+        public async Task<ActionResult<IEnumerable<StockTickerExchangeDto>>> GetStockTickerExchangesWithoutID()
+        {
+            var stockTickerExchanges = await _context.StockTickerExchanges
+                .Select(x => new StockTickerExchangeDto
+                {
+                    Ticker = x.Ticker,
+                    Exchange = x.Exchange
+                })
+                .ToListAsync();
+
+            return Ok(stockTickerExchanges);
+        }
+
         [HttpGet("GetStockTickerExchange/{id}")]
         public async Task<ActionResult<StockTickerExchange>> GetStockTickerExchange(int id)
         {
