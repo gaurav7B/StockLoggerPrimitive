@@ -20,7 +20,7 @@ namespace StockLogger.BackgroundServices
         {
             _httpClient = httpClient;
             _logger = logger;
-            _stockDataLogger = new StockDataLogger(@"C:\Users\Admin\Desktop\Project");
+            _stockDataLogger = new StockDataLogger(@"C:\Users\Admin\Desktop\Project\StockLogger\Models\Data");
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -49,13 +49,11 @@ namespace StockLogger.BackgroundServices
                 }
                 else
                 {
-                    _logger.LogWarning($"Failed to fetch stock ticker exchanges. Status code: {response.StatusCode}");
                     return null;
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while fetching stock ticker exchanges.");
                 return null;
 
             }
@@ -74,10 +72,6 @@ namespace StockLogger.BackgroundServices
 
                     _stockDataLogger.LogStockDataTXT(ticker, exchange, stockData);
                     _stockDataLogger.LogStockDataInJSON(ticker, exchange, stockData);
-                }
-                else
-                {
-                    _logger.LogWarning($"Failed to fetch stock price for {ticker}. Status code: {response.StatusCode}");
                 }
             }
             catch (Exception ex)

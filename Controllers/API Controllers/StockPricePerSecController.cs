@@ -48,50 +48,20 @@ namespace StockLogger.Controllers.API_Controllers
             return CreatedAtAction(nameof(GetStockPrice), new { id = stockPrice.Id }, stockPrice);
         }
 
-        // PUT: api/StockPricePerSec/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutStockPrice(long id, StockPricePerSec stockPrice)
+        // DELETE: api/StockPricePerSec
+        [HttpDelete]
+        public async Task<IActionResult> TruncateStockPrice()
         {
-            if (id != stockPrice.Id)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(stockPrice).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE StockPricePerSec");
+                return NoContent();
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception ex)
             {
-                if (!StockPriceExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                // Handle any errors (e.g., logging)
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
-
-            return NoContent();
-        }
-
-        // DELETE: api/StockPricePerSec/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteStockPrice(long id)
-        {
-            var stockPrice = await _context.StockPricePerSec.FindAsync(id);
-            if (stockPrice == null)
-            {
-                return NotFound();
-            }
-
-            _context.StockPricePerSec.Remove(stockPrice);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
         }
 
         private bool StockPriceExists(long id)
