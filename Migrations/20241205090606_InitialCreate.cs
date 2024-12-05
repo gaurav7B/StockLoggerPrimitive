@@ -35,6 +35,22 @@ namespace StockLogger.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "StockPricePerSec",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Ticker = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TickerId = table.Column<long>(type: "bigint", nullable: false),
+                    StockDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    StockPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StockPricePerSec", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "StockTickerExchanges",
                 columns: table => new
                 {
@@ -54,6 +70,9 @@ namespace StockLogger.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Candel");
+
+            migrationBuilder.DropTable(
+                name: "StockPricePerSec");
 
             migrationBuilder.DropTable(
                 name: "StockTickerExchanges");

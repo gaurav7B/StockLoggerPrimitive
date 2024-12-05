@@ -25,25 +25,22 @@ namespace StockLogger.BackgroundServices
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            var stocks = (await GetStockTickerExchanges())
-                .Select(x => new { Ticker = (string)x.Ticker, Exchange = (string)x.Exchange })
-                .ToArray();
+            var stocks = (await GetStockTickerExchanges()).Select(x => new { Ticker = (string)x.Ticker, Exchange = (string)x.Exchange }).ToArray(); //got the TICKERS here using the API
 
             while (!stoppingToken.IsCancellationRequested)
             {
-
                 var stockTasks = stocks.Select(stock => FetchAndLogStockPriceAsync(stock.Ticker, stock.Exchange)); // Create tasks dynamically for each stock
                 await Task.WhenAll(stockTasks); // Process all tasks in parallel
                 await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken); // Wait for 1 minute before the next iteration
             }
         }
 
-        // Method to fetch stock ticker and exchange data from the API
+        // Method to fetch stock TICKER and EXCHANGE data from the API
         private async Task<IEnumerable<dynamic>> GetStockTickerExchanges()
         {
             try
             {
-                var response = await _httpClient.GetAsync("https://localhost:44364/api/StockTickerExchange/GetStockTickerExchangesWithoutID");
+                var response = await _httpClient.GetAsync("https://localhost:44364/api/StockTickerExchange/GetStockTickerExchangesWithoutID"); // API to get the TICKER and EXCHANGE
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -53,13 +50,13 @@ namespace StockLogger.BackgroundServices
                 else
                 {
                     _logger.LogWarning($"Failed to fetch stock ticker exchanges. Status code: {response.StatusCode}");
-                    return new object[] { };
+                    return null;
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while fetching stock ticker exchanges.");
-                return new object[] { };
+                return null;
 
             }
         }
@@ -69,7 +66,7 @@ namespace StockLogger.BackgroundServices
         {
             try
             {
-                var response = await _httpClient.GetAsync($"https://localhost:44364/Stock/GetStockPriceByTicker?ticker={ticker}");
+                var response = await _httpClient.GetAsync($"https://localhost:44364/Stock/GetStockPriceByTicker?ticker={ticker}"); // API to get the TICKER Price
 
                 if (response.IsSuccessStatusCode)
                 {

@@ -2,7 +2,7 @@
 {
   public class StockDataDto
   {
-    public string time { get; set; }
+    public DateTime time { get; set; }
     public decimal price { get; set; }
   }
 }

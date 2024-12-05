@@ -70,6 +70,32 @@ namespace StockLogger.Migrations
                     b.ToTable("Candel");
                 });
 
+            modelBuilder.Entity("StockLogger.Models.Candel.StockPricePerSec", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("StockDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("StockPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("TickerId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("StockPricePerSec");
+                });
+
             modelBuilder.Entity("StockLogger.Models.Candel.StockTickerExchange", b =>
                 {
                     b.Property<long>("Id")

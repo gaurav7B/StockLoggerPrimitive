@@ -12,7 +12,7 @@ using StockLogger.Data;
 namespace StockLogger.Migrations
 {
     [DbContext(typeof(StockLoggerDbContext))]
-    [Migration("20241205045000_InitialCreate")]
+    [Migration("20241205090606_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -71,6 +71,32 @@ namespace StockLogger.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Candel");
+                });
+
+            modelBuilder.Entity("StockLogger.Models.Candel.StockPricePerSec", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("StockDateTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("StockPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("TickerId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("StockPricePerSec");
                 });
 
             modelBuilder.Entity("StockLogger.Models.Candel.StockTickerExchange", b =>

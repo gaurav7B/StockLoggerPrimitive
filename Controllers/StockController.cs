@@ -52,7 +52,7 @@ namespace StockLogger.Controllers
 
             var stockData = new StockDataDto
             {
-                time = DateTime.Now.ToString("HH:mm:ss"),
+                time = DateTime.Now,
                 price = price
             };
 

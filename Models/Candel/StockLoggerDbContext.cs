@@ -11,6 +11,7 @@ namespace StockLogger.Data
         }
 
         public DbSet<StockTickerExchange> StockTickerExchanges { get; set; }
+        public DbSet<StockPricePerSec> StockPricePerSec { get; set; }
         public DbSet<Candel> Candel { get; set; }
     }
 }

@@ -17,7 +17,7 @@ namespace StockLogger.Controllers
             _context = context;
         }
 
-        [HttpGet("GetAll")]
+        [HttpGet("GetStockTickerExchanges")]
         public async Task<ActionResult<IEnumerable<StockTickerExchange>>> GetStockTickerExchanges()
         {
             return await _context.StockTickerExchanges.ToListAsync();
