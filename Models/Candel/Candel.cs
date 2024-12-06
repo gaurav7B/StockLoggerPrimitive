@@ -33,9 +33,23 @@ namespace StockLogger.Models.Candel
         // Method to set bullish or bearish status based on prices
         public void SetBullBearStatus()
         {
-            IsBullish = EndPrice > StartPrice;
-            IsBearish = EndPrice < StartPrice;
+            if (EndPrice > StartPrice)
+            {
+                IsBullish = true;
+                IsBearish = false;
+            }
+            else if (EndPrice < StartPrice)
+            {
+                IsBullish = false;
+                IsBearish = true;
+            }
+            else
+            {
+                IsBullish = null;
+                IsBearish = null;
+            }
         }
+
 
         // Calculated Properties
         public decimal PriceChange { get; set; }
