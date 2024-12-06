@@ -26,10 +26,10 @@ namespace StockLogger.BackgroundServices
         // Mandatory override for the BackgroundService
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            var stocks = (await GetStockTickerExchanges()).Select(x => new { Ticker = (string)x.Ticker, Exchange = (string)x.Exchange }).ToArray(); //got the TICKERS here using the API
-
             while (!stoppingToken.IsCancellationRequested)
             {
+                var stocks = (await GetStockTickerExchanges()).Select(x => new { Ticker = (string)x.Ticker, Exchange = (string)x.Exchange }).ToArray(); //got the TICKERS here using the API
+
                 var stockTasks = stocks.Select(stock => FetchStockDataAsync(stock.Ticker, stock.Exchange)); // Create tasks dynamically for each stock
                 await Task.WhenAll(stockTasks); // Process all tasks in parallel
                 await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);  // Delay of 1 sec before the next iteration

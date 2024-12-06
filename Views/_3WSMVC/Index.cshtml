@@ -1,0 +1,42 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            padding: 20px;
+            width: 100vw;
+            box-sizing: border-box;
+        }
+
+        .box {
+            background-color: #4CAF50; /* Green color */
+            height: 70px; /* Adjust for rectangle height */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        @for (int i = 1; i <= 50; i++)
+        {
+            <div class="box"></div>
+        }
+    </div>
+</body>
+</html>

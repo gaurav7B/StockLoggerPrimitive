@@ -24,10 +24,10 @@ namespace StockLogger.Migrations
                     OpenTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CloseTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Ticker = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TickerId = table.Column<long>(type: "bigint", nullable: false),
                     Exchange = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MovingAverage = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    BollingerUpper = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    BollingerLower = table.Column<decimal>(type: "decimal(18,2)", nullable: true)
+                    IsBullish = table.Column<bool>(type: "bit", nullable: false),
+                    IsBearish = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {

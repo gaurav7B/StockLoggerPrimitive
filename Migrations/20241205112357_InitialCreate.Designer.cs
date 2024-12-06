@@ -12,7 +12,7 @@ using StockLogger.Data;
 namespace StockLogger.Migrations
 {
     [DbContext(typeof(StockLoggerDbContext))]
-    [Migration("20241205090606_InitialCreate")]
+    [Migration("20241205112357_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -33,12 +33,6 @@ namespace StockLogger.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<decimal?>("BollingerLower")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("BollingerUpper")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<DateTime>("CloseTime")
                         .HasColumnType("datetime2");
 
@@ -52,10 +46,13 @@ namespace StockLogger.Migrations
                     b.Property<decimal>("HighestPrice")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<decimal>("LowestPrice")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<bool>("IsBearish")
+                        .HasColumnType("bit");
 
-                    b.Property<decimal?>("MovingAverage")
+                    b.Property<bool>("IsBullish")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("LowestPrice")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("OpenTime")
@@ -67,6 +64,9 @@ namespace StockLogger.Migrations
                     b.Property<string>("Ticker")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("TickerId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 

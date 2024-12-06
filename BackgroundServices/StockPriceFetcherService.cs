@@ -20,15 +20,15 @@ namespace StockLogger.BackgroundServices
         {
             _httpClient = httpClient;
             _logger = logger;
-            _stockDataLogger = new StockDataLogger(@"C:\Users\Admin\Desktop\Project\StockLogger\Models\Data");
+            _stockDataLogger = new StockDataLogger(@"C:\Users\Admin\Desktop\Project");
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            var stocks = (await GetStockTickerExchanges()).Select(x => new { Ticker = (string)x.Ticker, Exchange = (string)x.Exchange }).ToArray(); //got the TICKERS here using the API
-
             while (!stoppingToken.IsCancellationRequested)
             {
+                var stocks = (await GetStockTickerExchanges()).Select(x => new { Ticker = (string)x.Ticker, Exchange = (string)x.Exchange }).ToArray(); //got the TICKERS here using the API
+
                 var stockTasks = stocks.Select(stock => FetchAndLogStockPriceAsync(stock.Ticker, stock.Exchange)); // Create tasks dynamically for each stock
                 await Task.WhenAll(stockTasks); // Process all tasks in parallel
                 await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken); // Wait for 1 minute before the next iteration

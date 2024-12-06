@@ -23,43 +23,53 @@ namespace StockLogger.Models.Candel
 
         // Meta-information
         public string Ticker { get; set; }
+        public long TickerId { get; set; }
         public string Exchange { get; set; }
 
-        // Calculated properties
-        public bool IsBullish => EndPrice > StartPrice;
-        public bool IsBearish => EndPrice < StartPrice;
-        public decimal PriceChange => EndPrice - StartPrice;
-        public decimal PriceChangePercentage => StartPrice != 0 ? (PriceChange / StartPrice) * 100 : 0;
+        // BULL BEAR properties
+        public bool IsBullish { get; set; }
+        public bool IsBearish { get; set; }
 
-        // Calculated properties (moving average and Bollinger bands)
-        public decimal? MovingAverage { get; private set; }
-        public decimal? BollingerUpper { get; private set; }
-        public decimal? BollingerLower { get; private set; }
-
-        // Method to calculate Moving Average
-        public void CalculateMovingAverage(List<decimal> closingPrices)
+        // Method to set bullish or bearish status based on prices
+        public void SetBullBearStatus()
         {
-            if (closingPrices == null || closingPrices.Count == 0)
-                throw new ArgumentException("Closing prices list cannot be empty.");
-
-            MovingAverage = closingPrices.Sum() / closingPrices.Count;
+            IsBullish = EndPrice > StartPrice;
+            IsBearish = EndPrice < StartPrice;
         }
 
-        // Method to calculate Bollinger Bands
-        public void CalculateBollingerBands(List<decimal> closingPrices)
-        {
-            if (closingPrices == null || closingPrices.Count < 2)
-                throw new ArgumentException("At least 2 closing prices are required for Bollinger Bands calculation.");
+        //// Calculated Properties
+        //public decimal PriceChange => EndPrice - StartPrice;
+        //public decimal PriceChangePercentage => StartPrice != 0 ? (PriceChange / StartPrice) * 100 : 0;
 
-            CalculateMovingAverage(closingPrices);  // Ensure MovingAverage is calculated
+        //// Calculated properties (moving average and Bollinger bands)
+        //public decimal? MovingAverage { get; private set; }
+        //public decimal? BollingerUpper { get; private set; }
+        //public decimal? BollingerLower { get; private set; }
 
-            // Calculate the standard deviation
-            decimal sumOfSquares = closingPrices.Sum(price => (price - MovingAverage.Value) * (price - MovingAverage.Value));
-            decimal standardDeviation = (decimal)Math.Sqrt((double)(sumOfSquares / closingPrices.Count));
+        //// Method to calculate Moving Average
+        //public void CalculateMovingAverage(List<decimal> closingPrices)
+        //{
+        //    if (closingPrices == null || closingPrices.Count == 0)
+        //        throw new ArgumentException("Closing prices list cannot be empty.");
 
-            // Calculate upper and lower bands
-            BollingerUpper = MovingAverage + (2 * standardDeviation);
-            BollingerLower = MovingAverage - (2 * standardDeviation);
-        }
+        //    MovingAverage = closingPrices.Sum() / closingPrices.Count;
+        //}
+
+        //// Method to calculate Bollinger Bands
+        //public void CalculateBollingerBands(List<decimal> closingPrices)
+        //{
+        //    if (closingPrices == null || closingPrices.Count < 2)
+        //        throw new ArgumentException("At least 2 closing prices are required for Bollinger Bands calculation.");
+
+        //    CalculateMovingAverage(closingPrices);  // Ensure MovingAverage is calculated
+
+        //    // Calculate the standard deviation
+        //    decimal sumOfSquares = closingPrices.Sum(price => (price - MovingAverage.Value) * (price - MovingAverage.Value));
+        //    decimal standardDeviation = (decimal)Math.Sqrt((double)(sumOfSquares / closingPrices.Count));
+
+        //    // Calculate upper and lower bands
+        //    BollingerUpper = MovingAverage + (2 * standardDeviation);
+        //    BollingerLower = MovingAverage - (2 * standardDeviation);
+        //}
     }
 }
