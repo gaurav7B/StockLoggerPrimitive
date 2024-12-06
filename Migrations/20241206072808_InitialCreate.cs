@@ -57,7 +57,8 @@ namespace StockLogger.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Ticker = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Exchange = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Exchange = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CompanyName = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {

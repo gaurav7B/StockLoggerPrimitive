@@ -69,7 +69,8 @@ namespace StockLogger.Controllers
             var stockTickerExchange = new StockTickerExchange
             {
                 Ticker = stockTickerExchangeDto.Ticker.Replace(" ", ""),
-                Exchange = stockTickerExchangeDto.Exchange.Replace(" ", "")
+                Exchange = stockTickerExchangeDto.Exchange.Replace(" ", ""),
+                CompanyName = stockTickerExchangeDto.CompanyName
             };
 
             _context.StockTickerExchanges.Add(stockTickerExchange);

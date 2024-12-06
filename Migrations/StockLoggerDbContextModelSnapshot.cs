@@ -104,6 +104,10 @@ namespace StockLogger.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
+                    b.Property<string>("CompanyName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Exchange")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");

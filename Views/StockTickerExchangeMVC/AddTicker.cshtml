@@ -95,6 +95,10 @@
                 <input type="text" id="exchange" name="exchange" required />
             </div>
             <div class="form-group">
+                <label for="companyName">Company Name:</label>
+                <input type="text" id="companyName" name="companyName" required />
+            </div>
+            <div class="form-group">
                 <button type="submit">Submit</button>
             </div>
         </form>
@@ -108,10 +112,12 @@
 
             const ticker = document.getElementById("ticker").value;
             const exchange = document.getElementById("exchange").value;
+            const companyName  = document.getElementById("companyName").value;
 
             const requestData = {
                 ticker: ticker,
-                exchange: exchange
+                exchange: exchange,
+                companyName : companyName
             };
 
             try {

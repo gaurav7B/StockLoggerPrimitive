@@ -59,7 +59,6 @@
                 background-color: darkgreen;
             }
 
-        /* Updated Search Bar Styles */
         .search-bar {
             width: 80%;
             margin: 20px auto;
@@ -104,6 +103,7 @@
                     <tr>
                         <th scope="col">TICKER</th>
                         <th scope="col">EXCHANGE</th>
+                        <th scope="col">COMPANY</th>
                         <th scope="col" class="actions-column">ACTIONS</th>
                     </tr>
                 </thead>
@@ -113,6 +113,7 @@
                         <tr>
                             <td>@ticker.Ticker</td>
                             <td>@ticker.Exchange</td>
+                            <td>@ticker.CompanyName</td>
                             <td class="actions-column">
                                 <button class="btn btn-primary btn-sm">
                                     <i class="fas fa-edit"></i>
