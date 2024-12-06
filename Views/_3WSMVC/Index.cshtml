@@ -3,7 +3,6 @@
 *@
 @{
 }
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,17 +25,72 @@
         }
 
         .box {
-            background-color: #4CAF50; /* Green color */
-            height: 70px; /* Adjust for rectangle height */
+            background-color: #4CAF50;
+            height: 70px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            box-sizing: border-box;
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            border-radius: 4px;
         }
+
+        .box-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .red-box {
+            background-color: red;
+            width: 15px;
+            height: 15px;
+            margin-left: 10px;
+            border-radius: 3px;
+            opacity: 1;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .company-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
     </style>
 </head>
 <body>
     <div class="container">
         @for (int i = 1; i <= 50; i++)
         {
-            <div class="box"></div>
+            <div class="box">
+                <div class="company-name">Company Name</div>
+                <div class="box-content">
+                    <span>3WS Detected here</span>
+                    <div class="red-box" id="red-box-@i"></div>
+                </div>
+            </div>
         }
     </div>
+
+    <script>
+        // Function to toggle the visibility of the red box
+        function toggleBlinkingEffect() {
+            const redBoxes = document.querySelectorAll('.red-box');
+            redBoxes.forEach((box) => {
+                setInterval(() => {
+                    box.style.opacity = box.style.opacity == '1' ? '0' : '1';
+                }, 250); // Toggles every 500ms
+            });
+        }
+
+        // Call the function to start blinking
+        toggleBlinkingEffect();
+    </script>
 </body>
 </html>
