@@ -78,8 +78,8 @@ namespace StockLogger.BackgroundServices
                 while (DateTime.Now < endTime)
                 {
                     // Check if the current time is at the start of a new minute (00 milliseconds)
-                    //if (DateTime.Now.Second == 0)
-                    //{
+                    if (DateTime.Now.Second == 0)
+                    {
                         var response = await _httpClient.GetAsync($"https://localhost:44364/Stock/GetStockPriceByTicker?ticker={ticker}&exchange={exchange}");
 
                         if (response.IsSuccessStatusCode)
@@ -91,7 +91,7 @@ namespace StockLogger.BackgroundServices
                         {
                             _logger.LogError($"Failed to fetch stock price for {ticker}. Response: {response.StatusCode}");
                         }
-                    //}
+                    }
 
                     // Wait for a short period (e.g., 100 milliseconds) to avoid checking multiple times within the same second
                     await Task.Delay(100);
