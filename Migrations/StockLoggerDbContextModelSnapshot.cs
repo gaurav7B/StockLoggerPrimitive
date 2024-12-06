@@ -43,10 +43,10 @@ namespace StockLogger.Migrations
                     b.Property<decimal>("HighestPrice")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<bool>("IsBearish")
+                    b.Property<bool?>("IsBearish")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsBullish")
+                    b.Property<bool?>("IsBullish")
                         .HasColumnType("bit");
 
                     b.Property<decimal>("LowestPrice")

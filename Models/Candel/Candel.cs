@@ -27,8 +27,8 @@ namespace StockLogger.Models.Candel
         public string Exchange { get; set; }
 
         // BULL BEAR properties
-        public bool IsBullish { get; set; }
-        public bool IsBearish { get; set; }
+        public bool? IsBullish { get; set; }
+        public bool? IsBearish { get; set; }
 
         // Method to set bullish or bearish status based on prices
         public void SetBullBearStatus()
