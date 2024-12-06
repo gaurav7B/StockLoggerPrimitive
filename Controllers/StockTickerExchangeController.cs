@@ -30,7 +30,8 @@ namespace StockLogger.Controllers
                 .Select(x => new StockTickerExchangeDto
                 {
                     Ticker = x.Ticker,
-                    Exchange = x.Exchange
+                    Exchange = x.Exchange,
+                    CompanyName = x.CompanyName
                 })
                 .ToListAsync();
 
