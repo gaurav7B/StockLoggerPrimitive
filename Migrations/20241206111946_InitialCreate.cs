@@ -27,7 +27,9 @@ namespace StockLogger.Migrations
                     TickerId = table.Column<long>(type: "bigint", nullable: false),
                     Exchange = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsBullish = table.Column<bool>(type: "bit", nullable: false),
-                    IsBearish = table.Column<bool>(type: "bit", nullable: false)
+                    IsBearish = table.Column<bool>(type: "bit", nullable: false),
+                    PriceChange = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PriceChangePercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
                 {

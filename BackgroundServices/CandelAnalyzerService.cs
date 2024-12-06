@@ -115,6 +115,7 @@ namespace StockLogger.BackgroundServices
 
                 // Set the BullBear status based on your logic
                 CandelPayload.SetBullBearStatus();
+                CandelPayload.SetPriceChange();
 
                 // Send the POST request to save the data in the database
                 var postResponse = await _httpClient.PostAsJsonAsync("https://localhost:44364/api/Candel", CandelPayload);

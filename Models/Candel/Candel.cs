@@ -37,9 +37,16 @@ namespace StockLogger.Models.Candel
             IsBearish = EndPrice < StartPrice;
         }
 
-        //// Calculated Properties
-        //public decimal PriceChange => EndPrice - StartPrice;
-        //public decimal PriceChangePercentage => StartPrice != 0 ? (PriceChange / StartPrice) * 100 : 0;
+        // Calculated Properties
+        public decimal PriceChange { get; set; }
+        public decimal PriceChangePercentage { get; set; }
+
+        // Method to set bullish or bearish status based on prices
+        public void SetPriceChange()
+        {
+            PriceChange = EndPrice - StartPrice;
+            PriceChangePercentage = StartPrice != 0 ? (PriceChange / StartPrice) * 100 : 0;
+        }
 
         //// Calculated properties (moving average and Bollinger bands)
         //public decimal? MovingAverage { get; private set; }

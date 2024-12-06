@@ -12,7 +12,7 @@ using StockLogger.Data;
 namespace StockLogger.Migrations
 {
     [DbContext(typeof(StockLoggerDbContext))]
-    [Migration("20241206072808_InitialCreate")]
+    [Migration("20241206111946_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -57,6 +57,12 @@ namespace StockLogger.Migrations
 
                     b.Property<DateTime>("OpenTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<decimal>("PriceChange")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("PriceChangePercentage")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("StartPrice")
                         .HasColumnType("decimal(18,2)");

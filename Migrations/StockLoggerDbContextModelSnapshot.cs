@@ -55,6 +55,12 @@ namespace StockLogger.Migrations
                     b.Property<DateTime>("OpenTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<decimal>("PriceChange")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("PriceChangePercentage")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<decimal>("StartPrice")
                         .HasColumnType("decimal(18,2)");
 
