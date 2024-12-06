@@ -31,7 +31,7 @@ namespace StockLogger.BackgroundServices
 
                 var stockTasks = stocks.Select(stock => FetchStockDataAsync((int)stock.Id, stock.Ticker, stock.Exchange)); // Create tasks dynamically for each stock
                 await Task.WhenAll(stockTasks); // Process all tasks in parallel
-                await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken); // Delay of 1 sec before the next iteration
+                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken); // Delay of 1 Min before the next iteration
             }
         }
 
@@ -61,49 +61,71 @@ namespace StockLogger.BackgroundServices
             }
         }
 
-
-
-
-        private async Task FetchStockDataAsync(int Id ,string ticker, string exchange) // Methode to save the StockPricePerSec Data in the Database
+        private async Task FetchStockDataAsync(int Id, string ticker, string exchange)
         {
             try
             {
-                var response = await _httpClient.GetAsync($"https://localhost:44364/Stock/GetStockPriceByTicker?ticker={ticker}&exchange={exchange}"); // API to get the time and price on basis of TICKER
+                // Create a list to store the stock price responses
+                var stockPrices = new List<StockDataDto>();
 
-                if (response.IsSuccessStatusCode)
+                // Register the start time of the function
+                var startTime = DateTime.Now;
+
+                // Calculate the end time as one minute after the start time
+                var endTime = startTime.AddMinutes(1);
+
+                // Continue until the end time is reached
+                while (DateTime.Now < endTime)
                 {
-                    var stockData = await response.Content.ReadAsAsync<StockDataDto>();
-
-                    var CandelPayload = new Candel
+                    // Check if the current time is at the start of a new minute (00 milliseconds)
+                    if (DateTime.Now.Second == 0)
                     {
-                        StartPrice = 0,
-                        HighestPrice = 0,
-                        LowestPrice = 0,
-                        EndPrice = 0,
+                        var response = await _httpClient.GetAsync($"https://localhost:44364/Stock/GetStockPriceByTicker?ticker={ticker}&exchange={exchange}");
 
-                        OpenTime = DateTime.Now,
-                        CloseTime = DateTime.Now,
-
-                        Ticker = ticker,
-                        TickerId = Id,
-                        Exchange = exchange,
-                    };
-                    CandelPayload.SetBullBearStatus();
-
-                    // Send the POST request to save the data in the database
-                    var postResponse = await _httpClient.PostAsJsonAsync("https://localhost:44364/api/Candel", CandelPayload);
-
-                    if (!postResponse.IsSuccessStatusCode)
-                    {
-                        var errorContent = await postResponse.Content.ReadAsStringAsync();
-                        Console.WriteLine(errorContent); // Log or debug this to see the detailed error message
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var stockData = await response.Content.ReadAsAsync<StockDataDto>();
+                            stockPrices.Add(stockData); // Store the response in the list
+                        }
+                        else
+                        {
+                            _logger.LogError($"Failed to fetch stock price for {ticker}. Response: {response.StatusCode}");
+                        }
                     }
 
-                    if (postResponse.IsSuccessStatusCode)
-                    {
-                        var stockTickerExchanges = await response.Content.ReadAsAsync<IEnumerable<StockTickerExchange>>();
-                    }
+                    // Wait for a short period (e.g., 100 milliseconds) to avoid checking multiple times within the same second
+                    await Task.Delay(100);
+                }
 
+                // After collecting the data, create the Candel payload
+                var CandelPayload = new Candel
+                {
+                    StartPrice = stockPrices.FirstOrDefault()?.price ?? 0,  // Use the first price from the list or 0 if empty
+                    HighestPrice = stockPrices.Max(sp => sp.price),         // Get the highest price from the list
+                    LowestPrice = stockPrices.Min(sp => sp.price),          // Get the lowest price from the list
+                    EndPrice = stockPrices.LastOrDefault()?.price ?? 0,     // Use the last price from the list or 0 if empty
+
+                    OpenTime = startTime,
+                    CloseTime = DateTime.Now,
+
+                    Ticker = ticker,
+                    TickerId = Id,
+                    Exchange = exchange,
+                };
+
+                // Set the BullBear status based on your logic
+                CandelPayload.SetBullBearStatus();
+
+                // Send the POST request to save the data in the database
+                var postResponse = await _httpClient.PostAsJsonAsync("https://localhost:44364/api/Candel", CandelPayload);
+
+                if (postResponse.IsSuccessStatusCode)
+                {
+                    _logger.LogInformation("Candel data saved successfully.");
+                }
+                else
+                {
+                    _logger.LogError($"Failed to save Candel data. Response: {postResponse.StatusCode}");
                 }
             }
             catch (Exception ex)
@@ -111,8 +133,6 @@ namespace StockLogger.BackgroundServices
                 _logger.LogError(ex, $"An error occurred while fetching stock price for {ticker}.");
             }
         }
-
-
 
 
     }
