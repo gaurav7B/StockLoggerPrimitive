@@ -23,12 +23,12 @@ namespace StockLogger.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetStockPriceByTicker(string ticker)
+        public async Task<IActionResult> GetStockPriceByTicker(string ticker , string exchange)
         {
             var requestDto = new GetStockPriceRequestDto
             {
                 Ticker = ticker,
-                Exchange = "NSE"
+                Exchange = exchange
             };
 
             var url = $"https://www.google.com/finance/quote/{requestDto.Ticker}:{requestDto.Exchange}";

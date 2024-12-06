@@ -67,7 +67,7 @@ namespace StockLogger.BackgroundServices
             {
                 var TickerArray = new StockTickerExchange[] { };
 
-                var response = await _httpClient.GetAsync($"https://localhost:44364/Stock/GetStockPriceByTicker?ticker={ticker}"); // API to get the TICKER time and price
+                var response = await _httpClient.GetAsync($"https://localhost:44364/Stock/GetStockPriceByTicker?ticker={ticker}&exchange={exchange}"); // API to get the TICKER time and price
 
                 var TickerData = await _httpClient.GetAsync("https://localhost:44364/api/StockTickerExchange/GetStockTickerExchanges"); // API to get the list of Tickers available with there IDs
 

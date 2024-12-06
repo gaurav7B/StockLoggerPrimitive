@@ -64,7 +64,7 @@ namespace StockLogger.BackgroundServices
         {
             try
             {
-                var response = await _httpClient.GetAsync($"https://localhost:44364/Stock/GetStockPriceByTicker?ticker={ticker}"); // API to get the TICKER Price
+                var response = await _httpClient.GetAsync($"https://localhost:44364/Stock/GetStockPriceByTicker?ticker={ticker}&exchange={exchange}"); // API to get the TICKER Price
 
                 if (response.IsSuccessStatusCode)
                 {
