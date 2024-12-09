@@ -17,11 +17,33 @@ namespace StockLogger.Controllers.API_Controllers
             _context = context;
         }
 
-        // GET: api/StockPricePerSec
+        // GET: https://localhost:44364/api/StockPricePerSec
         [HttpGet]
         public async Task<ActionResult<IEnumerable<StockPricePerSec>>> GetStockPrices()
         {
             return await _context.StockPricePerSec.ToListAsync();
+        }
+
+        // GET: https://localhost:44364/api/StockPricePerSec/ByDateRange?ticker=INFY&startDate=2024-12-09 10:30:40.9553290&endDate=2024-12-09 10:38:59.0339196
+        [HttpGet("ByDateRange")]
+        public async Task<ActionResult<IEnumerable<StockPricePerSec>>> GetStockPricesByDateRange(
+            string ticker, DateTime startDate, DateTime endDate)
+        {
+            if (string.IsNullOrEmpty(ticker) || startDate == default || endDate == default)
+            {
+                return BadRequest("Invalid input parameters. Ensure ticker, startDate, and endDate are provided.");
+            }
+
+            var stockPrices = await _context.StockPricePerSec
+                .Where(sp => sp.Ticker == ticker && sp.StockDateTime >= startDate && sp.StockDateTime <= endDate)
+                .ToListAsync();
+
+            if (!stockPrices.Any())
+            {
+                return NotFound($"No stock prices found for ticker {ticker} between {startDate} and {endDate}.");
+            }
+
+            return Ok(stockPrices);
         }
 
         // GET: api/StockPricePerSec/5
