@@ -29,7 +29,7 @@ namespace StockLogger.BackgroundServices
             {
                 var stocks = (await GetStockTickerExchanges())?.Select(x => new { x.Id, x.Ticker, x.Exchange }).ToArray();
 
-                var stockTasks = stocks.Select(stock => FetchStockDataAsync((int)stock.Id, stock.Ticker, stock.Exchange)); // Create tasks dynamically for each stock
+                var stockTasks = stocks.Select(stock => CandelMaker((int)stock.Id, stock.Ticker, stock.Exchange)); // Create tasks dynamically for each stock
                 await Task.WhenAll(stockTasks); // Process all tasks in parallel
                 await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken); // Delay of 1 Min before the next iteration
             }
@@ -61,11 +61,42 @@ namespace StockLogger.BackgroundServices
             }
         }
 
-        private async Task FetchStockDataAsync(int Id, string ticker, string exchange)
+        private async Task CandelMaker(int Id, string ticker, string exchange)
         {
             try
             {
-                // Create a list to store the stock price responses
+                //// Create a list to store the stock price responses
+                //var stockPrices = new List<StockDataDto>();
+
+                //// Register the start time of the function
+                //var startTime = DateTime.Now;
+
+                //// Calculate the end time as one minute after the start time
+                //var endTime = startTime.AddMinutes(1);
+
+                //// Continue until the end time is reached
+                //while (DateTime.Now < endTime)
+                //{
+                //    // Check if the current time is at the start of a new minute (00 milliseconds)
+                //    if (DateTime.Now.Second == 0)
+                //    {
+                //        var response = await _httpClient.GetAsync($"https://localhost:44364/Stock/GetStockPriceByTicker?ticker={ticker}&exchange={exchange}");
+
+                //        if (response.IsSuccessStatusCode)
+                //        {
+                //            var stockData = await response.Content.ReadAsAsync<StockDataDto>();
+                //            stockPrices.Add(stockData); // Store the response in the list
+                //        }
+                //        else
+                //        {
+                //            _logger.LogError($"Failed to fetch stock price for {ticker}. Response: {response.StatusCode}");
+                //        }
+                //    }
+
+                //    // Wait for a short period (e.g., 100 milliseconds) to avoid checking multiple times within the same second
+                //    await Task.Delay(100);
+                //}
+
                 var stockPrices = new List<StockDataDto>();
 
                 // Register the start time of the function
@@ -77,8 +108,7 @@ namespace StockLogger.BackgroundServices
                 // Continue until the end time is reached
                 while (DateTime.Now < endTime)
                 {
-                    // Check if the current time is at the start of a new minute (00 milliseconds)
-                    if (DateTime.Now.Second == 0)
+                    try
                     {
                         var response = await _httpClient.GetAsync($"https://localhost:44364/Stock/GetStockPriceByTicker?ticker={ticker}&exchange={exchange}");
 
@@ -92,10 +122,17 @@ namespace StockLogger.BackgroundServices
                             _logger.LogError($"Failed to fetch stock price for {ticker}. Response: {response.StatusCode}");
                         }
                     }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "An error occurred while fetching stock price.");
+                    }
 
-                    // Wait for a short period (e.g., 100 milliseconds) to avoid checking multiple times within the same second
-                    await Task.Delay(100);
+                    // Wait for 1 second before the next API call
+                    await Task.Delay(1000);
                 }
+
+                // At this point, `stockPrices` contains multiple objects collected every second for 1 minute
+
 
                 // After collecting the data, create the Candel payload
                 var CandelPayload = new Candel

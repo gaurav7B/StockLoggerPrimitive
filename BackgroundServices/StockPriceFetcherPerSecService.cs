@@ -23,19 +23,48 @@ namespace StockLogger.BackgroundServices
             _httpClient = new HttpClient();
         }
 
-        // Mandatory override for the BackgroundService
+        //// Mandatory override for the BackgroundService
+        //protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        //{
+        //    while (!stoppingToken.IsCancellationRequested)
+        //    {
+        //        var stocks = (await GetStockTickerExchanges()).Select(x => new { Ticker = (string)x.Ticker, Exchange = (string)x.Exchange }).ToArray(); //got the TICKERS here using the API
+
+        //        var stockTasks = stocks.Select(stock => FetchStockDataAsync(stock.Ticker, stock.Exchange)); // Create tasks dynamically for each stock
+        //        await Task.WhenAll(stockTasks); // Process all tasks in parallel
+        //        await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);  // Delay of 1 sec before the next iteration
+        //    }
+
+        //}
+
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            while (!stoppingToken.IsCancellationRequested)
+            var timer = new System.Timers.Timer(1000); // Trigger every 1 second
+            timer.Elapsed += async (sender, e) =>
             {
-                var stocks = (await GetStockTickerExchanges()).Select(x => new { Ticker = (string)x.Ticker, Exchange = (string)x.Exchange }).ToArray(); //got the TICKERS here using the API
+                if (stoppingToken.IsCancellationRequested)
+                {
+                    timer.Stop();
+                    timer.Dispose();
+                    return;
+                }
 
-                var stockTasks = stocks.Select(stock => FetchStockDataAsync(stock.Ticker, stock.Exchange)); // Create tasks dynamically for each stock
-                await Task.WhenAll(stockTasks); // Process all tasks in parallel
-                await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken);  // Delay of 1 sec before the next iteration
-            }
+                await FetchStockPricesForAllTickers();
+            };
 
+            timer.Start();
+
+            await Task.Delay(Timeout.Infinite, stoppingToken); // Keeps the service alive
         }
+
+        private async Task FetchStockPricesForAllTickers()
+        {
+            var stocks = (await GetStockTickerExchanges()).Select(x => new { Ticker = (string)x.Ticker, Exchange = (string)x.Exchange }).ToArray();
+            var stockTasks = stocks.Select(stock => FetchStockDataAsync(stock.Ticker, stock.Exchange));
+            await Task.WhenAll(stockTasks);
+        }
+
 
         // Method to fetch stock TICKER and EXCHANGE data from the API
         private async Task<IEnumerable<dynamic>> GetStockTickerExchanges()
