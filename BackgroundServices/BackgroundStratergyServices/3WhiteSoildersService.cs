@@ -102,8 +102,8 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
                                     (recentThreeCandles[0].EndPrice - recentThreeCandles[0].StartPrice);
 
             // Check if the body is at least 60% of the total range (strong body)
-            bool strongBodyRatio = (recentThreeCandles[0].EndPrice - recentThreeCandles[0].StartPrice) /
-                                   (recentThreeCandles[0].HighestPrice - recentThreeCandles[0].LowestPrice) > 0.6m;
+            decimal range = recentThreeCandles[0].HighestPrice - recentThreeCandles[0].LowestPrice;
+            bool strongBodyRatio = range != 0 && (recentThreeCandles[0].EndPrice - recentThreeCandles[0].StartPrice) / range > 0.6m;
 
             // Check the 4th previous candle for a potential downtrend or neutral pattern
             bool priorConsolidationOrBearish = candelList.Count > 3 &&
@@ -144,7 +144,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
                             // Deserialize the response body into a list of Candel objects
                             List<Candel> candelList = await response.Content.ReadAsAsync<List<Candel>>();
 
-                            // Analyzes the recent three candels for 3 WHITE SOILDER PATTERN and adds it to the Database
+                            // Analyzes the recent four candels for 3 WHITE SOILDER PATTERN and adds it to the Database
                             ThreeWhiteSoilderAnalyzer(candelList);
 
                         }

@@ -53,9 +53,29 @@
             align-items: center;
             border: none;
             cursor: pointer;
+            margin-right: 10px; /* Added margin to create space between buttons */
         }
 
             #downloadBtn:hover {
+                background-color: darkgreen;
+            }
+
+        #uploadBtn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: green;
+            color: white;
+            font-size: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: none;
+            cursor: pointer;
+            margin-right: 0; /* No margin for the upload button */
+        }
+
+            #uploadBtn:hover {
                 background-color: darkgreen;
             }
 
@@ -82,9 +102,9 @@
                     box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
                 }
 
-            .search-bar input:focus + i {
-                color: #007BFF;
-            }
+                    .search-bar input:focus + i {
+                        color: #007BFF;
+                    }
     </style>
 </head>
 <body>
@@ -128,6 +148,9 @@
             </table>
             <button id="downloadBtn" class="mb-4">
                 <i class="fas fa-download"></i>
+            </button>
+            <button id="uploadBtn" class="mb-4">
+                <i class="fas fa-upload"></i>
             </button>
         </div>
     </div>
