@@ -79,20 +79,48 @@
     </div>
 
     <script>
-        async function fetchStockData() {
+        // Function to fetch stock data from the first API
+        async function fetchStockTickerData() {
             try {
                 const response = await fetch('https://localhost:44364/api/StockTickerExchange/GetStockTickerExchanges');
                 if (!response.ok) {
-                    throw new Error('Failed to fetch data from API');
+                    throw new Error('Failed to fetch data from StockTickerExchange API');
                 }
                 const data = await response.json();
-                console.log('Fetched Data:', data);
+                console.log('StockTickerExchange Data:', data);  // Log the response from the first API
 
-                // You can store the data in a variable for later use
-                const stockDataArray = data;
+                // Store the data in a variable for later use
+                let stockTickerData = data;  // You can use `stockTickerData` as needed
+
             } catch (error) {
-                console.error('Error fetching stock data:', error);
+                console.error('Error fetching stock ticker data:', error);
             }
+        }
+
+        // Function to fetch stock data from the second API
+        async function fetchThreeWhiteSoldierData() {
+            try {
+                const response = await fetch('https://localhost:44364/api/ThreeWhiteSoilderDb');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch data from ThreeWhiteSoilderDb API');
+                }
+                const data = await response.json();
+                console.log('ThreeWhiteSoldier Data:', data);  // Log the response from the second API
+
+                // Store the data in a variable for later use
+                let threeWhiteSoldierData = data;  // You can use `threeWhiteSoldierData` as needed
+
+            } catch (error) {
+                console.error('Error fetching ThreeWhiteSoldier data:', error);
+            }
+        }
+
+        // Function to start calling both APIs every second
+        function startFetchingData() {
+            setInterval(() => {
+                fetchStockTickerData();  // Call the first API every second
+                fetchThreeWhiteSoldierData();  // Call the second API every second
+            }, 1000); // 1000ms = 1 second
         }
 
         // Function to toggle the visibility of the red box
@@ -107,9 +135,10 @@
 
         // Run functions on page load
         document.addEventListener('DOMContentLoaded', () => {
-            fetchStockData(); // Fetch stock data
+            startFetchingData();  // Start calling both APIs every second
             toggleBlinkingEffect(); // Start blinking effect
         });
     </script>
+
 </body>
 </html>
