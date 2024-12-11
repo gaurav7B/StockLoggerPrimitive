@@ -90,16 +90,14 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
                                       recentThreeCandles[1].EndPrice > recentThreeCandles[2].EndPrice;
 
             // Check if the bodies of the candles are progressively larger
-            bool increasingBodySize = (recentThreeCandles[0].EndPrice - recentThreeCandles[0].StartPrice) >
-                                      (recentThreeCandles[1].EndPrice - recentThreeCandles[1].StartPrice) &&
-                                      (recentThreeCandles[1].EndPrice - recentThreeCandles[1].StartPrice) >
-                                      (recentThreeCandles[2].EndPrice - recentThreeCandles[2].StartPrice);
+            bool increasingBodySize = (recentThreeCandles[0].EndPrice - recentThreeCandles[0].StartPrice) > (recentThreeCandles[1].EndPrice - recentThreeCandles[1].StartPrice) 
+                                                                                                          &&
+                                      (recentThreeCandles[1].EndPrice - recentThreeCandles[1].StartPrice) > (recentThreeCandles[2].EndPrice - recentThreeCandles[2].StartPrice);
 
             // Check for small upper and lower shadows
-            bool smallUpperShadow = (recentThreeCandles[0].HighestPrice - recentThreeCandles[0].EndPrice) <
-                                    (recentThreeCandles[0].EndPrice - recentThreeCandles[0].StartPrice);
-            bool smallLowerShadow = (recentThreeCandles[0].StartPrice - recentThreeCandles[0].LowestPrice) <
-                                    (recentThreeCandles[0].EndPrice - recentThreeCandles[0].StartPrice);
+            bool smallUpperShadow = (recentThreeCandles[0].HighestPrice - recentThreeCandles[0].EndPrice) < (recentThreeCandles[0].EndPrice - recentThreeCandles[0].StartPrice);
+
+            bool smallLowerShadow = (recentThreeCandles[0].StartPrice - recentThreeCandles[0].LowestPrice) < (recentThreeCandles[0].EndPrice - recentThreeCandles[0].StartPrice);
 
             // Check if the body is at least 60% of the total range (strong body)
             decimal range = recentThreeCandles[0].HighestPrice - recentThreeCandles[0].LowestPrice;

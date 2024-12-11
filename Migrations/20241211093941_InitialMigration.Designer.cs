@@ -12,8 +12,8 @@ using StockLogger.Data;
 namespace StockLogger.Migrations
 {
     [DbContext(typeof(StockLoggerDbContext))]
-    [Migration("20241206114405_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20241211093941_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -128,6 +128,100 @@ namespace StockLogger.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("StockTickerExchanges");
+                });
+
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.ThreeWhiteSoilderCandels", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CloseTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("EndPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Exchange")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("HighestPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool?>("IsBearish")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsBullish")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("LowestPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("OpenTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("PriceChange")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("PriceChangePercentage")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("StartPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<long?>("ThreeWhiteSoilderDbId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("TickerId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ThreeWhiteSoilderDbId");
+
+                    b.ToTable("ThreeWhiteSoilderCandelss");
+                });
+
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.ThreeWhiteSoilderDb", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<bool>("IsThreeWhiteSoilderDetected")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("TickerId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ThreeWhiteSoilderDbs");
+                });
+
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.ThreeWhiteSoilderCandels", b =>
+                {
+                    b.HasOne("StockLogger.Models.Stratergic_Models.ThreeWhiteSoilderDb", null)
+                        .WithMany("ThreeWhiteSoilderCandels")
+                        .HasForeignKey("ThreeWhiteSoilderDbId");
+                });
+
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.ThreeWhiteSoilderDb", b =>
+                {
+                    b.Navigation("ThreeWhiteSoilderCandels");
                 });
 #pragma warning restore 612, 618
         }
