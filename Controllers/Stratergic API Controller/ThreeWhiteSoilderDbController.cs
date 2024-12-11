@@ -7,11 +7,11 @@ namespace StockLogger.Controllers.Stratergic_API_Controller
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ThreeWhiteSoilderController : ControllerBase
+    public class ThreeWhiteSoilderDbController : ControllerBase
     {
         private readonly StockLoggerDbContext _context;
 
-        public ThreeWhiteSoilderController(StockLoggerDbContext context)
+        public ThreeWhiteSoilderDbController(StockLoggerDbContext context)
         {
             _context = context;
         }
