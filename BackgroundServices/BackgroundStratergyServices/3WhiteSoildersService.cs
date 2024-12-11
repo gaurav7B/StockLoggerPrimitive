@@ -55,12 +55,12 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
             bool allThreeBullish = recentThreeCandles.All(c => c.IsBullish == true);
 
             // Check if the three candles close higher than the previous one
-            bool progressiveCloses = recentThreeCandles[0].EndPrice > recentThreeCandles[1].EndPrice 
+            bool progressiveCloses = recentThreeCandles[0].EndPrice > recentThreeCandles[1].EndPrice
                                                                     &&
                                      recentThreeCandles[1].EndPrice > recentThreeCandles[2].EndPrice;
 
             // Check if the bodies of the candles are progressively larger
-            bool increasingBodySize = (recentThreeCandles[0].EndPrice - recentThreeCandles[0].StartPrice) > (recentThreeCandles[1].EndPrice - recentThreeCandles[1].StartPrice) 
+            bool increasingBodySize = (recentThreeCandles[0].EndPrice - recentThreeCandles[0].StartPrice) > (recentThreeCandles[1].EndPrice - recentThreeCandles[1].StartPrice)
                                                                                                           &&
                                       (recentThreeCandles[1].EndPrice - recentThreeCandles[1].StartPrice) > (recentThreeCandles[2].EndPrice - recentThreeCandles[2].StartPrice);
 
@@ -87,6 +87,76 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
                 Console.WriteLine("Three White Soldiers Pattern Not Detected");
             }
         }
+
+
+        ////If implemented correctly and used in suitable market conditions, the accuracy
+        ////of detecting the Three White Soldiers pattern using this logic can align with the typical range of
+        ////80-85% accuracy.
+        //public async void ThreeWhiteSoilderAnalyzer(List<Candel> candelList)
+        //{
+        //    // Ensure there are at least 4 candles in the list
+        //    if (candelList.Count < 4)
+        //    {
+        //        Console.WriteLine("The list must contain at least 4 candles.");
+        //        return;
+        //    }
+
+        //    // Get the last 3 candles from the list (the most recent 3)
+        //    List<Candel> recentThreeCandles = candelList.OrderByDescending(c => c.CloseTime).Take(3).ToList();
+
+        //    // Check if all three candles are bullish
+        //    bool allThreeBullish = recentThreeCandles.All(c => c.IsBullish == true);
+
+        //    // Check if the three candles close higher than the previous one
+        //    bool progressiveCloses = recentThreeCandles[0].EndPrice > recentThreeCandles[1].EndPrice
+        //                                                            &&
+        //                             recentThreeCandles[1].EndPrice > recentThreeCandles[2].EndPrice;
+
+        //    // Check if the bodies of the candles are progressively larger
+        //    bool increasingBodySize = (recentThreeCandles[0].EndPrice - recentThreeCandles[0].StartPrice) > (recentThreeCandles[1].EndPrice - recentThreeCandles[1].StartPrice)
+        //                                                                                                  &&
+        //                              (recentThreeCandles[1].EndPrice - recentThreeCandles[1].StartPrice) > (recentThreeCandles[2].EndPrice - recentThreeCandles[2].StartPrice);
+
+
+        //    bool smallShadowsForAll = true;
+
+        //    foreach (var candle in recentThreeCandles)
+        //    {
+        //        decimal upperShadow = candle.HighestPrice - candle.EndPrice;
+        //        decimal lowerShadow = candle.StartPrice - candle.LowestPrice;
+        //        decimal bodySize = candle.EndPrice - candle.StartPrice;
+        //        decimal totalRange = candle.HighestPrice - candle.LowestPrice;
+
+        //        // Define "small" shadows as less than 20% of the total range
+        //        bool smallUpperShadow = upperShadow / totalRange < 0.2m;
+        //        bool smallLowerShadow = lowerShadow / totalRange < 0.2m;
+
+        //        if (!smallUpperShadow || !smallLowerShadow)
+        //        {
+        //            smallShadowsForAll = false;
+        //        }
+        //    }
+
+        //    // Check if the body is at least 60% of the total range (strong body)
+        //    decimal range = recentThreeCandles[0].HighestPrice - recentThreeCandles[0].LowestPrice;
+        //    bool strongBodyRatio = range != 0 && (recentThreeCandles[0].EndPrice - recentThreeCandles[0].StartPrice) / range > 0.6m;
+
+        //    // Check the 4th previous candle for a potential downtrend or neutral pattern
+        //    bool priorConsolidationOrBearish = candelList.Count > 3 &&
+        //                                       (candelList[3].IsBearish == true || candelList[3].IsBullish == false);
+
+        //    // Combine all conditions to detect the Three White Soldiers pattern
+        //    if (allThreeBullish && progressiveCloses && increasingBodySize && smallShadowsForAll &&
+        //        strongBodyRatio && priorConsolidationOrBearish)
+        //    {
+        //        Console.WriteLine("Three White Soldiers Pattern Detected");
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine("Three White Soldiers Pattern Not Detected");
+        //    }
+        //}
+
 
 
 
