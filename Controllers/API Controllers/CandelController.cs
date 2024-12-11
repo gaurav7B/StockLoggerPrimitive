@@ -79,6 +79,33 @@ namespace StockLogger.Controllers.API_Controllers
             return await _context.Candel.ToListAsync();
         }
 
+        // READ: api/candel/recent?ticker={ticker}&exchange={exchange}
+        [HttpGet("recent")]
+        public async Task<ActionResult<IEnumerable<Candel>>> GetRecentCandels(string ticker, string exchange)
+        {
+            // Validate input
+            if (string.IsNullOrEmpty(ticker) || string.IsNullOrEmpty(exchange))
+            {
+                return BadRequest("Ticker and Exchange are required.");
+            }
+
+            // Fetch the most recent 3 candels for the given ticker and exchange
+            var recentCandels = await _context.Candel
+                .Where(c => c.Ticker == ticker && c.Exchange == exchange)
+                .OrderByDescending(c => c.CloseTime)
+                .Take(4)
+                .ToListAsync();
+
+            // Check if data exists
+            if (!recentCandels.Any())
+            {
+                return NotFound("No candels found for the specified Ticker and Exchange.");
+            }
+
+            return Ok(recentCandels);
+        }
+
+
         // READ (Single Item): api/candel/{id}
         [HttpGet("{id}")]
         public async Task<ActionResult<Candel>> GetCandel(long id)
