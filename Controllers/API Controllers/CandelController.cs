@@ -20,14 +20,57 @@ namespace StockLogger.Controllers.API_Controllers
             _context = context;
         }
 
-        // CREATE: api/candel
+        //// CREATE: api/candel
+        //[HttpPost]
+        //public async Task<ActionResult<Candel>> CreateCandel(Candel candel)
+        //{
+        //    _context.Candel.Add(candel);
+        //    await _context.SaveChangesAsync();
+        //    return CreatedAtAction(nameof(GetCandel), new { id = candel.Id }, candel);
+        //}
+
+        // CREATE or UPDATE: api/candel
         [HttpPost]
-        public async Task<ActionResult<Candel>> CreateCandel(Candel candel)
+        public async Task<ActionResult<Candel>> CreateOrUpdateCandel(Candel candel)
         {
-            _context.Candel.Add(candel);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetCandel), new { id = candel.Id }, candel);
+            // Check if the Candel already exists based on unique fields (e.g., Ticker, OpenTime, CloseTime)
+            var existingCandel = await _context.Candel
+                .Where(c => c.Ticker == candel.Ticker && c.OpenTime == candel.OpenTime)
+                .FirstOrDefaultAsync();
+
+            if (existingCandel != null)
+            {
+                // If found, update the existing Candel with new data
+                existingCandel.StartPrice = candel.StartPrice;
+                existingCandel.HighestPrice = candel.HighestPrice;
+                existingCandel.LowestPrice = candel.LowestPrice;
+                existingCandel.EndPrice = candel.EndPrice;
+                existingCandel.TickerId = candel.TickerId;
+                existingCandel.Exchange = candel.Exchange;
+                existingCandel.IsBullish = candel.IsBullish;
+                existingCandel.IsBearish = candel.IsBearish;
+
+                // Recalculate the price change and set the bull/bear status again
+                existingCandel.SetPriceChange();
+                existingCandel.SetBullBearStatus();
+
+                // Save the changes
+                await _context.SaveChangesAsync();
+
+                //Return the updated Candel
+                return Ok();
+            }
+            else
+            {
+                // If no existing Candel is found, add the new Candel
+                _context.Candel.Add(candel);
+                await _context.SaveChangesAsync();
+
+                // Return the newly created Candel
+                return CreatedAtAction(nameof(GetCandel), new { id = candel.Id }, candel);
+            }
         }
+
 
         // READ: api/candel
         [HttpGet]
@@ -80,18 +123,12 @@ namespace StockLogger.Controllers.API_Controllers
             return NoContent();
         }
 
-        // DELETE: api/candel/{id}
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCandel(long id)
+        // DELETE: api/candel
+        [HttpDelete]
+        public async Task<IActionResult> DeleteCandel()
         {
-            var candel = await _context.Candel.FindAsync(id);
-            if (candel == null)
-            {
-                return NotFound();
-            }
-
-            _context.Candel.Remove(candel);
-            await _context.SaveChangesAsync();
+            // Execute raw SQL to truncate the table
+            await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE Candel");
 
             return NoContent();
         }

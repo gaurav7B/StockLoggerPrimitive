@@ -34,11 +34,17 @@ namespace StockLogger.Models.Candel
         public void SetBullBearStatus()
         {
             if (EndPrice > StartPrice)
-            { IsBullish = true; IsBearish = false; }
+            {
+                IsBullish = true; IsBearish = null;
+            }
             else if (EndPrice < StartPrice)
-            { IsBullish = false; IsBearish = true; }
+            {
+                IsBullish = null; IsBearish = true;
+            }
             else
-            { IsBullish = null; IsBearish = null; }
+            {
+                IsBullish = null; IsBearish = null;
+            }
         }
 
 

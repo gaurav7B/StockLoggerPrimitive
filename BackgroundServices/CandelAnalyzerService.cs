@@ -155,16 +155,8 @@ namespace StockLogger.BackgroundServices
                 CandelPayload.SetPriceChange();
 
                 // Send the POST request to save the data in the database
-                var postResponse = await _httpClient.PostAsJsonAsync("https://localhost:44364/api/Candel", CandelPayload);
+                //var postResponse = await _httpClient.PostAsJsonAsync("https://localhost:44364/api/Candel", CandelPayload);
 
-                if (postResponse.IsSuccessStatusCode)
-                {
-                    _logger.LogInformation("Candel data saved successfully.");
-                }
-                else
-                {
-                    _logger.LogError($"Failed to save Candel data. Response: {postResponse.StatusCode}");
-                }
             }
             catch (Exception ex)
             {

@@ -12,10 +12,12 @@ builder.Services.AddControllersWithViews()
 builder.Services.AddDbContext<StockLoggerDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("StockLoggerDbConnection")));
 
-
+//builder.Services.AddHostedService<CandelAnalyzerService>();
+//builder.Services.AddHostedService<CandelMakerService>();
 builder.Services.AddHostedService<StockPriceFetcherService>();
 builder.Services.AddHostedService<StockPriceFetcherPerSecService>();
-builder.Services.AddHostedService<CandelAnalyzerService>();
+builder.Services.AddHostedService<CandelMakerWithPriceCallEvery30sec>();
+
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
