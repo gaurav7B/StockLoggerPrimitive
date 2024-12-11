@@ -79,8 +79,9 @@ namespace StockLogger.Controllers.API_Controllers
             return await _context.Candel.ToListAsync();
         }
 
-        // READ: api/candel/recent?ticker={ticker}&exchange={exchange}
-        [HttpGet("recent")]
+        //For 3 WHITE SOILDER PATTERN
+        // READ: api/candel/recentThree?ticker={ticker}&exchange={exchange}
+        [HttpGet("recentThree")]
         public async Task<ActionResult<IEnumerable<Candel>>> GetRecentCandels(string ticker, string exchange)
         {
             // Validate input
@@ -104,6 +105,35 @@ namespace StockLogger.Controllers.API_Controllers
 
             return Ok(recentCandels);
         }
+
+
+        //For CUP AND HANDEL 
+        // READ: api/candel/recentTen?ticker={ticker}&exchange={exchange}
+        [HttpGet("recentTen")]
+        public async Task<ActionResult<IEnumerable<Candel>>> GetRecentTenCandels(string ticker, string exchange)
+        {
+            // Validate input
+            if (string.IsNullOrEmpty(ticker) || string.IsNullOrEmpty(exchange))
+            {
+                return BadRequest("Ticker and Exchange are required.");
+            }
+
+            // Fetch the most recent 3 candels for the given ticker and exchange
+            var recentCandels = await _context.Candel
+                .Where(c => c.Ticker == ticker && c.Exchange == exchange)
+                .OrderByDescending(c => c.CloseTime)
+                .Take(10)
+                .ToListAsync();
+
+            // Check if data exists
+            if (!recentCandels.Any())
+            {
+                return NotFound("No candels found for the specified Ticker and Exchange.");
+            }
+
+            return Ok(recentCandels);
+        }
+
 
 
         // READ (Single Item): api/candel/{id}

@@ -34,42 +34,6 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
             }
         }
 
-
-        //public async void ThreeWhiteSoilderAnalyzer(List<Candel> candelList)
-        //{
-        //    // Ensure there are at least 3 candles in the list
-        //    if (candelList.Count < 3)
-        //    {
-        //        Console.WriteLine("The list must contain at least 3 candles.");
-        //        return;
-        //    }
-
-        //    // Get the last 3 candles from the list (the most recent 3)
-        //    List<Candel> recentThreeCandles = candelList.OrderByDescending(c => c.CloseTime).Take(3).ToList();
-
-        //    // Check if all three candles are bullish
-        //    bool allThreeBullish = recentThreeCandles.All(c => c.IsBullish == true);
-
-        //    // Check if the three candles close higher than the previous one
-        //    bool progressiveCloses = recentThreeCandles[0].EndPrice > recentThreeCandles[1].EndPrice &&
-        //                              recentThreeCandles[1].EndPrice > recentThreeCandles[2].EndPrice;
-
-        //    // Check if the bodies of the candles are progressively larger
-        //    bool increasingBodySize = (recentThreeCandles[0].EndPrice - recentThreeCandles[0].StartPrice) >
-        //                              (recentThreeCandles[1].EndPrice - recentThreeCandles[1].StartPrice) &&
-        //                              (recentThreeCandles[1].EndPrice - recentThreeCandles[1].StartPrice) >
-        //                              (recentThreeCandles[2].EndPrice - recentThreeCandles[2].StartPrice);
-
-        //    if (allThreeBullish && progressiveCloses && increasingBodySize)
-        //    {
-        //        Console.WriteLine("Three White Soldiers Pattern Detected");
-        //    }
-        //    else
-        //    {
-        //        Console.WriteLine("Three White Soldiers Pattern Not Detected");
-        //    }
-        //}
-
         public async void ThreeWhiteSoilderAnalyzer(List<Candel> candelList)
         {
             // Ensure there are at least 4 candles in the list
@@ -86,8 +50,9 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
             bool allThreeBullish = recentThreeCandles.All(c => c.IsBullish == true);
 
             // Check if the three candles close higher than the previous one
-            bool progressiveCloses = recentThreeCandles[0].EndPrice > recentThreeCandles[1].EndPrice &&
-                                      recentThreeCandles[1].EndPrice > recentThreeCandles[2].EndPrice;
+            bool progressiveCloses = recentThreeCandles[0].EndPrice > recentThreeCandles[1].EndPrice 
+                                                                    &&
+                                     recentThreeCandles[1].EndPrice > recentThreeCandles[2].EndPrice;
 
             // Check if the bodies of the candles are progressively larger
             bool increasingBodySize = (recentThreeCandles[0].EndPrice - recentThreeCandles[0].StartPrice) > (recentThreeCandles[1].EndPrice - recentThreeCandles[1].StartPrice) 
@@ -96,7 +61,6 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
 
             // Check for small upper and lower shadows
             bool smallUpperShadow = (recentThreeCandles[0].HighestPrice - recentThreeCandles[0].EndPrice) < (recentThreeCandles[0].EndPrice - recentThreeCandles[0].StartPrice);
-
             bool smallLowerShadow = (recentThreeCandles[0].StartPrice - recentThreeCandles[0].LowestPrice) < (recentThreeCandles[0].EndPrice - recentThreeCandles[0].StartPrice);
 
             // Check if the body is at least 60% of the total range (strong body)
@@ -135,7 +99,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
                     try
                     {
                         // Send GET request to the API endpoint
-                        var response = await _httpClient.GetAsync($"https://localhost:44364/api/candel/recent?ticker={ticker}&exchange={exchange}");
+                        var response = await _httpClient.GetAsync($"https://localhost:44364/api/candel/recentThree?ticker={ticker}&exchange={exchange}");
 
                         if (response.IsSuccessStatusCode)
                         {

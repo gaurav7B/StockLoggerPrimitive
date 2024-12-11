@@ -10,6 +10,7 @@ namespace StockLogger.Models.Stratergic_Models
 
         public string Ticker { get; set; }
         public long TickerId { get; set; }
+        public string Exchange { get; set; }
 
         public bool IsThreeWhiteSoilderDetected { get; set; }
 

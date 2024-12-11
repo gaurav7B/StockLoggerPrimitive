@@ -75,6 +75,7 @@ namespace StockLogger.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Ticker = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TickerId = table.Column<long>(type: "bigint", nullable: false),
+                    Exchange = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsThreeWhiteSoilderDetected = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>

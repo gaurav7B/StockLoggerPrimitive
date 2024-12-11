@@ -12,7 +12,7 @@ using StockLogger.Data;
 namespace StockLogger.Migrations
 {
     [DbContext(typeof(StockLoggerDbContext))]
-    [Migration("20241211093941_InitialMigration")]
+    [Migration("20241211102348_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -196,6 +196,10 @@ namespace StockLogger.Migrations
                         .HasColumnType("bigint");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Exchange")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsThreeWhiteSoilderDetected")
                         .HasColumnType("bit");
