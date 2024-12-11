@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using StockLogger.BackgroundServices;
+using StockLogger.BackgroundServices.BackgroundStratergyServices;
 using StockLogger.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +18,7 @@ builder.Services.AddDbContext<StockLoggerDbContext>(options =>
 builder.Services.AddHostedService<StockPriceFetcherService>();
 builder.Services.AddHostedService<StockPriceFetcherPerSecService>();
 builder.Services.AddHostedService<CandelMakerWithPriceCallEvery30sec>();
+builder.Services.AddHostedService<_3WhiteSoildersService>();
 
 
 // Add services to the container.
