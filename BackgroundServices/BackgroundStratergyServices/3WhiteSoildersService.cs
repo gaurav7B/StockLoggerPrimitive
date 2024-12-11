@@ -2,6 +2,7 @@
 using StockLogger.Helpers;
 using StockLogger.Models.Candel;
 using StockLogger.Models.DTO;
+using StockLogger.Models.Stratergic_Models;
 using System.Diagnostics;
 using System.Text.Json;
 
@@ -34,7 +35,38 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
             }
         }
 
+        public async void PostData(List<Candel> recentThreeCandles)
+        {
+            // Map Candel objects to ThreeWhiteSoilderCandels
+            List<ThreeWhiteSoilderCandels> threeWhiteSoilderCandels = recentThreeCandles.Select(c => new ThreeWhiteSoilderCandels
+            {
+                Id = c.Id,
+                StartPrice = c.StartPrice,
+                HighestPrice = c.HighestPrice,
+                LowestPrice = c.LowestPrice,
+                EndPrice = c.EndPrice,
+                OpenTime = c.OpenTime,
+                CloseTime = c.CloseTime,
+                Ticker = c.Ticker,
+                TickerId = c.TickerId,
+                Exchange = c.Exchange,
+                IsBullish = c.IsBullish,
+                IsBearish = c.IsBearish,
+                PriceChange = c.PriceChange,
+                PriceChangePercentage = c.PriceChangePercentage
+            }).ToList();
 
+            var ThreeWhiteSoilderDetectedPayload = new ThreeWhiteSoilderDb
+            {
+                Ticker = recentThreeCandles[0].Ticker,
+                TickerId = recentThreeCandles[0].TickerId,
+                Exchange = recentThreeCandles[0].Exchange,
+                IsThreeWhiteSoilderDetected = true,
+                ThreeWhiteSoilderCandels = threeWhiteSoilderCandels,
+            };
+
+            var response = await _httpClient.PostAsJsonAsync("https://localhost:44364/api/ThreeWhiteSoilderDb", ThreeWhiteSoilderDetectedPayload);
+        }
 
         //If implemented correctly and used in suitable market conditions, the accuracy
         //of detecting the Three White Soldiers pattern using this logic can align with the typical range of
@@ -80,7 +112,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
             if (allThreeBullish && progressiveCloses && increasingBodySize && smallUpperShadow && smallLowerShadow &&
                 strongBodyRatio && priorConsolidationOrBearish)
             {
-                Console.WriteLine("Three White Soldiers Pattern Detected");
+                PostData(recentThreeCandles); // Post Data to DB
             }
             else
             {
@@ -149,6 +181,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
         //    if (allThreeBullish && progressiveCloses && increasingBodySize && smallShadowsForAll &&
         //        strongBodyRatio && priorConsolidationOrBearish)
         //    {
+        //        PostData(recentThreeCandles); // Post Data to DB
         //        Console.WriteLine("Three White Soldiers Pattern Detected");
         //    }
         //    else
@@ -156,9 +189,6 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
         //        Console.WriteLine("Three White Soldiers Pattern Not Detected");
         //    }
         //}
-
-
-
 
 
 
