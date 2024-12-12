@@ -15,11 +15,14 @@ builder.Services.AddDbContext<StockLoggerDbContext>(options =>
 
 //builder.Services.AddHostedService<CandelAnalyzerService>();
 //builder.Services.AddHostedService<CandelMakerService>();
-builder.Services.AddHostedService<StockPriceFetcherService>();
-builder.Services.AddHostedService<StockPriceFetcherPerSecService>();
+
+//builder.Services.AddHostedService<StockPriceFetcherPerSecService>();
+
+//builder.Services.AddHostedService<StockPriceFetcherService>();
+
 builder.Services.AddHostedService<CandelMakerWithPriceCallEvery30sec>();
 builder.Services.AddHostedService<_3WhiteSoildersService>();
-builder.Services.AddHostedService<CupAndHandelService>();
+//builder.Services.AddHostedService<CupAndHandelService>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

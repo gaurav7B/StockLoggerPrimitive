@@ -3,6 +3,8 @@ using StockLogger.Models.DTO;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.Json;
+using Polly;
+using Polly.Retry;
 
 namespace StockLogger.BackgroundServices
 {
@@ -129,6 +131,15 @@ namespace StockLogger.BackgroundServices
             {
                 if(stockList.Count > 58)
                 {
+                    // Get the last object in the stockList
+                    var lastStock = stockList.Last();
+
+                    // Check if the second of the StockDateTime is 59
+                    if (lastStock.StockDateTime.Second != 59)
+                    {
+                        return;
+                    }
+
                     List<Candel> CandelList = new List<Candel>();
 
                     firstStockPrice = GetFirstStockPrice(stockList);
@@ -159,7 +170,13 @@ namespace StockLogger.BackgroundServices
 
                     foreach (Candel CurrentCandel in CandelList)
                     {
-                        await _httpClient.PostAsJsonAsync("https://localhost:44364/api/Candel", CurrentCandel);
+                        //await _httpClient.PostAsJsonAsync("https://localhost:44364/api/Candel", CurrentCandel);
+                        var retryPolicy = Policy.Handle<TaskCanceledException>()
+                                   .Or<TimeoutException>()
+                                   .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+
+                        await retryPolicy.ExecuteAsync(() =>
+                            _httpClient.PostAsJsonAsync("https://localhost:44364/api/Candel", CurrentCandel));
                     }
 
                     firstStockPrice = null;
