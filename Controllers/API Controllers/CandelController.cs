@@ -20,56 +20,67 @@ namespace StockLogger.Controllers.API_Controllers
             _context = context;
         }
 
-        //// CREATE: api/candel
-        //[HttpPost]
-        //public async Task<ActionResult<Candel>> CreateCandel(Candel candel)
-        //{
-        //    _context.Candel.Add(candel);
-        //    await _context.SaveChangesAsync();
-        //    return CreatedAtAction(nameof(GetCandel), new { id = candel.Id }, candel);
-        //}
-
-        // CREATE or UPDATE: api/candel
         [HttpPost]
-        public async Task<ActionResult<Candel>> CreateOrUpdateCandel(Candel candel)
+        public async Task<ActionResult<Candel>> CreateCandel(Candel candel)
         {
-            // Check if the Candel already exists based on unique fields (e.g., Ticker, OpenTime, CloseTime)
+            // Check if a candel with the same CloseTime already exists
             var existingCandel = await _context.Candel
-                .Where(c => c.Ticker == candel.Ticker && c.OpenTime == candel.OpenTime)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(c => c.CloseTime == candel.CloseTime);
 
             if (existingCandel != null)
             {
-                // If found, update the existing Candel with new data
-                existingCandel.StartPrice = candel.StartPrice;
-                existingCandel.HighestPrice = candel.HighestPrice;
-                existingCandel.LowestPrice = candel.LowestPrice;
-                existingCandel.EndPrice = candel.EndPrice;
-                existingCandel.TickerId = candel.TickerId;
-                existingCandel.Exchange = candel.Exchange;
-                existingCandel.IsBullish = candel.IsBullish;
-                existingCandel.IsBearish = candel.IsBearish;
-
-                // Recalculate the price change and set the bull/bear status again
-                existingCandel.SetPriceChange();
-                existingCandel.SetBullBearStatus();
-
-                // Save the changes
-                await _context.SaveChangesAsync();
-
-                //Return the updated Candel
-                return Ok();
+                // Return a conflict response or bad request
+                return Conflict(new { message = "A candel with the same CloseTime already exists." });
             }
-            else
-            {
-                // If no existing Candel is found, add the new Candel
-                _context.Candel.Add(candel);
-                await _context.SaveChangesAsync();
 
-                // Return the newly created Candel
-                return CreatedAtAction(nameof(GetCandel), new { id = candel.Id }, candel);
-            }
+            // If not present, add the new candel
+            _context.Candel.Add(candel);
+            await _context.SaveChangesAsync();
+            return CreatedAtAction(nameof(GetCandel), new { id = candel.Id }, candel);
         }
+
+
+        //// CREATE or UPDATE: api/candel
+        //[HttpPost]
+        //public async Task<ActionResult<Candel>> CreateOrUpdateCandel(Candel candel)
+        //{
+        //    // Check if the Candel already exists based on unique fields (e.g., Ticker, OpenTime, CloseTime)
+        //    var existingCandel = await _context.Candel
+        //        .Where(c => c.Ticker == candel.Ticker && c.OpenTime == candel.OpenTime)
+        //        .FirstOrDefaultAsync();
+
+        //    if (existingCandel != null)
+        //    {
+        //        // If found, update the existing Candel with new data
+        //        existingCandel.StartPrice = candel.StartPrice;
+        //        existingCandel.HighestPrice = candel.HighestPrice;
+        //        existingCandel.LowestPrice = candel.LowestPrice;
+        //        existingCandel.EndPrice = candel.EndPrice;
+        //        existingCandel.TickerId = candel.TickerId;
+        //        existingCandel.Exchange = candel.Exchange;
+        //        existingCandel.IsBullish = candel.IsBullish;
+        //        existingCandel.IsBearish = candel.IsBearish;
+
+        //        // Recalculate the price change and set the bull/bear status again
+        //        existingCandel.SetPriceChange();
+        //        existingCandel.SetBullBearStatus();
+
+        //        // Save the changes
+        //        await _context.SaveChangesAsync();
+
+        //        //Return the updated Candel
+        //        return Ok();
+        //    }
+        //    else
+        //    {
+        //        // If no existing Candel is found, add the new Candel
+        //        _context.Candel.Add(candel);
+        //        await _context.SaveChangesAsync();
+
+        //        // Return the newly created Candel
+        //        return CreatedAtAction(nameof(GetCandel), new { id = candel.Id }, candel);
+        //    }
+        //}
 
 
         // READ: api/candel

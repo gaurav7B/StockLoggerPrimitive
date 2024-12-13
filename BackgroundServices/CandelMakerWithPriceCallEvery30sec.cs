@@ -127,25 +127,43 @@ namespace StockLogger.BackgroundServices
             long Id = 0;
             string exchange = null;
 
-            foreach (List<StockPricePerSec> stockList in soretedArray)
+
+            // Assuming each inner list represents stock prices for a specific ticker or interval
+            if (soretedArray == null || soretedArray.Count == 0)
             {
-                if(stockList.Count > 58)
-                {
+                Console.WriteLine("The sorted array is empty or null.");
+                return;
+            }
+
+            // Extracting the last list from the sorted array
+            var lastList = soretedArray.Last();
+
+            //if (lastList == null || lastList.Count == 0)
+            //{
+            //    Console.WriteLine("The last list in the array is empty or null.");
+            //    return;
+            //}
+
+            //// Extracting the last stock price from the last list
+            //var lastStockPriceMain = lastList.Last();
+
+            //foreach (List<StockPricePerSec> stockList in soretedArray)
+            //{
                     // Get the last object in the stockList
-                    var lastStock = stockList.Last();
+                    var lastStock = lastList.Last();
 
                     // Check if the second of the StockDateTime is 59
-                    if (lastStock.StockDateTime.Second != 59)
+                    if (lastStock.StockDateTime.Second < 59)
                     {
                         return;
                     }
 
                     List<Candel> CandelList = new List<Candel>();
 
-                    firstStockPrice = GetFirstStockPrice(stockList);
-                    highestStockPrice = GetHighestStockPrice(stockList);
-                    lowestStockPrice = GetLowestStockPrice(stockList);
-                    lastStockPrice = GetLastStockPrice(stockList);
+                    firstStockPrice = GetFirstStockPrice(lastList);
+                    highestStockPrice = GetHighestStockPrice(lastList);
+                    lowestStockPrice = GetLowestStockPrice(lastList);
+                    lastStockPrice = GetLastStockPrice(lastList);
 
                     var CandelPayLoad = new Candel
                     {
@@ -189,8 +207,8 @@ namespace StockLogger.BackgroundServices
                 }
 
 
-            }
-        }
+            
+        //}
 
 
         private async Task CandelMaker(int Id, string ticker, string exchange)
