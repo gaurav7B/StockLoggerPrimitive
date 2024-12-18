@@ -24,6 +24,120 @@ namespace StockLogger.Controllers.API_Controllers
             return await _context.StockPricePerSec.ToListAsync();
         }
 
+        [HttpGet("by-datetime1")]
+        public async Task<ActionResult<IEnumerable<StockPricePerSec>>> GetStockPricesByDateTimeAndTicker(
+            [FromQuery] DateTime datetime,
+            [FromQuery] string ticker)
+        {
+            Console.WriteLine($"Received datetime: {datetime}, Ticker: {ticker}"); // Log for debugging
+
+            var targetDate = datetime.Date;
+            var targetHour = datetime.Hour;
+            var targetMinute = datetime.Minute;
+
+            var query = _context.StockPricePerSec
+                .Where(sp => sp.StockDateTime.Date == targetDate &&
+                             sp.StockDateTime.Hour == targetHour &&
+                             sp.StockDateTime.Minute == targetMinute &&
+                             sp.StockDateTime.Second == 59);
+
+            // Apply ticker filter if provided
+            if (!string.IsNullOrEmpty(ticker))
+            {
+                query = query.Where(sp => sp.Ticker == ticker);
+            }
+
+            var result = await query.ToListAsync();
+
+            return Ok(result);
+        }
+
+        [HttpGet("by-datetime2")]
+        public async Task<ActionResult<IEnumerable<StockPricePerSec>>> GetStockPricesByDateTimeAndTicker2(
+    [FromQuery] DateTime datetime,
+    [FromQuery] string ticker)
+        {
+            Console.WriteLine($"Received datetime: {datetime}, Ticker: {ticker}"); // Log for debugging
+
+            var targetDate = datetime.Date;
+            var targetHour = datetime.Hour;
+            var targetMinute = datetime.Minute;
+
+            var query = _context.StockPricePerSec
+                .Where(sp => sp.StockDateTime.Date == targetDate &&
+                             sp.StockDateTime.Hour == targetHour &&
+                             sp.StockDateTime.Minute == targetMinute &&
+                             sp.StockDateTime.Second == 59);
+
+            // Apply ticker filter if provided
+            if (!string.IsNullOrEmpty(ticker))
+            {
+                query = query.Where(sp => sp.Ticker == ticker);
+            }
+
+            var result = await query.ToListAsync();
+
+            return Ok(result);
+        }
+
+        [HttpGet("by-datetime3")]
+        public async Task<ActionResult<IEnumerable<StockPricePerSec>>> GetStockPricesByDateTimeAndTicker3(
+    [FromQuery] DateTime datetime,
+    [FromQuery] string ticker)
+        {
+            Console.WriteLine($"Received datetime: {datetime}, Ticker: {ticker}"); // Log for debugging
+
+            var targetDate = datetime.Date;
+            var targetHour = datetime.Hour;
+            var targetMinute = datetime.Minute;
+
+            var query = _context.StockPricePerSec
+                .Where(sp => sp.StockDateTime.Date == targetDate &&
+                             sp.StockDateTime.Hour == targetHour &&
+                             sp.StockDateTime.Minute == targetMinute &&
+                             sp.StockDateTime.Second == 59);
+
+            // Apply ticker filter if provided
+            if (!string.IsNullOrEmpty(ticker))
+            {
+                query = query.Where(sp => sp.Ticker == ticker);
+            }
+
+            var result = await query.ToListAsync();
+
+            return Ok(result);
+        }
+
+        [HttpGet("by-datetime4")]
+        public async Task<ActionResult<IEnumerable<StockPricePerSec>>> GetStockPricesByDateTimeAndTicker4(
+    [FromQuery] DateTime datetime,
+    [FromQuery] string ticker)
+        {
+            Console.WriteLine($"Received datetime: {datetime}, Ticker: {ticker}"); // Log for debugging
+
+            var targetDate = datetime.Date;
+            var targetHour = datetime.Hour;
+            var targetMinute = datetime.Minute;
+
+            var query = _context.StockPricePerSec
+                .Where(sp => sp.StockDateTime.Date == targetDate &&
+                             sp.StockDateTime.Hour == targetHour &&
+                             sp.StockDateTime.Minute == targetMinute &&
+                             sp.StockDateTime.Second == 59);
+
+            // Apply ticker filter if provided
+            if (!string.IsNullOrEmpty(ticker))
+            {
+                query = query.Where(sp => sp.Ticker == ticker);
+            }
+
+            var result = await query.ToListAsync();
+
+            return Ok(result);
+        }
+
+
+
         // GET: https://localhost:44364/api/StockPricePerSec/ByDateRange?ticker=INFY&startDate=2024-12-09 10:30:40.9553290&endDate=2024-12-09 10:38:59.0339196
         [HttpGet("ByDateRange")]
         public async Task<ActionResult<IEnumerable<StockPricePerSec>>> GetStockPricesByDateRange(

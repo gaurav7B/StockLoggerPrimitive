@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace StockLogger.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -34,6 +34,81 @@ namespace StockLogger.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Candel", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Candel10min",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StartPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    HighestPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    LowestPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    EndPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    OpenTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CloseTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Ticker = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TickerId = table.Column<long>(type: "bigint", nullable: false),
+                    Exchange = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsBullish = table.Column<bool>(type: "bit", nullable: true),
+                    IsBearish = table.Column<bool>(type: "bit", nullable: true),
+                    PriceChange = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PriceChangePercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Candel10min", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Candel15min",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StartPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    HighestPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    LowestPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    EndPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    OpenTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CloseTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Ticker = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TickerId = table.Column<long>(type: "bigint", nullable: false),
+                    Exchange = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsBullish = table.Column<bool>(type: "bit", nullable: true),
+                    IsBearish = table.Column<bool>(type: "bit", nullable: true),
+                    PriceChange = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PriceChangePercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Candel15min", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Candel5min",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StartPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    HighestPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    LowestPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    EndPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    OpenTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CloseTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Ticker = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TickerId = table.Column<long>(type: "bigint", nullable: false),
+                    Exchange = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsBullish = table.Column<bool>(type: "bit", nullable: true),
+                    IsBearish = table.Column<bool>(type: "bit", nullable: true),
+                    PriceChange = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PriceChangePercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Candel5min", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -125,6 +200,15 @@ namespace StockLogger.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Candel");
+
+            migrationBuilder.DropTable(
+                name: "Candel10min");
+
+            migrationBuilder.DropTable(
+                name: "Candel15min");
+
+            migrationBuilder.DropTable(
+                name: "Candel5min");
 
             migrationBuilder.DropTable(
                 name: "StockPricePerSec");

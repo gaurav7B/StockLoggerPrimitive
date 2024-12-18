@@ -60,11 +60,11 @@ namespace StockLogger.BackgroundServices
 
         private async Task FetchStockPricesForAllTickers()
         {
-            var stocks = (await GetStockTickerExchanges()).Select(x => new { Ticker = (string)x.Ticker, Exchange = (string)x.Exchange }).ToArray();
-            //            var stocks = (await GetStockTickerExchanges() ?? Enumerable.Empty<dynamic>())
-            //.Where(x => x.Ticker != null && x.Exchange != null)
-            //.Select(x => new { Ticker = (string)x.Ticker, Exchange = (string)x.Exchange })
-            //.ToArray();
+            //var stocks = (await GetStockTickerExchanges()).Select(x => new { Ticker = (string)x.Ticker, Exchange = (string)x.Exchange }).ToArray();
+            var stocks = (await GetStockTickerExchanges() ?? Enumerable.Empty<dynamic>())
+            .Where(x => x.Ticker != null && x.Exchange != null)
+            .Select(x => new { Ticker = (string)x.Ticker, Exchange = (string)x.Exchange })
+            .ToArray();
             var stockTasks = stocks.Select(stock => FetchStockDataAsync(stock.Ticker, stock.Exchange));
             await Task.WhenAll(stockTasks);
         }

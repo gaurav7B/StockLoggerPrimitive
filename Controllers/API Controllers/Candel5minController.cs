@@ -11,19 +11,20 @@ namespace StockLogger.Controllers.API_Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CandelController : ControllerBase
+    public class Candel5minController : ControllerBase
     {
         private readonly StockLoggerDbContext _context;
 
-        public CandelController(StockLoggerDbContext context)
+        public Candel5minController(StockLoggerDbContext context)
         {
             _context = context;
         }
 
+
         [HttpPost]
-        public async Task<ActionResult<Candel>> CreateCandel(Candel candel)
+        public async Task<ActionResult<Candel5min>> CreateCandel(Candel5min candel)
         {
-            var existingCandel = await _context.Candel
+            var existingCandel = await _context.Candel5min
                 .FirstOrDefaultAsync(c =>
                     c.StartPrice == candel.StartPrice &&
                     c.HighestPrice == candel.HighestPrice &&
@@ -36,9 +37,9 @@ namespace StockLogger.Controllers.API_Controllers
                     c.Exchange == candel.Exchange
                 );
 
-            var matchingCandles = await _context.Candel
-           .Where(c => c.Ticker == candel.Ticker 
-                    && c.CloseTime.Hour == DateTime.Now.Hour 
+            var matchingCandles = await _context.Candel5min
+           .Where(c => c.Ticker == candel.Ticker
+                    && c.CloseTime.Hour == DateTime.Now.Hour
                     && c.CloseTime.Minute == 59)
            .ToListAsync();
 
@@ -53,20 +54,20 @@ namespace StockLogger.Controllers.API_Controllers
             }
 
             // If no duplicate, add the new candel
-            _context.Candel.Add(candel);
+            _context.Candel5min.Add(candel);
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetCandel), new { id = candel.Id }, candel);
         }
 
         // READ: api/candel
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Candel>>> GetCandels()
+        public async Task<ActionResult<IEnumerable<Candel5min>>> GetCandels()
         {
-            return await _context.Candel.ToListAsync();
+            return await _context.Candel5min.ToListAsync();
         }
 
         [HttpGet("recentThree")]
-        public async Task<ActionResult<IEnumerable<Candel>>> GetRecentCandels(string ticker, string exchange)
+        public async Task<ActionResult<IEnumerable<Candel5min>>> GetRecentCandels(string ticker, string exchange)
         {
             // Validate input
             if (string.IsNullOrEmpty(ticker) || string.IsNullOrEmpty(exchange))
@@ -75,7 +76,7 @@ namespace StockLogger.Controllers.API_Controllers
             }
 
             // Fetch the most recent 3 distinct candels based on CloseTime for the given ticker and exchange
-            var recentCandels = await _context.Candel
+            var recentCandels = await _context.Candel5min
                 .Where(c => c.Ticker == ticker && c.Exchange == exchange)
                 .GroupBy(c => c.OpenTime)
                 .OrderByDescending(g => g.Key) // Ordering by CloseTime
@@ -95,9 +96,9 @@ namespace StockLogger.Controllers.API_Controllers
 
 
         //For CUP AND HANDEL 
-        // READ: api/candel/recentTen?ticker={ticker}&exchange={exchange}
+        // READ: api/Candel5min/recentTen?ticker={ticker}&exchange={exchange}
         [HttpGet("recentTen")]
-        public async Task<ActionResult<IEnumerable<Candel>>> GetRecentTenCandels(string ticker, string exchange)
+        public async Task<ActionResult<IEnumerable<Candel5min>>> GetRecentTenCandels(string ticker, string exchange)
         {
             // Validate input
             if (string.IsNullOrEmpty(ticker) || string.IsNullOrEmpty(exchange))
@@ -106,7 +107,7 @@ namespace StockLogger.Controllers.API_Controllers
             }
 
             // Fetch the most recent 3 candels for the given ticker and exchange
-            var recentCandels = await _context.Candel
+            var recentCandels = await _context.Candel5min
                 .Where(c => c.Ticker == ticker && c.Exchange == exchange)
                 .OrderByDescending(c => c.CloseTime)
                 .Take(10)
@@ -123,11 +124,11 @@ namespace StockLogger.Controllers.API_Controllers
 
 
 
-        // READ (Single Item): api/candel/{id}
+        // READ (Single Item): api/Candel5min/{id}
         [HttpGet("{id}")]
-        public async Task<ActionResult<Candel>> GetCandel(long id)
+        public async Task<ActionResult<Candel5min>> GetCandel(long id)
         {
-            var candel = await _context.Candel.FindAsync(id);
+            var candel = await _context.Candel5min.FindAsync(id);
 
             if (candel == null)
             {
@@ -137,9 +138,9 @@ namespace StockLogger.Controllers.API_Controllers
             return candel;
         }
 
-        // UPDATE: api/candel/{id}
+        // UPDATE: api/Candel5min/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCandel(long id, Candel candel)
+        public async Task<IActionResult> UpdateCandel(long id, Candel5min candel)
         {
             if (id != candel.Id)
             {
@@ -172,14 +173,15 @@ namespace StockLogger.Controllers.API_Controllers
         public async Task<IActionResult> DeleteCandel()
         {
             // Execute raw SQL to truncate the table
-            await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE Candel");
+            await _context.Database.ExecuteSqlRawAsync("TRUNCATE TABLE Candel5min");
 
             return NoContent();
         }
 
         private bool CandelExists(long id)
         {
-            return _context.Candel.Any(e => e.Id == id);
+            return _context.Candel5min.Any(e => e.Id == id);
         }
+
     }
 }

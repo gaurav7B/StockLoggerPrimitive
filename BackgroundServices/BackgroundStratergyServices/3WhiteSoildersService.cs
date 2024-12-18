@@ -62,7 +62,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
                 TickerId = recentThreeCandles[0].TickerId,
                 Exchange = recentThreeCandles[0].Exchange,
                 IsThreeWhiteSoilderDetected = true,
-                ThreeWhiteSoilderCandels = threeWhiteSoilderCandels,
+                ThreeWhiteSoilderCandels = null,
             };
 
             var response = await _httpClient.PostAsJsonAsync("https://localhost:44364/api/ThreeWhiteSoilderDb", ThreeWhiteSoilderDetectedPayload);
