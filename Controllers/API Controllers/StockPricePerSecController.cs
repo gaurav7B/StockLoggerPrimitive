@@ -24,6 +24,102 @@ namespace StockLogger.Controllers.API_Controllers
             return await _context.StockPricePerSec.ToListAsync();
         }
 
+        // GET: https://localhost:44364/api/StockPricePerSec/GetForCandel?ticker=INFY
+        [HttpGet("GetForCandel")]
+        public async Task<ActionResult<IEnumerable<List<Candel>>>> MakeCandel([FromQuery] string ticker)
+        {
+            // Fetch data from the database based on the ticker
+            var query = _context.StockPricePerSec
+                                .Where(sp => sp.Ticker == ticker)
+                                .OrderBy(sp => sp.StockDateTime); // Ensure the data is sorted by time
+
+            var result = await query.ToListAsync();
+
+            // Grouping stock prices by minute (rounded to the nearest minute)
+            var groupedResult = result
+                                .GroupBy(sp => new DateTime(sp.StockDateTime.Year, sp.StockDateTime.Month, sp.StockDateTime.Day, sp.StockDateTime.Hour, sp.StockDateTime.Minute, 0))
+                                .Select(g => g.ToList()) // Create a list for each group
+                                .ToList();
+
+            StockPricePerSec firstStockPrice = null;
+            StockPricePerSec highestStockPrice = null;
+            StockPricePerSec lowestStockPrice = null;
+            StockPricePerSec lastStockPrice = null;
+
+            List<Candel> CandelList = new List<Candel>();
+
+            if (groupedResult != null)
+            {
+                foreach (List<StockPricePerSec> sp in groupedResult)
+                {
+                    firstStockPrice = GetFirstStockPrice(sp);
+                    highestStockPrice = GetHighestStockPrice(sp);
+                    lowestStockPrice = GetLowestStockPrice(sp);
+                    lastStockPrice = GetLastStockPrice(sp);
+
+                    var CandelPayLoad = new Candel
+                    {
+                        StartPrice = firstStockPrice.StockPrice,  // Use the first price from the list
+                        HighestPrice = highestStockPrice.StockPrice, // Get the highest price from the list
+                        LowestPrice = lowestStockPrice.StockPrice,  // Get the lowest price from the list
+                        EndPrice = lastStockPrice.StockPrice,     // Use the last price from the list
+
+                        OpenTime = firstStockPrice.StockDateTime,
+                        CloseTime = lastStockPrice.StockDateTime,
+
+                        Ticker = firstStockPrice.Ticker,
+                        TickerId = firstStockPrice.TickerId,
+                        Exchange = "NSE",
+                    };
+
+                    // Set the BullBear status based on your logic
+                    CandelPayLoad.SetBullBearStatus();
+                    CandelPayLoad.SetPriceChange();
+
+                    CandelList.Add(CandelPayLoad);
+                }
+
+            }
+
+            // Return the list of lists containing stock prices per minute
+            return Ok(CandelList);
+        }
+
+
+        public static StockPricePerSec GetHighestStockPrice(List<StockPricePerSec> stockList)
+        {
+            // Get the object with the highest StockPrice
+            var highestStockPrice = stockList.OrderByDescending(stock => stock.StockPrice).FirstOrDefault();
+
+            return highestStockPrice;
+        }
+
+        public static StockPricePerSec GetLowestStockPrice(List<StockPricePerSec> stockList)
+        {
+            // Get the object with the lowest StockPrice
+            var lowestStockPrice = stockList.OrderBy(stock => stock.StockPrice).FirstOrDefault();
+
+            return lowestStockPrice;
+        }
+
+
+        public static StockPricePerSec GetFirstStockPrice(List<StockPricePerSec> stockList)
+        {
+            // Get the first object in the list
+            var firstStockPrice = stockList.FirstOrDefault();
+
+            return firstStockPrice;
+        }
+
+        public static StockPricePerSec GetLastStockPrice(List<StockPricePerSec> stockList)
+        {
+            // Get the last object in the list
+            var lastStockPrice = stockList.LastOrDefault();
+
+            return lastStockPrice;
+        }
+
+
         [HttpGet("by-datetime1")]
         public async Task<ActionResult<IEnumerable<StockPricePerSec>>> GetStockPricesByDateTimeAndTicker(
             [FromQuery] DateTime datetime,

@@ -1,19 +1,20 @@
-﻿using Newtonsoft.Json;
-using Polly;
-using StockLogger.Models.Candel;
+﻿using StockLogger.Models.Candel;
 using StockLogger.Models.DTO;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.Json;
+using Polly;
+using Polly.Retry;
 
-namespace StockLogger.BackgroundServices.BackGroundServiceForEach
+namespace StockLogger.BackgroundServices._1
 {
-    public class _7Service : BackgroundService
+    public class CandelMakerWithPriceCallEvery30sec2 : BackgroundService
     {
-        private readonly ILogger<_7Service> _logger;
+        private readonly ILogger<CandelMakerWithPriceCallEvery30sec2> _logger;
         private readonly HttpClient _httpClient;
         private bool _isRunning = true;
 
-        public _7Service(ILogger<_7Service> logger)
+        public CandelMakerWithPriceCallEvery30sec2(ILogger<CandelMakerWithPriceCallEvery30sec2> logger)
         {
             _logger = logger;
             _httpClient = new HttpClient();
@@ -24,7 +25,7 @@ namespace StockLogger.BackgroundServices.BackGroundServiceForEach
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                var stocks = (await GetStockTickerExchanges())?.Select(x => new { x.Id, x.Ticker, x.Exchange }).Where(x => x.Id == 7).ToArray();
+                var stocks = (await GetStockTickerExchanges())?.Select(x => new { x.Id, x.Ticker, x.Exchange }).ToArray();
 
                 var stockTasks = stocks.Select(stock => CandelMaker((int)stock.Id, stock.Ticker, stock.Exchange)); // Create tasks dynamically for each stock
                 await Task.WhenAll(stockTasks); // Process all tasks in parallel
@@ -106,49 +107,12 @@ namespace StockLogger.BackgroundServices.BackGroundServiceForEach
             return firstStockPrice;
         }
 
-        public async Task<StockPricePerSec> GetLastStockPrice(List<StockPricePerSec> stockList, string tickerForAPI, DateTime lastDateTime)
+        public static StockPricePerSec GetLastStockPrice(List<StockPricePerSec> stockList)
         {
+            // Get the last object in the list
+            var lastStockPrice = stockList.LastOrDefault();
 
-            // Convert DateTime to the desired format
-            string formattedDateTime = lastDateTime.ToString("yyyy-MM-ddTHH:mm:ss");
-            string encodedTicker = Uri.EscapeDataString(tickerForAPI);
-
-            var url = $"https://localhost:44364/api/StockPricePerSec/by-datetime?datetime={formattedDateTime}&ticker={encodedTicker}";
-
-            var response = await _httpClient.GetAsync(url);
-            if (response.IsSuccessStatusCode)
-            {
-                var jsonResponse = await response.Content.ReadAsStringAsync();
-
-                if (lastDateTime.Second == 58)
-                {
-                    DateTime currentTime = DateTime.Now;
-                    int currentSecond = currentTime.Second;
-
-                    // Calculate remaining seconds until the 59th second
-                    int remainingSeconds = 59 - currentSecond;
-
-                    // Wait until the 59th second
-                    await Task.Delay(TimeSpan.FromSeconds(remainingSeconds));
-
-                    response = await _httpClient.GetAsync(url);
-                    jsonResponse = await response.Content.ReadAsStringAsync();
-                }
-                while (jsonResponse == "[]")
-                {
-                    response = await _httpClient.GetAsync(url);
-                    jsonResponse = await response.Content.ReadAsStringAsync();
-                }
-                var stockPriceList = JsonConvert.DeserializeObject<List<StockPricePerSec>>(jsonResponse);
-                var StockPriceData59 = stockPriceList?.FirstOrDefault();
-                if (StockPriceData59 != null)
-                {
-                    return StockPriceData59;
-                }
-            }
-            var defaultLastStockPrice = stockList.LastOrDefault();
-
-            return defaultLastStockPrice;
+            return lastStockPrice;
         }
 
 
@@ -174,14 +138,22 @@ namespace StockLogger.BackgroundServices.BackGroundServiceForEach
             // Extracting the last list from the sorted array
             var lastList = soretedArray.Last();
 
+            //if (lastList == null || lastList.Count == 0)
+            //{
+            //    Console.WriteLine("The last list in the array is empty or null.");
+            //    return;
+            //}
+
+            //// Extracting the last stock price from the last list
+            //var lastStockPriceMain = lastList.Last();
+
+            //foreach (List<StockPricePerSec> stockList in soretedArray)
+            //{
             // Get the last object in the stockList
             var lastStock = lastList.Last();
 
-            var lastDateTime = lastStock.StockDateTime;
-            var tickerForAPI = lastStock.Ticker;
-
-            ////Check if the second of the StockDateTime is 58
-            if (lastStock.StockDateTime.Second < 58)
+            // Check if the second of the StockDateTime is 59
+            if (lastStock.StockDateTime.Second < 59)
             {
                 return;
             }
@@ -191,7 +163,7 @@ namespace StockLogger.BackgroundServices.BackGroundServiceForEach
             firstStockPrice = GetFirstStockPrice(lastList);
             highestStockPrice = GetHighestStockPrice(lastList);
             lowestStockPrice = GetLowestStockPrice(lastList);
-            lastStockPrice = await GetLastStockPrice(lastList, tickerForAPI, lastDateTime);
+            lastStockPrice = GetLastStockPrice(lastList);
 
             var CandelPayLoad = new Candel
             {
@@ -216,7 +188,13 @@ namespace StockLogger.BackgroundServices.BackGroundServiceForEach
 
             foreach (Candel CurrentCandel in CandelList)
             {
-                await _httpClient.PostAsJsonAsync("https://localhost:44364/api/Candel", CurrentCandel);
+                //await _httpClient.PostAsJsonAsync("https://localhost:44364/api/Candel", CurrentCandel);
+                var retryPolicy = Policy.Handle<TaskCanceledException>()
+                           .Or<TimeoutException>()
+                           .WaitAndRetryAsync(3, retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)));
+
+                await retryPolicy.ExecuteAsync(() =>
+                    _httpClient.PostAsJsonAsync("https://localhost:44364/api/Candel", CurrentCandel));
             }
 
             firstStockPrice = null;
@@ -227,6 +205,7 @@ namespace StockLogger.BackgroundServices.BackGroundServiceForEach
             Id = 0;
             exchange = null;
         }
+
 
 
         //}
@@ -253,13 +232,13 @@ namespace StockLogger.BackgroundServices.BackGroundServiceForEach
                     try
                     {
                         // Make API request
-                        var response = await _httpClient.GetAsync($"https://localhost:44364/Stock/GetStockPriceByTickerFor_7Service?ticker={ticker}&exchange={exchange}");
+                        var response = await _httpClient.GetAsync($"https://localhost:44364/Stock/GetStockPriceByTicker?ticker={ticker}&exchange={exchange}");
 
                         if (response.IsSuccessStatusCode)
                         {
                             // Parse JSON response
                             var jsonResponse = await response.Content.ReadAsStringAsync();
-                            var stockData = System.Text.Json.JsonSerializer.Deserialize<StockDataDto>(jsonResponse);
+                            var stockData = JsonSerializer.Deserialize<StockDataDto>(jsonResponse);
 
                             if (stockData != null)
                             {
@@ -288,9 +267,9 @@ namespace StockLogger.BackgroundServices.BackGroundServiceForEach
                         Console.WriteLine($"Error: {ex.Message}");
                     }
 
-                    // Adjust delay to maintain 10-millisecond intervals
+                    // Adjust delay to maintain 1-second intervals
                     stopwatch.Stop();
-                    var delay = Math.Max(0, 10 - (int)stopwatch.ElapsedMilliseconds); // Delay set to 10 milliseconds
+                    var delay = Math.Max(0, 1000 - (int)stopwatch.ElapsedMilliseconds);
                     await Task.Delay(delay);
                 }
 
@@ -303,4 +282,5 @@ namespace StockLogger.BackgroundServices.BackGroundServiceForEach
 
 
     }
+
 }

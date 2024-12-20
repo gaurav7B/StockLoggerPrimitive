@@ -11,36 +11,17 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews()
     .AddRazorRuntimeCompilation();
 
-// Register DbContext with the connection string
-//builder.Services.AddDbContext<StockLoggerDbContext>(options =>
-//    options.UseSqlServer(builder.Configuration.GetConnectionString("StockLoggerDbConnection")));
-
 builder.Services.AddDbContext<StockLoggerDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("StockLoggerDbConnection"),
-    sqlServerOptions => sqlServerOptions.EnableRetryOnFailure()));  // Connection Pooling and Retry Logic
+    sqlServerOptions => sqlServerOptions.EnableRetryOnFailure()));
 
 //builder.Services.AddHostedService<CandelAnalyzerService>();
 //builder.Services.AddHostedService<CandelMakerService>();
 
-builder.Services.AddHostedService<StockPriceFetcherPerSecService>();
-
 //builder.Services.AddHostedService<StockPriceFetcherService>();
 
-//builder.Services.AddHostedService<CandelMakerWithPriceCallEvery30sec>();
-builder.Services.AddHostedService<_1Service>();
+builder.Services.AddHostedService<CandelMakerWithPriceCallEvery30sec>();
 //builder.Services.AddHostedService<_2Service>();
-//builder.Services.AddHostedService<_3Service>();
-//builder.Services.AddHostedService<_4Service>();
-
-//builder.Services.AddHostedService<_5Service>();
-//builder.Services.AddHostedService<_6Service>();
-//builder.Services.AddHostedService<_7Service>();
-//builder.Services.AddHostedService<_8Service>();
-
-//builder.Services.AddHostedService<_9Service>();
-//builder.Services.AddHostedService<_10Service>();
-//builder.Services.AddHostedService<_11Service>();
-//builder.Services.AddHostedService<_12Service>();
 
 builder.Services.AddHostedService<_3WhiteSoildersService>();
 //builder.Services.AddHostedService<CupAndHandelService>();
