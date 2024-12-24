@@ -87,9 +87,8 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
             CandelSample = recentThreeCandles[0];
 
             // Combine all conditions to detect the Three White Soldiers pattern
-            //if (allThreeBullish && progressiveCloses && increasingBodySize && smallUpperShadow && smallLowerShadow &&
-            //    strongBodyRatio && priorConsolidationOrBearish)
-            if(CandelSample != null)
+            if (allThreeBullish && progressiveCloses && increasingBodySize && smallUpperShadow && smallLowerShadow &&
+                strongBodyRatio && priorConsolidationOrBearish)
             {
                 if (Range == 1)
                 {
@@ -128,10 +127,36 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
                 else if (Range == 10)
                 {
                     MasterCandelListFor10MinCandel3WS.Add(candelList);
+                    ThreeWhiteSoilderDb TWSPayload = new ThreeWhiteSoilderDb
+                    {
+                        Ticker = CandelSample.Ticker,
+                        TickerId = CandelSample.TickerId,
+                        Exchange = CandelSample.Exchange,
+                        IsThreeWhiteSoilderDetected = true,
+                        DetectionRange = 10,
+                        DetectionTime = CandelSample.CloseTime,
+                        ThreeWhiteSoilderCandels = null
+                    };
+
+                    HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/ThreeWhiteSoilderDb",
+                                      new StringContent(JsonConvert.SerializeObject(TWSPayload), Encoding.UTF8, "application/json"));
                 }
                 else if (Range == 15)
                 {
                     MasterCandelListFor15MinCandel3WS.Add(candelList);
+                    ThreeWhiteSoilderDb TWSPayload = new ThreeWhiteSoilderDb
+                    {
+                        Ticker = CandelSample.Ticker,
+                        TickerId = CandelSample.TickerId,
+                        Exchange = CandelSample.Exchange,
+                        IsThreeWhiteSoilderDetected = true,
+                        DetectionRange = 15,
+                        DetectionTime = CandelSample.CloseTime,
+                        ThreeWhiteSoilderCandels = null
+                    };
+
+                    HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/ThreeWhiteSoilderDb",
+                                      new StringContent(JsonConvert.SerializeObject(TWSPayload), Encoding.UTF8, "application/json"));
                 }
             }
             else
