@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using StockLogger.BackgroundServices;
-using StockLogger.BackgroundServices.BackGroundServiceForEach;
 using StockLogger.BackgroundServices.BackgroundStratergyServices;
 using StockLogger.Data;
 
@@ -15,16 +14,8 @@ builder.Services.AddDbContext<StockLoggerDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("StockLoggerDbConnection"),
     sqlServerOptions => sqlServerOptions.EnableRetryOnFailure()));
 
-//builder.Services.AddHostedService<CandelAnalyzerService>();
-//builder.Services.AddHostedService<CandelMakerService>();
-
 //builder.Services.AddHostedService<StockPriceFetcherService>();
-
-builder.Services.AddHostedService<CandelMakerWithPriceCallEvery30sec>();
-//builder.Services.AddHostedService<_2Service>();
-
-builder.Services.AddHostedService<_3WhiteSoildersService>();
-//builder.Services.AddHostedService<CupAndHandelService>();
+builder.Services.AddHostedService<ThreeWhiteSoilders>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
