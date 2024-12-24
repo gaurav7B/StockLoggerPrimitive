@@ -112,6 +112,24 @@ namespace StockLogger.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "InvertedHammerDb",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Ticker = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TickerId = table.Column<long>(type: "bigint", nullable: false),
+                    Exchange = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsInvertedHammerDetected = table.Column<bool>(type: "bit", nullable: false),
+                    DetectionRange = table.Column<int>(type: "int", nullable: false),
+                    DetectionTime = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InvertedHammerDb", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "StockPricePerSec",
                 columns: table => new
                 {
@@ -161,6 +179,37 @@ namespace StockLogger.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "InvertedHammerCandels",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StartPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    HighestPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    LowestPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    EndPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    OpenTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CloseTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Ticker = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TickerId = table.Column<long>(type: "bigint", nullable: false),
+                    Exchange = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsBullish = table.Column<bool>(type: "bit", nullable: true),
+                    IsBearish = table.Column<bool>(type: "bit", nullable: true),
+                    PriceChange = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PriceChangePercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    InvertedHammerDbId = table.Column<long>(type: "bigint", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InvertedHammerCandels", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_InvertedHammerCandels_InvertedHammerDb_InvertedHammerDbId",
+                        column: x => x.InvertedHammerDbId,
+                        principalTable: "InvertedHammerDb",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ThreeWhiteSoilderCandelss",
                 columns: table => new
                 {
@@ -192,6 +241,11 @@ namespace StockLogger.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_InvertedHammerCandels_InvertedHammerDbId",
+                table: "InvertedHammerCandels",
+                column: "InvertedHammerDbId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ThreeWhiteSoilderCandelss_ThreeWhiteSoilderDbId",
                 table: "ThreeWhiteSoilderCandelss",
                 column: "ThreeWhiteSoilderDbId");
@@ -213,6 +267,9 @@ namespace StockLogger.Migrations
                 name: "Candel5min");
 
             migrationBuilder.DropTable(
+                name: "InvertedHammerCandels");
+
+            migrationBuilder.DropTable(
                 name: "StockPricePerSec");
 
             migrationBuilder.DropTable(
@@ -220,6 +277,9 @@ namespace StockLogger.Migrations
 
             migrationBuilder.DropTable(
                 name: "ThreeWhiteSoilderCandelss");
+
+            migrationBuilder.DropTable(
+                name: "InvertedHammerDb");
 
             migrationBuilder.DropTable(
                 name: "ThreeWhiteSoilderDbs");

@@ -289,6 +289,98 @@ namespace StockLogger.Migrations
                     b.ToTable("StockTickerExchanges");
                 });
 
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Inverted_Hammer.InvertedHammerCandels", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CloseTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("EndPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Exchange")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("HighestPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<long?>("InvertedHammerDbId")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool?>("IsBearish")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsBullish")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("LowestPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("OpenTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("PriceChange")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("PriceChangePercentage")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("StartPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("TickerId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("InvertedHammerDbId");
+
+                    b.ToTable("InvertedHammerCandels");
+                });
+
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Inverted_Hammer.InvertedHammerDb", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("DetectionRange")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DetectionTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Exchange")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsInvertedHammerDetected")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("TickerId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("InvertedHammerDb");
+                });
+
             modelBuilder.Entity("StockLogger.Models.Stratergic_Models.ThreeWhiteSoilderCandels", b =>
                 {
                     b.Property<long>("Id")
@@ -381,11 +473,23 @@ namespace StockLogger.Migrations
                     b.ToTable("ThreeWhiteSoilderDbs");
                 });
 
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Inverted_Hammer.InvertedHammerCandels", b =>
+                {
+                    b.HasOne("StockLogger.Models.Stratergic_Models.Inverted_Hammer.InvertedHammerDb", null)
+                        .WithMany("InvertedHammerCandels")
+                        .HasForeignKey("InvertedHammerDbId");
+                });
+
             modelBuilder.Entity("StockLogger.Models.Stratergic_Models.ThreeWhiteSoilderCandels", b =>
                 {
                     b.HasOne("StockLogger.Models.Stratergic_Models.ThreeWhiteSoilderDb", null)
                         .WithMany("ThreeWhiteSoilderCandels")
                         .HasForeignKey("ThreeWhiteSoilderDbId");
+                });
+
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Inverted_Hammer.InvertedHammerDb", b =>
+                {
+                    b.Navigation("InvertedHammerCandels");
                 });
 
             modelBuilder.Entity("StockLogger.Models.Stratergic_Models.ThreeWhiteSoilderDb", b =>
