@@ -48,7 +48,7 @@ namespace StockLogger.Controllers.Stratergic_API_Controller
             _context.ThreeWhiteSoilderDbs.Add(threeWhiteSoilderDb);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetThreeWhiteSoilderDb", new { id = threeWhiteSoilderDb.Id }, threeWhiteSoilderDb);
+            return Ok();
         }
 
         // PUT: api/ThreeWhiteSoilder/5
