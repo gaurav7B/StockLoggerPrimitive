@@ -100,6 +100,68 @@ namespace StockLogger.BackgroundServices
             }
         }
 
+        private async Task Post10MinCandelToDb(string ticker, CancellationToken stoppingToken)
+        {
+
+            try
+            {
+                HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:44364/api/StockPricePerSec/Get10MinCandel?ticker={ticker}", stoppingToken);
+                response.EnsureSuccessStatusCode();
+
+                string responseData = await response.Content.ReadAsStringAsync(stoppingToken);
+
+                List<Candel> candels = JsonConvert.DeserializeObject<List<Candel>>(responseData);
+
+                List<Candel> lastTwoCandels = candels.TakeLast(2).ToList();
+
+                if (candels != null)
+                {
+                    foreach (var candel in lastTwoCandels)
+                    {
+
+                        HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/Candel10min",
+                                                                                        new StringContent(JsonConvert.SerializeObject(candel), Encoding.UTF8, "application/json"),
+                                                                                        stoppingToken);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error analyzing ticker {ticker}: {ex.Message}");
+            }
+        }
+
+        private async Task Post15MinCandelToDb(string ticker, CancellationToken stoppingToken)
+        {
+
+            try
+            {
+                HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:44364/api/StockPricePerSec/Get15MinCandel?ticker={ticker}", stoppingToken);
+                response.EnsureSuccessStatusCode();
+
+                string responseData = await response.Content.ReadAsStringAsync(stoppingToken);
+
+                List<Candel> candels = JsonConvert.DeserializeObject<List<Candel>>(responseData);
+
+                List<Candel> lastTwoCandels = candels.TakeLast(2).ToList();
+
+                if (candels != null)
+                {
+                    foreach (var candel in lastTwoCandels)
+                    {
+
+                        HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/Candel15min",
+                                                                                        new StringContent(JsonConvert.SerializeObject(candel), Encoding.UTF8, "application/json"),
+                                                                                        stoppingToken);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error analyzing ticker {ticker}: {ex.Message}");
+            }
+        }
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
 
@@ -115,6 +177,8 @@ namespace StockLogger.BackgroundServices
                     {
                         await Post1MinCandelToDb(stock.ticker, stoppingToken);
                         await Post5MinCandelToDb(stock.ticker, stoppingToken);
+                        await Post10MinCandelToDb(stock.ticker, stoppingToken);
+                        await Post15MinCandelToDb(stock.ticker, stoppingToken);
                     }
                     catch (Exception ex)
                     {

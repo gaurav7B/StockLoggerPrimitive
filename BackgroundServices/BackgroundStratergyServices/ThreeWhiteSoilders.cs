@@ -87,6 +87,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
             CandelSample = recentThreeCandles[0];
 
             // Combine all conditions to detect the Three White Soldiers pattern
+            //if(CandelSample != null)
             if (allThreeBullish && progressiveCloses && increasingBodySize && smallUpperShadow && smallLowerShadow &&
                 strongBodyRatio && priorConsolidationOrBearish)
             {
@@ -211,6 +212,52 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
             }
         }
 
+        private async Task AnalyzeThreeWhite10MinCandelSoldiersAsync(string ticker, CancellationToken stoppingToken)
+        {
+            try
+            {
+                HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:44364/api/StockPricePerSec/Get10MinCandel?ticker={ticker}", stoppingToken);
+                response.EnsureSuccessStatusCode();
+
+                string responseData = await response.Content.ReadAsStringAsync(stoppingToken);
+
+                List<Candel> candels = JsonConvert.DeserializeObject<List<Candel>>(responseData);
+
+                if (candels != null)
+                {
+                    var lastFourCandels = candels.TakeLast(4).ToList();
+                    ThreeWhiteSoilderAnalyzer(lastFourCandels, 10);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error analyzing ticker {ticker}: {ex.Message}");
+            }
+        }
+
+        private async Task AnalyzeThreeWhite15MinCandelSoldiersAsync(string ticker, CancellationToken stoppingToken)
+        {
+            try
+            {
+                HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:44364/api/StockPricePerSec/Get15MinCandel?ticker={ticker}", stoppingToken);
+                response.EnsureSuccessStatusCode();
+
+                string responseData = await response.Content.ReadAsStringAsync(stoppingToken);
+
+                List<Candel> candels = JsonConvert.DeserializeObject<List<Candel>>(responseData);
+
+                if (candels != null)
+                {
+                    var lastFourCandels = candels.TakeLast(4).ToList();
+                    ThreeWhiteSoilderAnalyzer(lastFourCandels, 15);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error analyzing ticker {ticker}: {ex.Message}");
+            }
+        }
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
 
@@ -226,6 +273,8 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
                     {
                         await AnalyzeThreeWhiteSoldiersAsync(stock.ticker, stoppingToken);
                         await AnalyzeThreeWhite5MinCandelSoldiersAsync(stock.ticker, stoppingToken);
+                        await AnalyzeThreeWhite10MinCandelSoldiersAsync(stock.ticker, stoppingToken);
+                        await AnalyzeThreeWhite15MinCandelSoldiersAsync(stock.ticker, stoppingToken);
                     }
                     catch (Exception ex)
                     {
