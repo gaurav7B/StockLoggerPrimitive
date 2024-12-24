@@ -16,6 +16,7 @@ builder.Services.AddDbContext<StockLoggerDbContext>(options =>
 
 //builder.Services.AddHostedService<StockPriceFetcherService>();
 builder.Services.AddHostedService<ThreeWhiteSoilders>();
+builder.Services.AddHostedService<CandelMakerService>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

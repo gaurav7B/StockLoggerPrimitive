@@ -106,6 +106,52 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
             }
         }
 
+        private async Task AnalyzeThreeWhiteSoldiersAsync(string ticker, CancellationToken stoppingToken)
+        {
+            try
+            {
+                HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:44364/api/StockPricePerSec/GetCandel?ticker={ticker}", stoppingToken);
+                response.EnsureSuccessStatusCode();
+
+                string responseData = await response.Content.ReadAsStringAsync(stoppingToken);
+
+                List<Candel> candels = JsonConvert.DeserializeObject<List<Candel>>(responseData);
+
+                if (candels != null)
+                {
+                    var lastFourCandels = candels.TakeLast(4).ToList();
+                    ThreeWhiteSoilderAnalyzer(lastFourCandels, 1);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error analyzing ticker {ticker}: {ex.Message}");
+            }
+        }
+
+        private async Task AnalyzeThreeWhite5MinCandelSoldiersAsync(string ticker, CancellationToken stoppingToken)
+        {
+            try
+            {
+                HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:44364/api/StockPricePerSec/Get5MinCandel?ticker={ticker}", stoppingToken);
+                response.EnsureSuccessStatusCode();
+
+                string responseData = await response.Content.ReadAsStringAsync(stoppingToken);
+
+                List<Candel> candels = JsonConvert.DeserializeObject<List<Candel>>(responseData);
+
+                if (candels != null)
+                {
+                    var lastFourCandels = candels.TakeLast(4).ToList();
+                    ThreeWhiteSoilderAnalyzer(lastFourCandels, 5);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error analyzing ticker {ticker}: {ex.Message}");
+            }
+        }
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
 
@@ -119,45 +165,8 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
                 {
                     try
                     {
-
-                        //FOR 1 MIN CANDEL 3WS ANALYZER
-
-                        // Call the API and get the response as a string
-                        HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:44364/api/StockPricePerSec/GetCandel?ticker={stock.ticker}", stoppingToken);
-                        response.EnsureSuccessStatusCode();
-
-                        string responseData = await response.Content.ReadAsStringAsync(stoppingToken);
-
-                        // Deserialize the JSON response into a list of Candel objects
-                        List<Candel> candels = JsonConvert.DeserializeObject<List<Candel>>(responseData);
-
-                        // Store the candles in a variable (for future use)
-                        if (candels != null)
-                        {
-                            var lastFourCandels = candels.TakeLast(4).ToList();
-                            ThreeWhiteSoilderAnalyzer(lastFourCandels, 1);
-                        }
-
-
-
-
-                        //FOR 5 MIN CANDEL 3WS ANALYZER
-
-                        // Call the API and get the response as a string
-                        HttpResponseMessage response5 = await _httpClient.GetAsync($"https://localhost:44364/api/StockPricePerSec/Get5MinCandel?ticker={stock.ticker}", stoppingToken);
-                        response5.EnsureSuccessStatusCode();
-                        string responseData5 = await response5.Content.ReadAsStringAsync(stoppingToken);
-                        // Deserialize the JSON response into a list of Candel objects
-                        List<Candel> candels5 = JsonConvert.DeserializeObject<List<Candel>>(responseData5);
-                        // Store the candles in a variable (for future use)
-                        if (candels5 != null)
-                        {
-                            var lastFourCandels = candels5.TakeLast(4).ToList();
-                            ThreeWhiteSoilderAnalyzer(lastFourCandels, 5);
-                        }
-
-
-
+                        await AnalyzeThreeWhiteSoldiersAsync(stock.ticker, stoppingToken);
+                        await AnalyzeThreeWhite5MinCandelSoldiersAsync(stock.ticker, stoppingToken);
                     }
                     catch (Exception ex)
                     {

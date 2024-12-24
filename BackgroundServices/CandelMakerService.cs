@@ -1,0 +1,122 @@
+﻿using Newtonsoft.Json;
+using StockLogger.Models.Candel;
+using System.Diagnostics;
+
+namespace StockLogger.BackgroundServices
+{
+    public class CandelMakerService : BackgroundService
+    {
+        private readonly HttpClient _httpClient;
+        private readonly List<(string ticker, string exchange, string name, long id)> _stocks;
+
+        public CandelMakerService(HttpClient httpClient)
+        {
+            _httpClient = httpClient;
+
+            _stocks = new List<(string, string, string, long)>
+            {
+                ("INFY", "NSE", "Infosys", 1),
+                ("RELIANCE", "NSE", "Reliance Industries", 2),
+                ("TCS", "NSE", "Tata Consultancy Services", 3),
+                ("HDFCBANK", "NSE", "HDFC Bank", 4),
+                ("ICICIBANK", "NSE", "ICICI Bank", 5),
+                ("HINDUNILVR", "NSE", "Hindustan Unilever", 6),
+                ("ITC", "NSE", "ITC Limited", 7),
+                ("KOTAKBANK", "NSE", "Kotak Mahindra Bank", 8),
+                ("LT", "NSE", "Larsen & Toubro", 9),
+                ("SBIN", "NSE", "State Bank of India", 10),
+                ("AXISBANK", "NSE", "Axis Bank", 11),
+                ("BAJFINANCE", "NSE", "Bajaj Finance", 12),
+                ("BHARTIARTL", "NSE", "Bharti Airtel", 13),
+                ("HCLTECH", "NSE", "HCL Technologies", 14),
+                ("ASIANPAINT", "NSE", "Asian Paints", 15),
+                ("DMART", "NSE", "Avenue Supermarts", 16),
+                ("MARUTI", "NSE", "Maruti Suzuki India", 17),
+                ("SUNPHARMA", "NSE", "Sun Pharmaceutical Industries", 18),
+                ("NTPC", "NSE", "NTPC Limited", 19),
+                ("TITAN", "NSE", "Titan Company", 20),
+            };
+        }
+
+        private async Task Post1MinCandelToDb(string ticker, CancellationToken stoppingToken)
+        {
+            try
+            {
+                HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:44364/api/StockPricePerSec/GetCandel?ticker={ticker}", stoppingToken);
+                response.EnsureSuccessStatusCode();
+
+                string responseData = await response.Content.ReadAsStringAsync(stoppingToken);
+
+                List<Candel> candels = JsonConvert.DeserializeObject<List<Candel>>(responseData);
+
+                if (candels != null)
+                {
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error analyzing ticker {ticker}: {ex.Message}");
+            }
+        }
+
+        private async Task Post5MinCandelToDb(string ticker, CancellationToken stoppingToken)
+        {
+            try
+            {
+                HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:44364/api/StockPricePerSec/Get5MinCandel?ticker={ticker}", stoppingToken);
+                response.EnsureSuccessStatusCode();
+
+                string responseData = await response.Content.ReadAsStringAsync(stoppingToken);
+
+                List<Candel> candels = JsonConvert.DeserializeObject<List<Candel>>(responseData);
+
+                if (candels != null)
+                {
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error analyzing ticker {ticker}: {ex.Message}");
+            }
+        }
+
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+
+            List<double> iterationTimes = new();
+
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                var stopwatch = Stopwatch.StartNew();
+
+                var tasks = _stocks.Select(stock => Task.Run(async () =>
+                {
+                    try
+                    {
+                        await Post1MinCandelToDb(stock.ticker, stoppingToken);
+                        await Post5MinCandelToDb(stock.ticker, stoppingToken);
+                    }
+                    catch (Exception ex)
+                    {
+                    }
+                }, stoppingToken));
+
+
+
+                // Wait for all tasks to complete.
+                await Task.WhenAll(tasks);
+
+                stopwatch.Stop();
+                iterationTimes.Add(stopwatch.Elapsed.TotalMilliseconds);
+
+                // Trigger garbage collection periodically
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+
+            }
+
+        }
+
+    }
+
+}
