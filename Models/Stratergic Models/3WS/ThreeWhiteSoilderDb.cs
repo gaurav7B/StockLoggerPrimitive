@@ -14,6 +14,8 @@ namespace StockLogger.Models.Stratergic_Models
 
         public bool IsThreeWhiteSoilderDetected { get; set; }
 
+        public int DetectionRange { get; set; }
+
         // Navigation property to hold the list of Candel objects
         public List<ThreeWhiteSoilderCandels>? ThreeWhiteSoilderCandels { get; set; }
 

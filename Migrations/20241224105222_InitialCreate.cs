@@ -151,7 +151,8 @@ namespace StockLogger.Migrations
                     Ticker = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TickerId = table.Column<long>(type: "bigint", nullable: false),
                     Exchange = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsThreeWhiteSoilderDetected = table.Column<bool>(type: "bit", nullable: false)
+                    IsThreeWhiteSoilderDetected = table.Column<bool>(type: "bit", nullable: false),
+                    DetectionRange = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {

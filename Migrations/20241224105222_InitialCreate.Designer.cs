@@ -12,7 +12,7 @@ using StockLogger.Data;
 namespace StockLogger.Migrations
 {
     [DbContext(typeof(StockLoggerDbContext))]
-    [Migration("20241218052348_InitialCreate")]
+    [Migration("20241224105222_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -358,6 +358,9 @@ namespace StockLogger.Migrations
                         .HasColumnType("bigint");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("DetectionRange")
+                        .HasColumnType("int");
 
                     b.Property<string>("Exchange")
                         .IsRequired()

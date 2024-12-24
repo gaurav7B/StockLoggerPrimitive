@@ -99,6 +99,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
                         TickerId = CandelSample.TickerId,
                         Exchange = CandelSample.Exchange,
                         IsThreeWhiteSoilderDetected = true,
+                        DetectionRange = 1,
                         ThreeWhiteSoilderCandels = null
                     };
 
@@ -114,6 +115,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
                         TickerId = CandelSample.TickerId,
                         Exchange = CandelSample.Exchange,
                         IsThreeWhiteSoilderDetected = true,
+                        DetectionRange = 5,
                         ThreeWhiteSoilderCandels = null
                     };
 

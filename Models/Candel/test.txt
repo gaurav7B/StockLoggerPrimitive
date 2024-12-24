@@ -30,6 +30,6 @@
 
 
 
-
+python start_services.py
 
 
