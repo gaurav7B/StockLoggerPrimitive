@@ -1,6 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using StockLogger.Models.Candel;
 using System.Diagnostics;
+using System.Text;
 
 namespace StockLogger.BackgroundServices
 {
@@ -51,6 +53,17 @@ namespace StockLogger.BackgroundServices
 
                 if (candels != null)
                 {
+                    foreach (var candel in candels)
+                    {
+                        // Get the top second candle
+                        var topSecondCandle = candels[1];
+
+
+                            // Call the API to insert the candel into the database
+                            HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/Candel",
+                                                                                            new StringContent(JsonConvert.SerializeObject(candel), Encoding.UTF8, "application/json"),
+                                                                                            stoppingToken);
+                    }
                 }
             }
             catch (Exception ex)
@@ -72,6 +85,26 @@ namespace StockLogger.BackgroundServices
 
                 if (candels != null)
                 {
+                    foreach (var candel in candels)
+                    {
+                        // Get the top second candle
+                        var topSecondCandle = candels[1];
+
+                        // Inserting the normal candels
+                        //if ((candel.OpenTime.Minute - candel.CloseTime.Minute) == 4 && (candel.CloseTime.Second) == 59)
+                        //{
+
+                        // Call the API to insert the candel into the database
+                        HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/Candel5min",
+                                                                                        new StringContent(JsonConvert.SerializeObject(candel), Encoding.UTF8, "application/json"),
+                                                                                        stoppingToken);
+
+                        if(postResponse.IsSuccessStatusCode)
+                        {
+
+                        }
+                        //}
+                    }
                 }
             }
             catch (Exception ex)

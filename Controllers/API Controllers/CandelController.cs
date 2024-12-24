@@ -21,42 +21,43 @@ namespace StockLogger.Controllers.API_Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Candel>> CreateCandel(Candel candel)
+        public async Task<ActionResult> CreateCandel(Candel candel)
         {
             var existingCandel = await _context.Candel
                 .FirstOrDefaultAsync(c =>
-                    c.StartPrice == candel.StartPrice &&
-                    c.HighestPrice == candel.HighestPrice &&
-                    c.LowestPrice == candel.LowestPrice &&
-                    c.EndPrice == candel.EndPrice &&
                     c.OpenTime == candel.OpenTime &&
-                    c.CloseTime == candel.CloseTime &&
-                    c.Ticker == candel.Ticker &&
-                    c.TickerId == candel.TickerId &&
-                    c.Exchange == candel.Exchange
+                    c.Ticker == candel.Ticker
                 );
-
-            var matchingCandles = await _context.Candel
-           .Where(c => c.Ticker == candel.Ticker 
-                    && c.CloseTime.Hour == DateTime.Now.Hour 
-                    && c.CloseTime.Minute == 59)
-           .ToListAsync();
-
-            if (matchingCandles.Count > 0)
-            {
-                return null;
-            }
 
             if (existingCandel != null)
             {
-                return null;
+                // Update the existing candel with new data
+                existingCandel.StartPrice = candel.StartPrice;
+                existingCandel.HighestPrice = candel.HighestPrice;
+                existingCandel.LowestPrice = candel.LowestPrice;
+                existingCandel.EndPrice = candel.EndPrice;
+                existingCandel.OpenTime = candel.OpenTime;
+                existingCandel.CloseTime = candel.CloseTime;
+                existingCandel.Ticker = candel.Ticker;
+                existingCandel.TickerId = candel.TickerId;
+                existingCandel.Exchange = candel.Exchange;
+                existingCandel.IsBullish = candel.IsBullish;
+                existingCandel.IsBearish = candel.IsBearish;
+                existingCandel.PriceChange = candel.PriceChange;
+                existingCandel.PriceChangePercentage = candel.PriceChangePercentage;
+
+                // Save the changes to the database
+                await _context.SaveChangesAsync();
+
+                return Ok(); // Return the updated candel
             }
 
             // If no duplicate, add the new candel
             _context.Candel.Add(candel);
             await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetCandel), new { id = candel.Id }, candel);
+            return Ok();
         }
+
 
         // READ: api/candel
         [HttpGet]
