@@ -359,6 +359,9 @@ namespace StockLogger.Migrations
                     b.Property<int>("DetectionRange")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("DetectionTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Exchange")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");

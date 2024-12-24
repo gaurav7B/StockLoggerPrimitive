@@ -12,7 +12,7 @@ using StockLogger.Data;
 namespace StockLogger.Migrations
 {
     [DbContext(typeof(StockLoggerDbContext))]
-    [Migration("20241224105222_InitialCreate")]
+    [Migration("20241224110409_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -361,6 +361,9 @@ namespace StockLogger.Migrations
 
                     b.Property<int>("DetectionRange")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("DetectionTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Exchange")
                         .IsRequired()

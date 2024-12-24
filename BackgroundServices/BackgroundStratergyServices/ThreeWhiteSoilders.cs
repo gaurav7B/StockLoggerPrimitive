@@ -87,8 +87,9 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
             CandelSample = recentThreeCandles[0];
 
             // Combine all conditions to detect the Three White Soldiers pattern
-            if (allThreeBullish && progressiveCloses && increasingBodySize && smallUpperShadow && smallLowerShadow &&
-                strongBodyRatio && priorConsolidationOrBearish)
+            //if (allThreeBullish && progressiveCloses && increasingBodySize && smallUpperShadow && smallLowerShadow &&
+            //    strongBodyRatio && priorConsolidationOrBearish)
+            if(CandelSample != null)
             {
                 if (Range == 1)
                 {
@@ -100,6 +101,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
                         Exchange = CandelSample.Exchange,
                         IsThreeWhiteSoilderDetected = true,
                         DetectionRange = 1,
+                        DetectionTime = CandelSample.CloseTime,
                         ThreeWhiteSoilderCandels = null
                     };
 
@@ -116,6 +118,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
                         Exchange = CandelSample.Exchange,
                         IsThreeWhiteSoilderDetected = true,
                         DetectionRange = 5,
+                        DetectionTime = CandelSample.CloseTime,
                         ThreeWhiteSoilderCandels = null
                     };
 
