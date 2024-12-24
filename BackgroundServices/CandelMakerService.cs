@@ -51,18 +51,15 @@ namespace StockLogger.BackgroundServices
 
                 List<Candel> candels = JsonConvert.DeserializeObject<List<Candel>>(responseData);
 
-                if (candels != null)
+                List<Candel> lastTwoCandels = candels.TakeLast(2).ToList();
+
+                if(candels != null)
                 {
-                    foreach (var candel in candels)
+                    foreach (var candel in lastTwoCandels)
                     {
-                        // Get the top second candle
-                        var topSecondCandle = candels[1];
-
-
-                            // Call the API to insert the candel into the database
-                            HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/Candel",
-                                                                                            new StringContent(JsonConvert.SerializeObject(candel), Encoding.UTF8, "application/json"),
-                                                                                            stoppingToken);
+                        HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/Candel",
+                                                              new StringContent(JsonConvert.SerializeObject(candel), Encoding.UTF8, "application/json"),
+                                                              stoppingToken);
                     }
                 }
             }
@@ -74,6 +71,7 @@ namespace StockLogger.BackgroundServices
 
         private async Task Post5MinCandelToDb(string ticker, CancellationToken stoppingToken)
         {
+
             try
             {
                 HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:44364/api/StockPricePerSec/Get5MinCandel?ticker={ticker}", stoppingToken);
@@ -83,27 +81,16 @@ namespace StockLogger.BackgroundServices
 
                 List<Candel> candels = JsonConvert.DeserializeObject<List<Candel>>(responseData);
 
+                List<Candel> lastTwoCandels = candels.TakeLast(2).ToList();
+
                 if (candels != null)
                 {
-                    foreach (var candel in candels)
+                    foreach (var candel in lastTwoCandels)
                     {
-                        // Get the top second candle
-                        var topSecondCandle = candels[1];
 
-                        // Inserting the normal candels
-                        //if ((candel.OpenTime.Minute - candel.CloseTime.Minute) == 4 && (candel.CloseTime.Second) == 59)
-                        //{
-
-                        // Call the API to insert the candel into the database
                         HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/Candel5min",
                                                                                         new StringContent(JsonConvert.SerializeObject(candel), Encoding.UTF8, "application/json"),
                                                                                         stoppingToken);
-
-                        if(postResponse.IsSuccessStatusCode)
-                        {
-
-                        }
-                        //}
                     }
                 }
             }
