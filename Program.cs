@@ -44,6 +44,9 @@ builder.Services.AddHostedService<RisingThreeMethodsService>();
 builder.Services.AddHttpClient<TweezerBottomService>();
 builder.Services.AddHostedService<TweezerBottomService>();
 
+builder.Services.AddHttpClient<ReporterService>();
+builder.Services.AddHostedService<ReporterService>();
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 

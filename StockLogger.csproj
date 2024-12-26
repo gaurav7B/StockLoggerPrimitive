@@ -32,4 +32,17 @@
     <None Include="wwwroot\Images\Imperium.jpg" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Models\Stratergic Models\Bullish Kicker\" />
+    <Folder Include="Models\Stratergic Models\Bullish Three Outside Up\" />
+    <Folder Include="Models\Stratergic Models\Marubozu %28Bullish%29\" />
+    <Folder Include="Models\Stratergic Models\Bullish Belt Hold\" />
+    <Folder Include="Models\Stratergic Models\Bullish Abandoned Baby\" />
+    <Folder Include="Models\Stratergic Models\Bullish Counterattack\" />
+    <Folder Include="Models\Stratergic Models\Breakaway %28Bullish%29\" />
+    <Folder Include="Models\Stratergic Models\Bullish Homing Pigeon\" />
+    <Folder Include="Models\Stratergic Models\Tower Bottom\" />
+    <Folder Include="Models\Stratergic Models\Rising Sun\" />
+  </ItemGroup>
+
 </Project>
