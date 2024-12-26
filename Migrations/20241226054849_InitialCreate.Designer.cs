@@ -12,7 +12,7 @@ using StockLogger.Data;
 namespace StockLogger.Migrations
 {
     [DbContext(typeof(StockLoggerDbContext))]
-    [Migration("20241224115557_InitialCreate")]
+    [Migration("20241226054849_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -384,6 +384,98 @@ namespace StockLogger.Migrations
                     b.ToTable("InvertedHammerDb");
                 });
 
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Morning_Star.MorningStarCandels", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CloseTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("EndPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Exchange")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("HighestPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool?>("IsBearish")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsBullish")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("LowestPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<long?>("MorningStarDbId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("OpenTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("PriceChange")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("PriceChangePercentage")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("StartPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("TickerId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MorningStarDbId");
+
+                    b.ToTable("MorningStarCandels");
+                });
+
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Morning_Star.MorningStarDb", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("DetectionRange")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DetectionTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Exchange")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsMorningStarDetected")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("TickerId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MorningStarDb");
+                });
+
             modelBuilder.Entity("StockLogger.Models.Stratergic_Models.ThreeWhiteSoilderCandels", b =>
                 {
                     b.Property<long>("Id")
@@ -483,6 +575,13 @@ namespace StockLogger.Migrations
                         .HasForeignKey("InvertedHammerDbId");
                 });
 
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Morning_Star.MorningStarCandels", b =>
+                {
+                    b.HasOne("StockLogger.Models.Stratergic_Models.Morning_Star.MorningStarDb", null)
+                        .WithMany("MorningStarCandels")
+                        .HasForeignKey("MorningStarDbId");
+                });
+
             modelBuilder.Entity("StockLogger.Models.Stratergic_Models.ThreeWhiteSoilderCandels", b =>
                 {
                     b.HasOne("StockLogger.Models.Stratergic_Models.ThreeWhiteSoilderDb", null)
@@ -493,6 +592,11 @@ namespace StockLogger.Migrations
             modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Inverted_Hammer.InvertedHammerDb", b =>
                 {
                     b.Navigation("InvertedHammerCandels");
+                });
+
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Morning_Star.MorningStarDb", b =>
+                {
+                    b.Navigation("MorningStarCandels");
                 });
 
             modelBuilder.Entity("StockLogger.Models.Stratergic_Models.ThreeWhiteSoilderDb", b =>

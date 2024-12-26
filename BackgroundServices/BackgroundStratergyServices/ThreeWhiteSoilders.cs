@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers;
 using StockLogger.Models.Candel;
 using StockLogger.Models.Stratergic_Models;
 using StockLogger.Models.Stratergic_Models.Inverted_Hammer;
@@ -17,9 +18,13 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
         public List<List<Candel>> MasterCandelListFor10MinCandel3WS = new List<List<Candel>>();
         public List<List<Candel>> MasterCandelListFor15MinCandel3WS = new List<List<Candel>>();
 
+        private readonly MorningStarAnalyzer _morningStarAnalyzer;
+
         public ThreeWhiteSoilders(HttpClient httpClient)
         {
             _httpClient = httpClient;
+
+            _morningStarAnalyzer = new MorningStarAnalyzer();
 
             _stocks = new List<(string, string, string, long)>
             {
@@ -60,6 +65,13 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
             // Get the last 3 candles from the list (the most recent 3)
             List<Candel> recentThreeCandles = candelList.OrderByDescending(c => c.CloseTime).Take(3).ToList();
 
+            Candel latestCandel = recentThreeCandles.FirstOrDefault();
+
+            if (latestCandel.CloseTime.Second < 59)
+            {
+                return;
+            }
+
             // Check if all three candles are bullish
             bool allThreeBullish = recentThreeCandles.All(c => c.IsBullish == true);
 
@@ -89,8 +101,9 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
 
             // Combine all conditions to detect the Three White Soldiers pattern
             //if (CandelSample != null)
-            if (allThreeBullish && progressiveCloses && increasingBodySize && smallUpperShadow && smallLowerShadow &&
-                strongBodyRatio && priorConsolidationOrBearish)
+            if (allThreeBullish && progressiveCloses && increasingBodySize && priorConsolidationOrBearish)
+            //if (allThreeBullish && progressiveCloses && increasingBodySize && smallUpperShadow && smallLowerShadow &&
+            //strongBodyRatio && priorConsolidationOrBearish)
             {
                 if (Range == 1)
                 {
@@ -185,6 +198,11 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
                 return;
             }
 
+            if(recentCandle.CloseTime.Second < 59)
+            {
+                return;
+            }
+
             // Calculate the real body and the shadows
             decimal realBody = Math.Abs(recentCandle.EndPrice - recentCandle.StartPrice);
             decimal upperShadow = recentCandle.HighestPrice - Math.Max(recentCandle.EndPrice, recentCandle.StartPrice);
@@ -203,6 +221,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
                                                            .All(c => c.IsBearish.GetValueOrDefault() || !c.IsBullish.GetValueOrDefault());
 
             // Combine conditions to detect the Inverted Hammer
+            //if (CandelSample != null)
             if (smallRealBody && longUpperShadow && minimalLowerShadow && priorDowntrendOrConsolidation)
             {
                 if (Range == 1)
@@ -279,6 +298,57 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
                 Console.WriteLine("No Inverted Hammer pattern detected.");
             }
         }
+
+
+        //public async void MorningStarAnalyzer(List<Candel> candelList, int Range)
+        //{
+        //    // Ensure there are at least 3 candles in the list
+        //    if (candelList.Count < 3)
+        //    {
+        //        Console.WriteLine("The list must contain at least 3 candles.");
+        //        return;
+        //    }
+
+        //    // Get the last 3 candles (most recent)
+        //    List<Candel> recentThreeCandles = candelList.OrderByDescending(c => c.CloseTime).Take(3).ToList();
+
+        //    // Get the latest candel (top-most from the recentThreeCandles list)
+        //    Candel latestCandel = recentThreeCandles.FirstOrDefault();
+
+        //    if(latestCandel.CloseTime.Second < 58)
+        //    {
+        //        return;
+        //    }
+
+        //    // Condition 1: The first candle should be bearish with a large body
+        //    bool firstBearish = recentThreeCandles[2].IsBearish == true &&
+        //                        (recentThreeCandles[2].StartPrice - recentThreeCandles[2].EndPrice) >
+        //                        (recentThreeCandles[2].HighestPrice - recentThreeCandles[2].LowestPrice) * 0.6m;
+
+        //    // Condition 2: The second candle should be a small-bodied candle (indecision)
+        //    decimal secondBodySize = Math.Abs(recentThreeCandles[1].EndPrice - recentThreeCandles[1].StartPrice);
+        //    decimal secondRange = recentThreeCandles[1].HighestPrice - recentThreeCandles[1].LowestPrice;
+        //    bool secondIndecision = secondBodySize / secondRange <= 0.3m;
+
+        //    // Condition 3: The third candle should be bullish with a large body
+        //    bool thirdBullish = recentThreeCandles[0].IsBullish == true &&
+        //                        (recentThreeCandles[0].EndPrice - recentThreeCandles[0].StartPrice) >
+        //                        (recentThreeCandles[0].HighestPrice - recentThreeCandles[0].LowestPrice) * 0.6m;
+
+        //    // Condition 4: The third candle should close above the midpoint of the first candle
+        //    decimal firstMidpoint = (recentThreeCandles[2].StartPrice + recentThreeCandles[2].EndPrice) / 2;
+        //    bool thirdClosesAboveMidpoint = recentThreeCandles[0].EndPrice > firstMidpoint;
+
+        //    // Combine all conditions to detect the Morning Star pattern
+        //    if (firstBearish && secondIndecision && thirdBullish && thirdClosesAboveMidpoint)
+        //    {
+        //        Console.WriteLine("Morning Star pattern detected!");
+        //    }
+        //    else
+        //    {
+        //        Console.WriteLine("No Morning Star pattern detected.");
+        //    }
+        //}
 
 
         private async Task AnalyzeThreeWhiteSoldiersAsync(string ticker, CancellationToken stoppingToken)
@@ -489,6 +559,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
                         await Analyze5MinCandelInvertedHammerAsync(stock.ticker, stoppingToken);
                         await Analyze10MinCandelInvertedHammerAsync(stock.ticker, stoppingToken);
                         await Analyze15MinCandelInvertedHammerAsync(stock.ticker, stoppingToken);
+
                     }
                     catch (Exception ex)
                     {

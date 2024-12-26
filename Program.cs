@@ -15,7 +15,12 @@ builder.Services.AddDbContext<StockLoggerDbContext>(options =>
     sqlServerOptions => sqlServerOptions.EnableRetryOnFailure()));
 
 //builder.Services.AddHostedService<StockPriceFetcherService>();
+builder.Services.AddHttpClient<ThreeWhiteSoilders>();
 builder.Services.AddHostedService<ThreeWhiteSoilders>();
+
+builder.Services.AddHttpClient<MorningStarService>();
+builder.Services.AddHostedService<MorningStarService>();
+
 builder.Services.AddHostedService<CandelMakerService>();
 
 // Add services to the container.

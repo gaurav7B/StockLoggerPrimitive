@@ -2,6 +2,7 @@
 using StockLogger.Models.Candel;
 using StockLogger.Models.Stratergic_Models;
 using StockLogger.Models.Stratergic_Models.Inverted_Hammer;
+using StockLogger.Models.Stratergic_Models.Morning_Star;
 
 namespace StockLogger.Data
 {
@@ -27,6 +28,11 @@ namespace StockLogger.Data
 
         //INVERTED_HAMMER TRADING STRATERGY
         public DbSet<InvertedHammerDb> InvertedHammerDb { get; set; }
-        public DbSet<InvertedHammerCandels> InvertedHammerCandels {  get; set; }
+        public DbSet<InvertedHammerCandels> InvertedHammerCandels { get; set; }
+
+        //MORNING_STAR TRADING STARTERGY
+        public DbSet<MorningStarDb> MorningStarDb { get; set; }
+        public DbSet<MorningStarCandels> MorningStarCandels { get; set; }
+
     }
 }
