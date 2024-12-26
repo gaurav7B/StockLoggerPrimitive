@@ -23,11 +23,11 @@ namespace StockLogger.Models.Stratergic_Models
 
         public void SetNextCandelBullBearStatus()
         {
-            if(NextCandelClosePrice > ReportCandelClosePrice)
+            if (NextCandelClosePrice > ReportCandelClosePrice)
             {
                 IsPredictionTrue = true; IsPredictionFalse = null;
             }
-            else if(NextCandelClosePrice < ReportCandelClosePrice)
+            else if (NextCandelClosePrice < ReportCandelClosePrice)
             {
                 IsPredictionTrue = null; IsPredictionFalse = true;
             }
@@ -35,6 +35,16 @@ namespace StockLogger.Models.Stratergic_Models
             {
                 IsPredictionTrue = null; IsPredictionFalse = null;
             }
+        }
+
+        public decimal PriceChange { get; set; }
+        public decimal PriceChangePercentage { get; set; }
+
+        // Method to set bullish or bearish status based on prices
+        public void SetPriceChange()
+        {
+            PriceChange = NextCandelClosePrice - ReportCandelClosePrice;
+            PriceChangePercentage = ReportCandelClosePrice != 0 ? (PriceChange / ReportCandelClosePrice) * 100 : 0;
         }
     }
 }
