@@ -26,29 +26,8 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
 
             _morningStarAnalyzer = new MorningStarAnalyzer();
 
-            _stocks = new List<(string, string, string, long)>
-            {
-                ("INFY", "NSE", "Infosys", 1),
-                ("RELIANCE", "NSE", "Reliance Industries", 2),
-                ("TCS", "NSE", "Tata Consultancy Services", 3),
-                ("HDFCBANK", "NSE", "HDFC Bank", 4),
-                ("ICICIBANK", "NSE", "ICICI Bank", 5),
-                ("HINDUNILVR", "NSE", "Hindustan Unilever", 6),
-                ("ITC", "NSE", "ITC Limited", 7),
-                ("KOTAKBANK", "NSE", "Kotak Mahindra Bank", 8),
-                ("LT", "NSE", "Larsen & Toubro", 9),
-                ("SBIN", "NSE", "State Bank of India", 10),
-                ("AXISBANK", "NSE", "Axis Bank", 11),
-                ("BAJFINANCE", "NSE", "Bajaj Finance", 12),
-                ("BHARTIARTL", "NSE", "Bharti Airtel", 13),
-                ("HCLTECH", "NSE", "HCL Technologies", 14),
-                ("ASIANPAINT", "NSE", "Asian Paints", 15),
-                ("DMART", "NSE", "Avenue Supermarts", 16),
-                ("MARUTI", "NSE", "Maruti Suzuki India", 17),
-                ("SUNPHARMA", "NSE", "Sun Pharmaceutical Industries", 18),
-                ("NTPC", "NSE", "NTPC Limited", 19),
-                ("TITAN", "NSE", "Titan Company", 20),
-            };
+            // Fetch stocks from StockList
+            _stocks = StockList.GetStocks();
         }
 
         public async void ThreeWhiteSoilderAnalyzer(List<Candel> candelList, int Range)
@@ -101,11 +80,11 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
 
             // Combine all conditions to detect the Three White Soldiers pattern
             //if (CandelSample != null)
-            if (allThreeBullish && progressiveCloses && increasingBodySize && priorConsolidationOrBearish)
-            //if (allThreeBullish && progressiveCloses && increasingBodySize && smallUpperShadow && smallLowerShadow &&
-            //strongBodyRatio && priorConsolidationOrBearish)
-            {
-                if (Range == 1)
+            if (allThreeBullish && progressiveCloses && increasingBodySize && smallUpperShadow && smallLowerShadow &&
+            strongBodyRatio && priorConsolidationOrBearish)
+                //if (allThreeBullish && progressiveCloses && increasingBodySize && priorConsolidationOrBearish)
+                {
+                    if (Range == 1)
                 {
                     MasterCandelListFor1MinCandel3WS.Add(candelList);
                     ThreeWhiteSoilderDb TWSPayload = new ThreeWhiteSoilderDb
@@ -136,8 +115,11 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
                         ThreeWhiteSoilderCandels = null
                     };
 
-                    HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/ThreeWhiteSoilderDb",
-                                      new StringContent(JsonConvert.SerializeObject(TWSPayload), Encoding.UTF8, "application/json"));
+                    if ((CandelSample.CloseTime.Minute - CandelSample.OpenTime.Minute) > 4)
+                    {
+                        HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/ThreeWhiteSoilderDb",
+                                          new StringContent(JsonConvert.SerializeObject(TWSPayload), Encoding.UTF8, "application/json"));
+                    }
                 }
                 else if (Range == 10)
                 {
@@ -153,8 +135,11 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
                         ThreeWhiteSoilderCandels = null
                     };
 
-                    HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/ThreeWhiteSoilderDb",
-                                      new StringContent(JsonConvert.SerializeObject(TWSPayload), Encoding.UTF8, "application/json"));
+                    if ((CandelSample.CloseTime.Minute - CandelSample.OpenTime.Minute) > 9)
+                    {
+                        HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/ThreeWhiteSoilderDb",
+                                          new StringContent(JsonConvert.SerializeObject(TWSPayload), Encoding.UTF8, "application/json"));
+                    }
                 }
                 else if (Range == 15)
                 {
@@ -170,8 +155,11 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
                         ThreeWhiteSoilderCandels = null
                     };
 
-                    HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/ThreeWhiteSoilderDb",
-                                      new StringContent(JsonConvert.SerializeObject(TWSPayload), Encoding.UTF8, "application/json"));
+                    if ((CandelSample.CloseTime.Minute - CandelSample.OpenTime.Minute) > 14)
+                    {
+                        HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/ThreeWhiteSoilderDb",
+                                          new StringContent(JsonConvert.SerializeObject(TWSPayload), Encoding.UTF8, "application/json"));
+                    }
                 }
             }
             else
@@ -255,8 +243,11 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
                         InvertedHammerCandels = null
                     };
 
-                    HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/InvertedHammerDb",
+                    if ((recentCandle.CloseTime.Minute - recentCandle.OpenTime.Minute) > 4)
+                    {
+                        HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/InvertedHammerDb",
                                       new StringContent(JsonConvert.SerializeObject(IMPayload), Encoding.UTF8, "application/json"));
+                    }
                 }
                 else if (Range == 10)
                 {
@@ -272,8 +263,11 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
                         InvertedHammerCandels = null
                     };
 
-                    HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/InvertedHammerDb",
+                    if ((recentCandle.CloseTime.Minute - recentCandle.OpenTime.Minute) > 9)
+                    {
+                        HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/InvertedHammerDb",
                                       new StringContent(JsonConvert.SerializeObject(IMPayload), Encoding.UTF8, "application/json"));
+                    }
                 }
                 else if (Range == 15)
                 {
@@ -289,8 +283,11 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
                         InvertedHammerCandels = null
                     };
 
-                    HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/InvertedHammerDb",
+                    if ((recentCandle.CloseTime.Minute - recentCandle.OpenTime.Minute) > 14)
+                    {
+                        HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/InvertedHammerDb",
                                       new StringContent(JsonConvert.SerializeObject(IMPayload), Encoding.UTF8, "application/json"));
+                    }
                 }
             }
             else
@@ -298,58 +295,6 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
                 Console.WriteLine("No Inverted Hammer pattern detected.");
             }
         }
-
-
-        //public async void MorningStarAnalyzer(List<Candel> candelList, int Range)
-        //{
-        //    // Ensure there are at least 3 candles in the list
-        //    if (candelList.Count < 3)
-        //    {
-        //        Console.WriteLine("The list must contain at least 3 candles.");
-        //        return;
-        //    }
-
-        //    // Get the last 3 candles (most recent)
-        //    List<Candel> recentThreeCandles = candelList.OrderByDescending(c => c.CloseTime).Take(3).ToList();
-
-        //    // Get the latest candel (top-most from the recentThreeCandles list)
-        //    Candel latestCandel = recentThreeCandles.FirstOrDefault();
-
-        //    if(latestCandel.CloseTime.Second < 58)
-        //    {
-        //        return;
-        //    }
-
-        //    // Condition 1: The first candle should be bearish with a large body
-        //    bool firstBearish = recentThreeCandles[2].IsBearish == true &&
-        //                        (recentThreeCandles[2].StartPrice - recentThreeCandles[2].EndPrice) >
-        //                        (recentThreeCandles[2].HighestPrice - recentThreeCandles[2].LowestPrice) * 0.6m;
-
-        //    // Condition 2: The second candle should be a small-bodied candle (indecision)
-        //    decimal secondBodySize = Math.Abs(recentThreeCandles[1].EndPrice - recentThreeCandles[1].StartPrice);
-        //    decimal secondRange = recentThreeCandles[1].HighestPrice - recentThreeCandles[1].LowestPrice;
-        //    bool secondIndecision = secondBodySize / secondRange <= 0.3m;
-
-        //    // Condition 3: The third candle should be bullish with a large body
-        //    bool thirdBullish = recentThreeCandles[0].IsBullish == true &&
-        //                        (recentThreeCandles[0].EndPrice - recentThreeCandles[0].StartPrice) >
-        //                        (recentThreeCandles[0].HighestPrice - recentThreeCandles[0].LowestPrice) * 0.6m;
-
-        //    // Condition 4: The third candle should close above the midpoint of the first candle
-        //    decimal firstMidpoint = (recentThreeCandles[2].StartPrice + recentThreeCandles[2].EndPrice) / 2;
-        //    bool thirdClosesAboveMidpoint = recentThreeCandles[0].EndPrice > firstMidpoint;
-
-        //    // Combine all conditions to detect the Morning Star pattern
-        //    if (firstBearish && secondIndecision && thirdBullish && thirdClosesAboveMidpoint)
-        //    {
-        //        Console.WriteLine("Morning Star pattern detected!");
-        //    }
-        //    else
-        //    {
-        //        Console.WriteLine("No Morning Star pattern detected.");
-        //    }
-        //}
-
 
         private async Task AnalyzeThreeWhiteSoldiersAsync(string ticker, CancellationToken stoppingToken)
         {

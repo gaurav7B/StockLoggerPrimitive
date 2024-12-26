@@ -21,7 +21,7 @@ namespace StockLogger.Controllers.Stratergic_API_Controller
 
         // GET: https://localhost:44364/api/MorningStarDb
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MorningStarDb>>> GetThreeWhiteSoilderDbs()
+        public async Task<ActionResult<IEnumerable<MorningStarDb>>> GetFromDb()
         {
             return await _context.MorningStarDb
                 .Include(t => t.MorningStarCandels) // Eager load the navigation property
@@ -30,7 +30,7 @@ namespace StockLogger.Controllers.Stratergic_API_Controller
 
         // POST: https://localhost:44364/api/MorningStarDb
         [HttpPost]
-        public async Task<ActionResult<MorningStarDb>> PostThreeWhiteSoilderDb(MorningStarDb payload)
+        public async Task<ActionResult<MorningStarDb>> PostToDb(MorningStarDb payload)
         {
             _context.MorningStarDb.Add(payload);
             await _context.SaveChangesAsync();

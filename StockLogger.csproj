@@ -32,14 +32,4 @@
     <None Include="wwwroot\Images\Imperium.jpg" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Models\Stratergic Models\Bullish Engulfing\" />
-    <Folder Include="Models\Stratergic Models\Hammer\" />
-    <Folder Include="Models\Stratergic Models\Bullish Harami\" />
-    <Folder Include="Models\Stratergic Models\Dragonfly Doji\" />
-    <Folder Include="Models\Stratergic Models\Tweezer Bottom\" />
-    <Folder Include="Models\Stratergic Models\Rising Three Methods\" />
-    <Folder Include="Models\Stratergic Models\Piercing Line\" />
-  </ItemGroup>
-
 </Project>

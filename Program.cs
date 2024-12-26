@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using StockLogger.BackgroundServices;
 using StockLogger.BackgroundServices.BackgroundStratergyServices;
 using StockLogger.Data;
@@ -15,13 +14,35 @@ builder.Services.AddDbContext<StockLoggerDbContext>(options =>
     sqlServerOptions => sqlServerOptions.EnableRetryOnFailure()));
 
 //builder.Services.AddHostedService<StockPriceFetcherService>();
+
+builder.Services.AddHostedService<CandelMakerService>();
+
 builder.Services.AddHttpClient<ThreeWhiteSoilders>();
 builder.Services.AddHostedService<ThreeWhiteSoilders>();
 
 builder.Services.AddHttpClient<MorningStarService>();
 builder.Services.AddHostedService<MorningStarService>();
 
-builder.Services.AddHostedService<CandelMakerService>();
+builder.Services.AddHttpClient<BullishEngulfingService>();
+builder.Services.AddHostedService<BullishEngulfingService>();
+
+builder.Services.AddHttpClient<BullishHaramiService>();
+builder.Services.AddHostedService<BullishHaramiService>();
+
+builder.Services.AddHttpClient<DragonflyDojiService>();
+builder.Services.AddHostedService<DragonflyDojiService>();
+
+builder.Services.AddHttpClient<HammerService>();
+builder.Services.AddHostedService<HammerService>();
+
+builder.Services.AddHttpClient<PiercingLineService>();
+builder.Services.AddHostedService<PiercingLineService>();
+
+builder.Services.AddHttpClient<RisingThreeMethodsService>();
+builder.Services.AddHostedService<RisingThreeMethodsService>();
+
+builder.Services.AddHttpClient<TweezerBottomService>();
+builder.Services.AddHostedService<TweezerBottomService>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();

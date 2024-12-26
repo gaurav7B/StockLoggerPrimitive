@@ -1,134 +1,137 @@
 ﻿using Newtonsoft.Json;
 using StockLogger.Models.Candel;
-using StockLogger.Models.Stratergic_Models.Morning_Star;
-using System.Net.Http;
+using StockLogger.Models.Stratergic_Models.Hammer;
 using System.Text;
 
 namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
 {
-    public class MorningStarAnalyzer
+    public class HammerAnalyzer
     {
-        public async void MorningStarAnalyzerLogic(List<Candel> candelList, HttpClient _httpClient, int Range)
+        public async void HammerAnalyzerLogic(List<Candel> candelList, HttpClient _httpClient, int Range)
         {
-            // Ensure there are at least 3 candles in the list
-            if (candelList.Count < 3)
+            // Ensure there are at least 1 candle to check
+            if (candelList.Count < 1)
             {
-                Console.WriteLine("The list must contain at least 3 candles.");
+                Console.WriteLine("The list must contain at least 1 candle.");
                 return;
             }
 
-            // Get the last 3 candles (most recent)
-            List<Candel> recentThreeCandles = candelList.OrderByDescending(c => c.CloseTime).Take(3).ToList();
+            // Get the last (most recent) candle
+            Candel latestCandel = candelList.OrderByDescending(c => c.CloseTime).First();
 
-            // Get the latest candel (top-most from the recentThreeCandles list)
-            Candel latestCandel = recentThreeCandles.FirstOrDefault();
-
-            if (latestCandel.CloseTime.Second < 59)
+            if(latestCandel.CloseTime.Second < 59)
             {
                 return;
             }
 
-            // Condition 1: The first candle should be bearish with a large body
-            bool firstBearish = recentThreeCandles[2].IsBearish == true &&
-                                (recentThreeCandles[2].StartPrice - recentThreeCandles[2].EndPrice) >
-                                (recentThreeCandles[2].HighestPrice - recentThreeCandles[2].LowestPrice) * 0.6m;
+            // Calculate the body size
+            decimal bodySize = Math.Abs(latestCandel.EndPrice - latestCandel.StartPrice);
 
-            // Condition 2: The second candle should be a small-bodied candle (indecision)
-            decimal secondBodySize = Math.Abs(recentThreeCandles[1].EndPrice - recentThreeCandles[1].StartPrice);
-            decimal secondRange = recentThreeCandles[1].HighestPrice - recentThreeCandles[1].LowestPrice;
-            bool secondIndecision = secondRange != 0 && (secondBodySize / secondRange) <= 0.3m;
+            // Calculate the lower shadow size
+            decimal lowerShadowSize = latestCandel.StartPrice - latestCandel.LowestPrice;
 
-            // Condition 3: The third candle should be bullish with a large body
-            bool thirdBullish = recentThreeCandles[0].IsBullish == true &&
-                                (recentThreeCandles[0].EndPrice - recentThreeCandles[0].StartPrice) >
-                                (recentThreeCandles[0].HighestPrice - recentThreeCandles[0].LowestPrice) * 0.6m;
+            // Calculate the upper shadow size
+            decimal upperShadowSize = latestCandel.HighestPrice - latestCandel.EndPrice;
 
-            // Condition 4: The third candle should close above the midpoint of the first candle
-            decimal firstMidpoint = (recentThreeCandles[2].StartPrice + recentThreeCandles[2].EndPrice) / 2;
-            bool thirdClosesAboveMidpoint = recentThreeCandles[0].EndPrice > firstMidpoint;
+            // Check if the candle is bullish
+            bool isBullish = latestCandel.IsBullish == true;
 
-            // Combine all conditions to detect the Morning Star pattern
-            if (firstBearish && secondIndecision && thirdBullish && thirdClosesAboveMidpoint)
+            // Check if the body is small (small relative to the overall candle range)
+            bool smallBody = bodySize < (latestCandel.HighestPrice - latestCandel.LowestPrice) * 0.3m;
+
+            // Check if the lower shadow is at least twice as long as the body
+            bool longLowerShadow = lowerShadowSize > 2 * bodySize;
+
+            // Check if the upper shadow is very small or nonexistent
+            bool smallUpperShadow = upperShadowSize <= bodySize * 0.1m;
+
+            // If all conditions are met, the pattern is a bullish hammer
+            if (isBullish && smallBody && longLowerShadow && smallUpperShadow)
             {
                 if (Range == 1)
                 {
-                    MorningStarDb Payload = new MorningStarDb
+                    HammerDb Payload = new HammerDb
                     {
                         Ticker = latestCandel.Ticker,
                         TickerId = latestCandel.TickerId,
                         Exchange = latestCandel.Exchange,
-                        IsMorningStarDetected = true,
+                        IsHammerDetected = true,
                         DetectionRange = 1,
                         DetectionTime = latestCandel.CloseTime,
-                        MorningStarCandels = null
+                        HammerCandels = null
                     };
 
-                    HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/MorningStarDb",
-                                      new StringContent(JsonConvert.SerializeObject(Payload), Encoding.UTF8, "application/json"));
+                    HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/Hammer",
+                                        new StringContent(JsonConvert.SerializeObject(Payload), Encoding.UTF8, "application/json"));
                 }
                 else if (Range == 5)
                 {
-                    MorningStarDb Payload = new MorningStarDb
+                    HammerDb Payload = new HammerDb
                     {
                         Ticker = latestCandel.Ticker,
                         TickerId = latestCandel.TickerId,
                         Exchange = latestCandel.Exchange,
-                        IsMorningStarDetected = true,
+                        IsHammerDetected = true,
                         DetectionRange = 5,
                         DetectionTime = latestCandel.CloseTime,
-                        MorningStarCandels = null
+                        HammerCandels = null
                     };
-                    if((latestCandel.CloseTime.Minute - latestCandel.OpenTime.Minute) > 4)
+
+                    if ((latestCandel.CloseTime.Minute - latestCandel.OpenTime.Minute) > 4)
                     {
-                        HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/MorningStarDb",
-                                       new StringContent(JsonConvert.SerializeObject(Payload), Encoding.UTF8, "application/json"));
+                        HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/Hammer",
+                                            new StringContent(JsonConvert.SerializeObject(Payload), Encoding.UTF8, "application/json"));
                     }
                 }
                 else if (Range == 10)
                 {
-                    MorningStarDb Payload = new MorningStarDb
+                    HammerDb Payload = new HammerDb
                     {
                         Ticker = latestCandel.Ticker,
                         TickerId = latestCandel.TickerId,
                         Exchange = latestCandel.Exchange,
-                        IsMorningStarDetected = true,
+                        IsHammerDetected = true,
                         DetectionRange = 10,
                         DetectionTime = latestCandel.CloseTime,
-                        MorningStarCandels = null
+                        HammerCandels = null
                     };
+
                     if ((latestCandel.CloseTime.Minute - latestCandel.OpenTime.Minute) > 9)
                     {
-                        HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/MorningStarDb",
-                                      new StringContent(JsonConvert.SerializeObject(Payload), Encoding.UTF8, "application/json"));
+                        HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/Hammer",
+                                            new StringContent(JsonConvert.SerializeObject(Payload), Encoding.UTF8, "application/json"));
                     }
                 }
                 else if (Range == 15)
                 {
-                    MorningStarDb Payload = new MorningStarDb
+                    HammerDb Payload = new HammerDb
                     {
                         Ticker = latestCandel.Ticker,
                         TickerId = latestCandel.TickerId,
                         Exchange = latestCandel.Exchange,
-                        IsMorningStarDetected = true,
+                        IsHammerDetected = true,
                         DetectionRange = 15,
                         DetectionTime = latestCandel.CloseTime,
-                        MorningStarCandels = null
+                        HammerCandels = null
                     };
+
                     if ((latestCandel.CloseTime.Minute - latestCandel.OpenTime.Minute) > 14)
                     {
-                        HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/MorningStarDb",
-                                      new StringContent(JsonConvert.SerializeObject(Payload), Encoding.UTF8, "application/json"));
+                        HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/Hammer",
+                                            new StringContent(JsonConvert.SerializeObject(Payload), Encoding.UTF8, "application/json"));
                     }
                 }
             }
             else
             {
-                Console.WriteLine("No Morning Star pattern detected.");
+                Console.WriteLine("No Hammer pattern detected.");
             }
         }
 
 
-        public async Task AnalyzeMorningStarAsync(string ticker, HttpClient _httpClient, CancellationToken stoppingToken)
+
+
+        public async Task Analyze1MinCandelAsync(string ticker, HttpClient _httpClient, CancellationToken stoppingToken)
         {
             try
             {
@@ -141,7 +144,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
 
                 if (candels != null)
                 {
-                    MorningStarAnalyzerLogic(candels, _httpClient , 1);
+                    HammerAnalyzerLogic(candels, _httpClient, 1);
                 }
             }
             catch (Exception ex)
@@ -150,7 +153,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
             }
         }
 
-        public async Task Analyze5MinCandelMorningStarAsync(string ticker, HttpClient _httpClient, CancellationToken stoppingToken)
+        public async Task Analyze5MinCandelAsync(string ticker, HttpClient _httpClient, CancellationToken stoppingToken)
         {
             try
             {
@@ -163,7 +166,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
 
                 if (candels != null)
                 {
-                    MorningStarAnalyzerLogic(candels, _httpClient , 5);
+                    HammerAnalyzerLogic(candels, _httpClient, 5);
                 }
             }
             catch (Exception ex)
@@ -172,7 +175,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
             }
         }
 
-        public async Task Analyze10MinCandelMorningStarAsync(string ticker, HttpClient _httpClient, CancellationToken stoppingToken)
+        public async Task Analyze10MinCandelAsync(string ticker, HttpClient _httpClient, CancellationToken stoppingToken)
         {
             try
             {
@@ -185,7 +188,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
 
                 if (candels != null)
                 {
-                    MorningStarAnalyzerLogic(candels, _httpClient , 10);
+                    HammerAnalyzerLogic(candels, _httpClient, 10);
                 }
             }
             catch (Exception ex)
@@ -194,7 +197,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
             }
         }
 
-        public async Task Analyze15MinCandelMorningStarAsync(string ticker, HttpClient _httpClient, CancellationToken stoppingToken)
+        public async Task Analyze15MinCandelAsync(string ticker, HttpClient _httpClient, CancellationToken stoppingToken)
         {
             try
             {
@@ -207,7 +210,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
 
                 if (candels != null)
                 {
-                    MorningStarAnalyzerLogic(candels, _httpClient , 15);
+                    HammerAnalyzerLogic(candels, _httpClient, 15);
                 }
             }
             catch (Exception ex)

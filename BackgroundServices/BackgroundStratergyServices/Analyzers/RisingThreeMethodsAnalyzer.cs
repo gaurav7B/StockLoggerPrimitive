@@ -1,134 +1,138 @@
 ﻿using Newtonsoft.Json;
 using StockLogger.Models.Candel;
-using StockLogger.Models.Stratergic_Models.Morning_Star;
-using System.Net.Http;
+using StockLogger.Models.Stratergic_Models.Rising_Three_Methods;
 using System.Text;
 
 namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
 {
-    public class MorningStarAnalyzer
+    public class RisingThreeMethodsAnalyzer
     {
-        public async void MorningStarAnalyzerLogic(List<Candel> candelList, HttpClient _httpClient, int Range)
+        public async void RisingThreeMethodsAnalyzerLogic(List<Candel> candelList, HttpClient _httpClient, int Range)
         {
-            // Ensure there are at least 3 candles in the list
-            if (candelList.Count < 3)
+            // Ensure there are at least 5 candles in the list
+            if (candelList.Count < 5)
             {
-                Console.WriteLine("The list must contain at least 3 candles.");
+                Console.WriteLine("The list must contain at least 5 candles.");
                 return;
             }
 
-            // Get the last 3 candles (most recent)
-            List<Candel> recentThreeCandles = candelList.OrderByDescending(c => c.CloseTime).Take(3).ToList();
-
-            // Get the latest candel (top-most from the recentThreeCandles list)
-            Candel latestCandel = recentThreeCandles.FirstOrDefault();
+            // Get the last (most recent) candle
+            Candel latestCandel = candelList.OrderByDescending(c => c.CloseTime).First();
 
             if (latestCandel.CloseTime.Second < 59)
             {
                 return;
             }
 
-            // Condition 1: The first candle should be bearish with a large body
-            bool firstBearish = recentThreeCandles[2].IsBearish == true &&
-                                (recentThreeCandles[2].StartPrice - recentThreeCandles[2].EndPrice) >
-                                (recentThreeCandles[2].HighestPrice - recentThreeCandles[2].LowestPrice) * 0.6m;
+            // Get the last 5 candles from the list
+            List<Candel> lastFiveCandles = candelList.OrderByDescending(c => c.CloseTime).Take(5).ToList();
 
-            // Condition 2: The second candle should be a small-bodied candle (indecision)
-            decimal secondBodySize = Math.Abs(recentThreeCandles[1].EndPrice - recentThreeCandles[1].StartPrice);
-            decimal secondRange = recentThreeCandles[1].HighestPrice - recentThreeCandles[1].LowestPrice;
-            bool secondIndecision = secondRange != 0 && (secondBodySize / secondRange) <= 0.3m;
+            // Identify each candle for clarity
+            Candel firstBullishCandle = lastFiveCandles[4]; // First candle
+            List<Candel> middleThreeCandles = lastFiveCandles.GetRange(1, 3); // Middle three candles
+            Candel finalBullishCandle = lastFiveCandles[0]; // Last candle
 
-            // Condition 3: The third candle should be bullish with a large body
-            bool thirdBullish = recentThreeCandles[0].IsBullish == true &&
-                                (recentThreeCandles[0].EndPrice - recentThreeCandles[0].StartPrice) >
-                                (recentThreeCandles[0].HighestPrice - recentThreeCandles[0].LowestPrice) * 0.6m;
+            // Check if the first candle is strongly bullish
+            bool firstBullish = firstBullishCandle.IsBullish == true;
 
-            // Condition 4: The third candle should close above the midpoint of the first candle
-            decimal firstMidpoint = (recentThreeCandles[2].StartPrice + recentThreeCandles[2].EndPrice) / 2;
-            bool thirdClosesAboveMidpoint = recentThreeCandles[0].EndPrice > firstMidpoint;
+            // Check if the three middle candles are bearish or neutral and stay within the range of the first bullish candle
+            bool middleCandlesWithinRange = middleThreeCandles.All(c =>
+                c.HighestPrice <= firstBullishCandle.HighestPrice &&
+                c.LowestPrice >= firstBullishCandle.LowestPrice &&
+                (c.IsBearish == true || c.IsBullish == null)
+            );
 
-            // Combine all conditions to detect the Morning Star pattern
-            if (firstBearish && secondIndecision && thirdBullish && thirdClosesAboveMidpoint)
+            // Check if the final candle is strongly bullish and closes above the first candle's close
+            bool finalBullish = finalBullishCandle.IsBullish == true &&
+                                finalBullishCandle.EndPrice > firstBullishCandle.EndPrice;
+
+            // Combine all conditions to detect the Rising Three Methods pattern
+            if (firstBullish && middleCandlesWithinRange && finalBullish)
             {
                 if (Range == 1)
                 {
-                    MorningStarDb Payload = new MorningStarDb
+                    RisingThreeMethodsDb Payload = new RisingThreeMethodsDb
                     {
                         Ticker = latestCandel.Ticker,
                         TickerId = latestCandel.TickerId,
                         Exchange = latestCandel.Exchange,
-                        IsMorningStarDetected = true,
+                        IsRisingThreeMethodsDetected = true,
                         DetectionRange = 1,
                         DetectionTime = latestCandel.CloseTime,
-                        MorningStarCandels = null
+                        RisingThreeMethodsCandels = null
                     };
 
-                    HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/MorningStarDb",
-                                      new StringContent(JsonConvert.SerializeObject(Payload), Encoding.UTF8, "application/json"));
+                    HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/RisingThreeMethods",
+                                        new StringContent(JsonConvert.SerializeObject(Payload), Encoding.UTF8, "application/json"));
                 }
                 else if (Range == 5)
                 {
-                    MorningStarDb Payload = new MorningStarDb
+                    RisingThreeMethodsDb Payload = new RisingThreeMethodsDb
                     {
                         Ticker = latestCandel.Ticker,
                         TickerId = latestCandel.TickerId,
                         Exchange = latestCandel.Exchange,
-                        IsMorningStarDetected = true,
+                        IsRisingThreeMethodsDetected = true,
                         DetectionRange = 5,
                         DetectionTime = latestCandel.CloseTime,
-                        MorningStarCandels = null
+                        RisingThreeMethodsCandels = null
                     };
-                    if((latestCandel.CloseTime.Minute - latestCandel.OpenTime.Minute) > 4)
+
+                    if ((latestCandel.CloseTime.Minute - latestCandel.OpenTime.Minute) > 4)
                     {
-                        HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/MorningStarDb",
-                                       new StringContent(JsonConvert.SerializeObject(Payload), Encoding.UTF8, "application/json"));
+                        HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/RisingThreeMethods",
+                                            new StringContent(JsonConvert.SerializeObject(Payload), Encoding.UTF8, "application/json"));
                     }
                 }
                 else if (Range == 10)
                 {
-                    MorningStarDb Payload = new MorningStarDb
+                    RisingThreeMethodsDb Payload = new RisingThreeMethodsDb
                     {
                         Ticker = latestCandel.Ticker,
                         TickerId = latestCandel.TickerId,
                         Exchange = latestCandel.Exchange,
-                        IsMorningStarDetected = true,
+                        IsRisingThreeMethodsDetected = true,
                         DetectionRange = 10,
                         DetectionTime = latestCandel.CloseTime,
-                        MorningStarCandels = null
+                        RisingThreeMethodsCandels = null
                     };
+
                     if ((latestCandel.CloseTime.Minute - latestCandel.OpenTime.Minute) > 9)
                     {
-                        HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/MorningStarDb",
-                                      new StringContent(JsonConvert.SerializeObject(Payload), Encoding.UTF8, "application/json"));
+                        HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/RisingThreeMethods",
+                                            new StringContent(JsonConvert.SerializeObject(Payload), Encoding.UTF8, "application/json"));
                     }
                 }
                 else if (Range == 15)
                 {
-                    MorningStarDb Payload = new MorningStarDb
+                    RisingThreeMethodsDb Payload = new RisingThreeMethodsDb
                     {
                         Ticker = latestCandel.Ticker,
                         TickerId = latestCandel.TickerId,
                         Exchange = latestCandel.Exchange,
-                        IsMorningStarDetected = true,
+                        IsRisingThreeMethodsDetected = true,
                         DetectionRange = 15,
                         DetectionTime = latestCandel.CloseTime,
-                        MorningStarCandels = null
+                        RisingThreeMethodsCandels = null
                     };
+
                     if ((latestCandel.CloseTime.Minute - latestCandel.OpenTime.Minute) > 14)
                     {
-                        HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/MorningStarDb",
-                                      new StringContent(JsonConvert.SerializeObject(Payload), Encoding.UTF8, "application/json"));
+                        HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/RisingThreeMethods",
+                                            new StringContent(JsonConvert.SerializeObject(Payload), Encoding.UTF8, "application/json"));
                     }
                 }
             }
             else
             {
-                Console.WriteLine("No Morning Star pattern detected.");
+                Console.WriteLine("Rising Three Methods pattern not detected.");
             }
         }
 
 
-        public async Task AnalyzeMorningStarAsync(string ticker, HttpClient _httpClient, CancellationToken stoppingToken)
+
+
+        public async Task Analyze1MinCandelAsync(string ticker, HttpClient _httpClient, CancellationToken stoppingToken)
         {
             try
             {
@@ -141,7 +145,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
 
                 if (candels != null)
                 {
-                    MorningStarAnalyzerLogic(candels, _httpClient , 1);
+                    RisingThreeMethodsAnalyzerLogic(candels, _httpClient, 1);
                 }
             }
             catch (Exception ex)
@@ -150,7 +154,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
             }
         }
 
-        public async Task Analyze5MinCandelMorningStarAsync(string ticker, HttpClient _httpClient, CancellationToken stoppingToken)
+        public async Task Analyze5MinCandelAsync(string ticker, HttpClient _httpClient, CancellationToken stoppingToken)
         {
             try
             {
@@ -163,7 +167,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
 
                 if (candels != null)
                 {
-                    MorningStarAnalyzerLogic(candels, _httpClient , 5);
+                    RisingThreeMethodsAnalyzerLogic(candels, _httpClient, 5);
                 }
             }
             catch (Exception ex)
@@ -172,7 +176,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
             }
         }
 
-        public async Task Analyze10MinCandelMorningStarAsync(string ticker, HttpClient _httpClient, CancellationToken stoppingToken)
+        public async Task Analyze10MinCandelAsync(string ticker, HttpClient _httpClient, CancellationToken stoppingToken)
         {
             try
             {
@@ -185,7 +189,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
 
                 if (candels != null)
                 {
-                    MorningStarAnalyzerLogic(candels, _httpClient , 10);
+                    RisingThreeMethodsAnalyzerLogic(candels, _httpClient, 10);
                 }
             }
             catch (Exception ex)
@@ -194,7 +198,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
             }
         }
 
-        public async Task Analyze15MinCandelMorningStarAsync(string ticker, HttpClient _httpClient, CancellationToken stoppingToken)
+        public async Task Analyze15MinCandelAsync(string ticker, HttpClient _httpClient, CancellationToken stoppingToken)
         {
             try
             {
@@ -207,7 +211,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
 
                 if (candels != null)
                 {
-                    MorningStarAnalyzerLogic(candels, _httpClient , 15);
+                    RisingThreeMethodsAnalyzerLogic(candels, _httpClient, 15);
                 }
             }
             catch (Exception ex)
@@ -215,6 +219,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
                 Console.WriteLine($"Error analyzing ticker {ticker}: {ex.Message}");
             }
         }
+
 
 
 

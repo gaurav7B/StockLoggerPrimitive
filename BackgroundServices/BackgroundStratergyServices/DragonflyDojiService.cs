@@ -1,20 +1,22 @@
 ﻿using StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers;
 using StockLogger.Models.Candel;
 using System.Diagnostics;
+using System.Net.Http;
 
 namespace StockLogger.BackgroundServices.BackgroundStratergyServices
 {
-    public class MorningStarService : BackgroundService
+    public class DragonflyDojiService : BackgroundService
     {
         private readonly HttpClient _httpClient;
         private readonly List<(string ticker, string exchange, string name, long id)> _stocks;
-        private readonly MorningStarAnalyzer _morningStarAnalyzer;
+        private readonly DragonFlyDojiAnalyzer _analyzer;
 
-        public MorningStarService(HttpClient httpClient)
+
+        public DragonflyDojiService(HttpClient httpClient)
         {
             _httpClient = httpClient;
 
-            _morningStarAnalyzer = new MorningStarAnalyzer();
+            _analyzer = new DragonFlyDojiAnalyzer();
 
             // Fetch stocks from StockList
             _stocks = StockList.GetStocks();
@@ -34,10 +36,10 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
                 {
                     try
                     {
-                        await _morningStarAnalyzer.AnalyzeMorningStarAsync(stock.ticker, _httpClient, stoppingToken);
-                        await _morningStarAnalyzer.Analyze5MinCandelMorningStarAsync(stock.ticker, _httpClient, stoppingToken);
-                        await _morningStarAnalyzer.Analyze10MinCandelMorningStarAsync(stock.ticker, _httpClient, stoppingToken);
-                        await _morningStarAnalyzer.Analyze15MinCandelMorningStarAsync(stock.ticker, _httpClient, stoppingToken);
+                        await _analyzer.Analyze1MinCandelAsync(stock.ticker, _httpClient, stoppingToken);
+                        await _analyzer.Analyze5MinCandelAsync(stock.ticker, _httpClient, stoppingToken);
+                        await _analyzer.Analyze10MinCandelAsync(stock.ticker, _httpClient, stoppingToken);
+                        await _analyzer.Analyze15MinCandelAsync(stock.ticker, _httpClient, stoppingToken);
                     }
                     catch (Exception ex)
                     {
@@ -59,6 +61,5 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
             }
 
         }
-
     }
 }

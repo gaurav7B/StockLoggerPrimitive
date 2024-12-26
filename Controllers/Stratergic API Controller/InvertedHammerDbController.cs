@@ -20,7 +20,7 @@ namespace StockLogger.Controllers.Stratergic_API_Controller
 
         // GET: https://localhost:44364/api/InvertedHammerDb
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<InvertedHammerDb>>> GetThreeWhiteSoilderDbs()
+        public async Task<ActionResult<IEnumerable<InvertedHammerDb>>> GetFromDb()
         {
             return await _context.InvertedHammerDb
                 .Include(t => t.InvertedHammerCandels) // Eager load the navigation property
@@ -29,7 +29,7 @@ namespace StockLogger.Controllers.Stratergic_API_Controller
 
         // POST: https://localhost:44364/api/InvertedHammerDb
         [HttpPost]
-        public async Task<ActionResult<InvertedHammerDb>> PostThreeWhiteSoilderDb(InvertedHammerDb invertedHammerDb)
+        public async Task<ActionResult<InvertedHammerDb>> PostToDb(InvertedHammerDb invertedHammerDb)
         {
             _context.InvertedHammerDb.Add(invertedHammerDb);
             await _context.SaveChangesAsync();

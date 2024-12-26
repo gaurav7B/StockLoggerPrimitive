@@ -4,22 +4,21 @@ using System.Diagnostics;
 
 namespace StockLogger.BackgroundServices.BackgroundStratergyServices
 {
-    public class MorningStarService : BackgroundService
+    public class TweezerBottomService : BackgroundService
     {
         private readonly HttpClient _httpClient;
         private readonly List<(string ticker, string exchange, string name, long id)> _stocks;
-        private readonly MorningStarAnalyzer _morningStarAnalyzer;
+        private readonly TweezerBottomAnalyzer _analyzer;
 
-        public MorningStarService(HttpClient httpClient)
+        public TweezerBottomService(HttpClient httpClient)
         {
             _httpClient = httpClient;
 
-            _morningStarAnalyzer = new MorningStarAnalyzer();
+            _analyzer = new TweezerBottomAnalyzer();
 
             // Fetch stocks from StockList
             _stocks = StockList.GetStocks();
         }
-
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -34,10 +33,10 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
                 {
                     try
                     {
-                        await _morningStarAnalyzer.AnalyzeMorningStarAsync(stock.ticker, _httpClient, stoppingToken);
-                        await _morningStarAnalyzer.Analyze5MinCandelMorningStarAsync(stock.ticker, _httpClient, stoppingToken);
-                        await _morningStarAnalyzer.Analyze10MinCandelMorningStarAsync(stock.ticker, _httpClient, stoppingToken);
-                        await _morningStarAnalyzer.Analyze15MinCandelMorningStarAsync(stock.ticker, _httpClient, stoppingToken);
+                        await _analyzer.Analyze1MinCandelAsync(stock.ticker, _httpClient, stoppingToken);
+                        await _analyzer.Analyze5MinCandelAsync(stock.ticker, _httpClient, stoppingToken);
+                        await _analyzer.Analyze10MinCandelAsync(stock.ticker, _httpClient, stoppingToken);
+                        await _analyzer.Analyze15MinCandelAsync(stock.ticker, _httpClient, stoppingToken);
                     }
                     catch (Exception ex)
                     {
