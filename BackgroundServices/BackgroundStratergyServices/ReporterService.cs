@@ -33,22 +33,26 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
 
                 if (HammerReport.Count != 0)
                 {
-                    foreach(HammerDb hammer in HammerReport)
+                    foreach(HammerDb report in HammerReport)
                     {
-                        if(hammer.DetectionRange == 1)
+                        if(report.DetectionRange == 1)
                         {
+                            DateTime DetectionTime = report.DetectionTime;
 
                         }
-                        else if(hammer.DetectionRange == 5)
+                        else if(report.DetectionRange == 5)
                         {
+                            DateTime DetectionTime = report.DetectionTime;
 
                         }
-                        else if (hammer.DetectionRange == 10)
+                        else if (report.DetectionRange == 10)
                         {
+                            DateTime DetectionTime = report.DetectionTime;
 
                         }
-                        else if (hammer.DetectionRange == 15)
+                        else if (report.DetectionRange == 15)
                         {
+                            DateTime DetectionTime = report.DetectionTime;
 
                         }
                     }
