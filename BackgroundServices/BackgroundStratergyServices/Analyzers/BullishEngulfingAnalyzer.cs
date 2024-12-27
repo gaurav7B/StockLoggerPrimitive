@@ -22,7 +22,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
             Candel previousCandle = recentTwoCandles[1];
             Candel currentCandle = recentTwoCandles[0];
 
-            if (currentCandle.CloseTime.Second < 59)
+            if (currentCandle.CloseTime.Second < 58)
             {
                 return;
             }

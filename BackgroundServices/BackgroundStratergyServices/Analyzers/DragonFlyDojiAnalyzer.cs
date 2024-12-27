@@ -21,7 +21,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
             // Get the most recent candle
             Candel recentCandel = candelList.OrderByDescending(c => c.CloseTime).FirstOrDefault();
 
-            if (recentCandel.CloseTime.Second < 59)
+            if (recentCandel.CloseTime.Second < 58)
             {
                 return;
             }

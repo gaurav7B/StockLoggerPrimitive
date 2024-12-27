@@ -66,7 +66,7 @@
 </head>
 <body>
     <div class="container">
-        @for (int i = 1; i <= 50; i++)
+@*         @for (int i = 1; i <= 50; i++)
         {
             <div class="box">
                 <div class="company-name">Company Name</div>
@@ -75,7 +75,8 @@
                     <div class="red-box" id="red-box-@i"></div>
                 </div>
             </div>
-        }
+        } *@
+        <button onclick="fetchAllData()">REPORT</button>
     </div>
 
     <script>
@@ -87,7 +88,7 @@
                     throw new Error('Failed to fetch data from StockTickerExchange API');
                 }
                 const data = await response.json();
-                console.log('StockTickerExchange Data:', data);  // Log the response from the first API
+                // console.log('StockTickerExchange Data:', data);  // Log the response from the first API
 
                 // Store the data in a variable for later use
                 let stockTickerData = data;  // You can use `stockTickerData` as needed
@@ -105,7 +106,7 @@
                     throw new Error('Failed to fetch data from ThreeWhiteSoilderDb API');
                 }
                 const data = await response.json();
-                console.log('ThreeWhiteSoldier Data:', data);  // Log the response from the second API
+                // console.log('ThreeWhiteSoldier Data:', data);  // Log the response from the second API
 
                 // Store the data in a variable for later use
                 let threeWhiteSoldierData = data;  // You can use `threeWhiteSoldierData` as needed
@@ -140,5 +141,249 @@
         });
     </script>
 
+    <script>
+        const apiHammerUrl = "https://localhost:44364/api/Hammer";
+        const apiBullishEngulfingUrl = "https://localhost:44364/api/BullishEngulfing";
+        const apiBullishHaramiUrl = "https://localhost:44364/api/BullishHarami";
+        const apiDragonflyDojiUrl = "https://localhost:44364/api/DragonflyDoji";
+        const apiInvertedHammerUrl = "https://localhost:44364/api/InvertedHammerDb";
+        const apiMorningStarUrl = "https://localhost:44364/api/MorningStarDb";
+        const apiPiercingLineUrl = "https://localhost:44364/api/PiercingLine";
+        const apiRisingThreeMethodsUrl = "https://localhost:44364/api/RisingThreeMethods";
+        const apiThreeWhiteSoilderDbUrl = "https://localhost:44364/api/ThreeWhiteSoilderDb";
+        const apiTweezerBottomUrl = "https://localhost:44364/api/TweezerBottom";
+        const apiCandelUrl = "https://localhost:44364/api/Candel/getByTimeAndTicker?dateTime=";
+
+        let masterarray = [];
+
+        let Globalarray = [];
+
+        let hammerData = null;
+        let BullishEngulfingData = null;
+        let BullishHaramiData = null;
+        let DragonflyDojiData = null;
+        let InvertedHammerData = null;
+        let MorningStarDbData = null;
+        let PiercingLineData = null;
+        let RisingThreeMethodsData = null;
+        let ThreeWhiteSoilderDbData = null;
+        let TweezerBottomData = null;
+
+        async function fetchData() {
+            try {
+                const response = await fetch(apiHammerUrl);
+                if (!response.ok) {
+                    console.error(`Error fetching Hammer data: ${response.status} ${response.statusText}`);
+                    return;
+                }
+
+                const data = await response.json();
+                hammerData = data;
+                masterarray.push({ hammerData: data });  // Store data in masterarray
+                console.log("hammerData:", data);
+            } catch (error) {
+                console.error("Error during fetch Hammer:", error);
+            }
+        }
+
+        async function fetchData2() {
+            try {
+                const response = await fetch(apiBullishEngulfingUrl);
+                if (!response.ok) {
+                    console.error(`Error fetching BullishEngulfing data: ${response.status} ${response.statusText}`);
+                    return;
+                }
+
+                const data = await response.json();
+                BullishEngulfingData = data;
+                masterarray.push({ BullishEngulfingData: data });
+                console.log("BullishEngulfingData:", data);
+            } catch (error) {
+                console.error("Error during fetch BullishEngulfing:", error);
+            }
+        }
+
+        async function fetchData3() {
+            try {
+                const response = await fetch(apiBullishHaramiUrl);
+                if (!response.ok) {
+                    console.error(`Error fetching BullishHarami data: ${response.status} ${response.statusText}`);
+                    return;
+                }
+
+                const data = await response.json();
+                BullishHaramiData = data;
+                masterarray.push({ BullishHaramiData: data });
+                console.log("BullishHaramiData:", data);
+            } catch (error) {
+                console.error("Error during fetch BullishHarami:", error);
+            }
+        }
+
+        async function fetchData4() {
+            try {
+                const response = await fetch(apiDragonflyDojiUrl);
+                if (!response.ok) {
+                    console.error(`Error fetching DragonflyDoji data: ${response.status} ${response.statusText}`);
+                    return;
+                }
+
+                const data = await response.json();
+                DragonflyDojiData = data;
+                masterarray.push({ DragonflyDojiData: data });
+                console.log("DragonflyDojiData:", data);
+            } catch (error) {
+                console.error("Error during fetch DragonflyDoji:", error);
+            }
+        }
+
+        async function fetchData5() {
+            try {
+                const response = await fetch(apiInvertedHammerUrl);
+                if (!response.ok) {
+                    console.error(`Error fetching InvertedHammerData: ${response.status} ${response.statusText}`);
+                    return;
+                }
+
+                const data = await response.json();
+                InvertedHammerData = data;
+                masterarray.push({ InvertedHammerData: data });
+                console.log("InvertedHammerData:", data);
+            } catch (error) {
+                console.error("Error during fetch InvertedHammerData:", error);
+            }
+        }
+
+        async function fetchData6() {
+            try {
+                const response = await fetch(apiMorningStarUrl);
+                if (!response.ok) {
+                    console.error(`Error fetching MorningStarDb data: ${response.status} ${response.statusText}`);
+                    return;
+                }
+
+                const data = await response.json();
+                masterarray.push({ MorningStarDbData: data });
+                MorningStarDbData = data;
+                console.log("MorningStarDbData:", data);
+            } catch (error) {
+                console.error("Error during fetch MorningStarDb:", error);
+            }
+        }
+
+        async function fetchData7() {
+            try {
+                const response = await fetch(apiPiercingLineUrl);
+                if (!response.ok) {
+                    console.error(`Error fetching PiercingLineData: ${response.status} ${response.statusText}`);
+                    return;
+                }
+
+                const data = await response.json();
+                masterarray.push({ PiercingLineData: data });
+                PiercingLineData = data;
+                console.log("PiercingLineData:", data);
+            } catch (error) {
+                console.error("Error during fetch PiercingLineData:", error);
+            }
+        }
+
+        async function fetchData8() {
+            try {
+                const response = await fetch(apiRisingThreeMethodsUrl);
+                if (!response.ok) {
+                    console.error(`Error fetching RisingThreeMethodsData: ${response.status} ${response.statusText}`);
+                    return;
+                }
+
+                const data = await response.json();
+                masterarray.push({ RisingThreeMethodsData: data });
+                RisingThreeMethodsData = data;
+                console.log("RisingThreeMethodsData:", data);
+            } catch (error) {
+                console.error("Error during fetch RisingThreeMethodsData:", error);
+            }
+        }
+
+        async function fetchData9() {
+            try {
+                const response = await fetch(apiThreeWhiteSoilderDbUrl);
+                if (!response.ok) {
+                    console.error(`Error fetching ThreeWhiteSoilderDbData: ${response.status} ${response.statusText}`);
+                    return;
+                }
+
+                const data = await response.json();
+                masterarray.push({ ThreeWhiteSoilderDbData: data });
+                ThreeWhiteSoilderDbData = data;
+                console.log("ThreeWhiteSoilderDbData:", data);
+            } catch (error) {
+                console.error("Error during fetch ThreeWhiteSoilderDbData:", error);
+            }
+        }
+
+        async function fetchData10() {
+            try {
+                const response = await fetch(apiTweezerBottomUrl);
+                if (!response.ok) {
+                    console.error(`Error fetching TweezerBottomData: ${response.status} ${response.statusText}`);
+                    return;
+                }
+
+                const data = await response.json();
+                masterarray.push({ TweezerBottomData: data });
+                TweezerBottomData = data;
+                console.log("TweezerBottomData:", data);
+            } catch (error) {
+                console.error("Error during fetch TweezerBottomData:", error);
+            }
+        }
+
+        // Function to fetch data based on ticker, tickerId, and detectionTime
+        function fetchCandelData(data, Name) {
+            const url = `${apiCandelUrl}${data.detectionTime}&ticker=${data.ticker}&tickerId=${data.tickerId}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                            Globalarray.push({ Stratergyname: Name, data: data });
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
+
+        function DataAnalyzer()
+        {
+         // console.log("Globalarray",Globalarray);
+                 for (let i = 0; i < Globalarray.length; i++) {
+            const strategy = Globalarray[i];
+            console.log(`Strategy Name: ${strategy.Stratergyname}`);
+
+            for (let j = 0; j < strategy.data.length; j++) {
+                const dataObj = strategy.data[j];
+                console.log(dataObj);
+            }
+        }
+        }
+
+        // Function to run all fetch functions in parallel every second
+        function fetchAllData() {
+            masterarray = [];
+            Promise.all([fetchData(), fetchData2(), fetchData3(), fetchData4(), fetchData5(), fetchData6(), fetchData7(), fetchData8(), fetchData9(), fetchData10()])
+                .then(() => {
+                    console.log('All data fetched.');
+                    hammerData.forEach((item) => {
+                        let Name = "Hammer"; // Initialize hammer directly here
+                        fetchCandelData(item, Name); // Pass the initialized hammer value
+                    });
+                // Run the DataAnalyzer function after processing hammerData
+                 DataAnalyzer();
+                })
+                .catch(error => {
+                    console.error("Error fetching one or more API data:", error);
+                });
+        }
+    </script>
 </body>
 </html>

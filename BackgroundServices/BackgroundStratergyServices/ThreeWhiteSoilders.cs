@@ -46,7 +46,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
 
             Candel latestCandel = recentThreeCandles.FirstOrDefault();
 
-            if (latestCandel.CloseTime.Second < 59)
+            if (latestCandel.CloseTime.Second < 58)
             {
                 return;
             }
@@ -186,7 +186,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
                 return;
             }
 
-            if(recentCandle.CloseTime.Second < 59)
+            if(recentCandle.CloseTime.Second < 58)
             {
                 return;
             }
