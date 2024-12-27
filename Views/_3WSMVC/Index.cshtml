@@ -158,6 +158,9 @@
 
         let Globalarray = [];
 
+        let correctPrediction = [];
+        let wrongPredictions = [];
+
         let hammerData = null;
         let BullishEngulfingData = null;
         let BullishHaramiData = null;
@@ -340,49 +343,176 @@
         }
 
         // Function to fetch data based on ticker, tickerId, and detectionTime
+        // function fetchCandelData(data, Name) {
+        //     const url = `${apiCandelUrl}${data.detectionTime}&ticker=${data.ticker}&tickerId=${data.tickerId}`;
+
+        //     fetch(url)
+        //         .then(response => response.json())
+        //         .then(data => {
+        //                     Globalarray.push({ Stratergyname: Name, data: data });
+
+        //                     let DetectionCandel = data[0]
+        //                     let NextCandel = data[1]
+        //                     let FarthestCandel = data[2]
+
+        //                     console.log("DetectionCandel",DetectionCandel, DetectionCandel.endPrice);
+        //                     console.log("NextCandel",NextCandel, NextCandel.endPrice);
+
+        //                     if(NextCandel.endPrice > DetectionCandel.endPrice)
+        //                     {
+        //                         correctPrediction.push({ Stratergyname: Name, data : data });
+        //                     }
+        //                     else if
+        //                     (NextCandel.endPrice < DetectionCandel.endPrice)
+        //                     {
+        //                         if(FarthestCandel.endPrice > DetectionCandel.endPrice)
+        //                         {
+        //                             correctPrediction.push({ Stratergyname: Name, data : data });
+        //                         }else if (FarthestCandel.endPrice < DetectionCandel.endPrice)
+        //                         {
+        //                                                                 wrongPredictions.push({ Stratergyname: Name, data : data });
+        //                         }
+        //                         else
+        //                         {
+        //                            wrongPredictions.push({ Stratergyname: Name, data : data });
+        //                         }
+                                
+        //                     }
+
+        //         })
+        //         .catch(error => {
+        //             console.error('Error fetching data:', error);
+        //         });
+        // }
+
+                let totalProfit = 0; // Variable to store total profit
+        let totalLoss = 0;   // Variable to store total loss
+
         function fetchCandelData(data, Name) {
             const url = `${apiCandelUrl}${data.detectionTime}&ticker=${data.ticker}&tickerId=${data.tickerId}`;
 
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
-                            Globalarray.push({ Stratergyname: Name, data: data });
+                    Globalarray.push({ Stratergyname: Name, data: data });
+
+                    let DetectionCandel = data[0];
+                    let NextCandel = data[1];
+                    let FarthestCandel = data[2];
+
+                    console.log("DetectionCandel", DetectionCandel, DetectionCandel.endPrice);
+                    console.log("NextCandel", NextCandel, NextCandel.endPrice);
+
+                    if (NextCandel.endPrice > DetectionCandel.endPrice) {
+                        correctPrediction.push({ Stratergyname: Name, data: data });
+
+                        // Calculate profit
+                        let profit = NextCandel.endPrice - DetectionCandel.endPrice;
+                        totalProfit += profit;
+                    } else if (NextCandel.endPrice < DetectionCandel.endPrice) {
+                        if (FarthestCandel.endPrice > DetectionCandel.endPrice) {
+                            correctPrediction.push({ Stratergyname: Name, data: data });
+
+                            // Calculate profit
+                            let profit = FarthestCandel.endPrice - DetectionCandel.endPrice;
+                            totalProfit += profit;
+                        } else if (FarthestCandel.endPrice < DetectionCandel.endPrice) {
+                            wrongPredictions.push({ Stratergyname: Name, data: data });
+
+                            // Calculate loss
+                            let loss = DetectionCandel.endPrice - FarthestCandel.endPrice;
+                            totalLoss += loss;
+                        } else {
+                            wrongPredictions.push({ Stratergyname: Name, data: data });
+
+                            // Optional: Calculate loss for the flat case (if needed)
+                            let loss = DetectionCandel.endPrice - FarthestCandel.endPrice; // This might be zero
+                            totalLoss += loss;
+                        }
+                    }
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);
                 });
         }
 
-        function DataAnalyzer()
-        {
-         // console.log("Globalarray",Globalarray);
-                 for (let i = 0; i < Globalarray.length; i++) {
-            const strategy = Globalarray[i];
-            console.log(`Strategy Name: ${strategy.Stratergyname}`);
+        // Log final results
+        function logProfitAndLoss() {
+            console.log("Total Profit:", totalProfit);
+            console.log("Total Loss:", totalLoss);
 
-            for (let j = 0; j < strategy.data.length; j++) {
-                const dataObj = strategy.data[j];
-                console.log(dataObj);
-            }
-        }
+            let netResult = totalProfit - totalLoss;
+            console.log("Net Result (Profit - Loss):", netResult);
         }
 
         // Function to run all fetch functions in parallel every second
         function fetchAllData() {
             masterarray = [];
+            // correctPrediction = [];
+            // wrongPredictions = [];
             Promise.all([fetchData(), fetchData2(), fetchData3(), fetchData4(), fetchData5(), fetchData6(), fetchData7(), fetchData8(), fetchData9(), fetchData10()])
                 .then(() => {
                     console.log('All data fetched.');
+
+
                     hammerData.forEach((item) => {
                         let Name = "Hammer"; // Initialize hammer directly here
                         fetchCandelData(item, Name); // Pass the initialized hammer value
                     });
-                // Run the DataAnalyzer function after processing hammerData
-                 DataAnalyzer();
+
+                    BullishEngulfingData.forEach((item) => {
+                        let Name = "BullishEngulfing"; // Initialize hammer directly here
+                        fetchCandelData(item, Name); // Pass the initialized hammer value
+                    });
+
+                    BullishHaramiData.forEach((item) => {
+                        let Name = "BullishHarami"; // Initialize hammer directly here
+                        fetchCandelData(item, Name); // Pass the initialized hammer value
+                    });
+
+                    // DragonflyDojiData.forEach((item) => {
+                    //     let Name = "DragonflyDojiData"; // Initialize hammer directly here
+                    //     fetchCandelData(item, Name); // Pass the initialized hammer value
+                    // });
+
+                    InvertedHammerData.forEach((item) => {
+                        let Name = "InvertedHammerData"; // Initialize hammer directly here
+                        fetchCandelData(item, Name); // Pass the initialized hammer value
+                    });
+
+                    MorningStarDbData.forEach((item) => {
+                        let Name = "MorningStarDbData"; // Initialize hammer directly here
+                        fetchCandelData(item, Name); // Pass the initialized hammer value
+                    });
+
+                    PiercingLineData.forEach((item) => {
+                        let Name = "PiercingLineData"; // Initialize hammer directly here
+                        fetchCandelData(item, Name); // Pass the initialized hammer value
+                    });
+
+                    RisingThreeMethodsData.forEach((item) => {
+                        let Name = "RisingThreeMethodsData"; // Initialize hammer directly here
+                        fetchCandelData(item, Name); // Pass the initialized hammer value
+                    });
+
+                    ThreeWhiteSoilderDbData.forEach((item) => {
+                        let Name = "ThreeWhiteSoilderDbData"; // Initialize hammer directly here
+                        fetchCandelData(item, Name); // Pass the initialized hammer value
+                    });
+
+                    TweezerBottomData.forEach((item) => {
+                        let Name = "TweezerBottomData"; // Initialize hammer directly here
+                        fetchCandelData(item, Name); // Pass the initialized hammer value
+                    });
+
                 })
                 .catch(error => {
                     console.error("Error fetching one or more API data:", error);
                 });
+
+                    console.log("correctPrediction",correctPrediction);
+                    console.log("wrongPrediction", wrongPredictions);
+                    logProfitAndLoss();
         }
     </script>
 </body>
