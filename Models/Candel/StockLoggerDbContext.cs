@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using StockLogger.Models.Candel;
 using StockLogger.Models.Stratergic_Models;
+using StockLogger.Models.Stratergic_Models.Breakaway__Bullish_;
 using StockLogger.Models.Stratergic_Models.Bullish_Engulfing;
 using StockLogger.Models.Stratergic_Models.Bullish_Harami;
 using StockLogger.Models.Stratergic_Models.Dragonfly_Doji;
@@ -68,6 +69,10 @@ namespace StockLogger.Data
         //TWEEZER_BOTTOM TRADING STRTERGY
         public DbSet<TweezerBottomDb> TweezerBottomDb { get; set; }
         public DbSet<TweezerBottomCandels> TweezerBottomCandels { get; set; }
+
+        //BREAKAWAY_BULLISH TRADING STARTERGY
+        public DbSet<BreakawayDb> BreakawayDb { get; set; }
+        public DbSet<BreakawayCandels> BreakawayCandels { get; set; }
 
     }
 }

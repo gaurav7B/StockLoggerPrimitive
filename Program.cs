@@ -44,6 +44,9 @@ builder.Services.AddHostedService<RisingThreeMethodsService>();
 builder.Services.AddHttpClient<TweezerBottomService>();
 builder.Services.AddHostedService<TweezerBottomService>();
 
+builder.Services.AddHttpClient<BreakawayService>();
+builder.Services.AddHostedService<BreakawayService>();
+
 builder.Services.AddHttpClient<ReporterService>();
 builder.Services.AddHostedService<ReporterService>();
 
