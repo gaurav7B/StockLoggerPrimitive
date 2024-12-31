@@ -50,6 +50,9 @@ builder.Services.AddHostedService<BreakawayService>();
 builder.Services.AddHttpClient<AbandonedBabyService>();
 builder.Services.AddHostedService<AbandonedBabyService>();
 
+builder.Services.AddHttpClient<BeltHoldService>();
+builder.Services.AddHostedService<BeltHoldService>();
+
 builder.Services.AddHttpClient<ReporterService>();
 builder.Services.AddHostedService<ReporterService>();
 

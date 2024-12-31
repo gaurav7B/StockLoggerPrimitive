@@ -3,6 +3,7 @@ using StockLogger.Models.Candel;
 using StockLogger.Models.Stratergic_Models;
 using StockLogger.Models.Stratergic_Models.Breakaway__Bullish_;
 using StockLogger.Models.Stratergic_Models.Bullish_Abandoned_Baby;
+using StockLogger.Models.Stratergic_Models.Bullish_Belt_Hold;
 using StockLogger.Models.Stratergic_Models.Bullish_Engulfing;
 using StockLogger.Models.Stratergic_Models.Bullish_Harami;
 using StockLogger.Models.Stratergic_Models.Dragonfly_Doji;
@@ -78,6 +79,24 @@ namespace StockLogger.Data
         //BULLISH_ABANDONED_BABY TRADING STRATERGY
         public DbSet<AbandonedBabyDb> AbandonedBabyDb { get; set; }
         public DbSet<AbandonedBabyCandels> AbandonedBabyCandels { get; set; }
+
+        //BULLISH_BELT_HOLD TRADING STRATERGY
+        public DbSet<BeltHoldDb> BeltHoldDb { get; set; }
+        public DbSet<BeltHoldCandels> BeltHoldCandels { get; set; }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     }
 }
