@@ -44,6 +44,8 @@ builder.Services.AddHostedService<RisingThreeMethodsService>();
 builder.Services.AddHttpClient<TweezerBottomService>();
 builder.Services.AddHostedService<TweezerBottomService>();
 
+///////////////////////////
+
 builder.Services.AddHttpClient<BreakawayService>();
 builder.Services.AddHostedService<BreakawayService>();
 
@@ -52,6 +54,8 @@ builder.Services.AddHostedService<AbandonedBabyService>();
 
 builder.Services.AddHttpClient<BeltHoldService>();
 builder.Services.AddHostedService<BeltHoldService>();
+
+////////////////////////
 
 builder.Services.AddHttpClient<ReporterService>();
 builder.Services.AddHostedService<ReporterService>();

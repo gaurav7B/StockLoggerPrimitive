@@ -9,9 +9,12 @@ using StockLogger.Models.Stratergic_Models.Bullish_Harami;
 using StockLogger.Models.Stratergic_Models.Dragonfly_Doji;
 using StockLogger.Models.Stratergic_Models.Hammer;
 using StockLogger.Models.Stratergic_Models.Inverted_Hammer;
+using StockLogger.Models.Stratergic_Models.Marubozu__Bullish_;
 using StockLogger.Models.Stratergic_Models.Morning_Star;
 using StockLogger.Models.Stratergic_Models.Piercing_Line;
+using StockLogger.Models.Stratergic_Models.Rising_Sun;
 using StockLogger.Models.Stratergic_Models.Rising_Three_Methods;
+using StockLogger.Models.Stratergic_Models.Tower_Bottom;
 using StockLogger.Models.Stratergic_Models.Tweezer_Bottom;
 
 namespace StockLogger.Data
@@ -84,12 +87,19 @@ namespace StockLogger.Data
         public DbSet<BeltHoldDb> BeltHoldDb { get; set; }
         public DbSet<BeltHoldCandels> BeltHoldCandels { get; set; }
 
+        /// //////////////////////////////////////////////////////////////////////
 
+        //MARUBOZU TRADING STRATERGY
+        public DbSet<MarubozuDb> MarubozuDb { get; set; }
+        public DbSet<MarubozuCandels> MarubozuCandels { get; set; }
 
+        //RISING_SUN BULLISH TRADING PATTERN
+        public DbSet<RisingSunDb> RisingSunDb { get; set; }
+        public DbSet<RisingSunCandels> RisingSunCandels { get; set; }
 
-
-
-
+        //TOWER_BOTTOM BULLISH TRADING PATTERN
+        public DbSet<TowerBottomDb> TowerBottomDb { get; set; }
+        public DbSet<TowerBottomCandels> TowerBottomCandels { get; set; }
 
 
 
