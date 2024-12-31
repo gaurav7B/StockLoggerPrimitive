@@ -55,6 +55,9 @@ builder.Services.AddHostedService<AbandonedBabyService>();
 builder.Services.AddHttpClient<BeltHoldService>();
 builder.Services.AddHostedService<BeltHoldService>();
 
+builder.Services.AddHttpClient<MarubozuService>();
+builder.Services.AddHostedService<MarubozuService>();
+
 ////////////////////////
 
 builder.Services.AddHttpClient<ReporterService>();
