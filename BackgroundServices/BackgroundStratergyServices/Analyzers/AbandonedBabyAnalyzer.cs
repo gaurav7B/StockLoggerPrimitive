@@ -1,18 +1,19 @@
 ﻿using Newtonsoft.Json;
 using StockLogger.Models.Candel;
 using StockLogger.Models.Stratergic_Models.Breakaway__Bullish_;
+using StockLogger.Models.Stratergic_Models.Bullish_Abandoned_Baby;
 using System.Text;
 
 namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
 {
-    public class BreakawayAnalyzer
+    public class AbandonedBabyAnalyzer
     {
         public async void AnalyzerLogic(List<Candel> candelList, HttpClient _httpClient, int Range)
         {
-            // Ensure there are at least 5 candles in the list
-            if (candelList.Count < 5)
+            // Ensure there are at least 3 candles in the list
+            if (candelList.Count < 3)
             {
-                Console.WriteLine("The list must contain at least 5 candles.");
+                Console.WriteLine("The list must contain at least 3 candles.");
                 return;
             }
 
@@ -24,58 +25,54 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
                 return;
             }
 
-            // Get the last 5 candles (most recent)
-            List<Candel> lastFiveCandles = candelList.OrderByDescending(c => c.CloseTime).Take(5).ToList();
+            // Get the last 3 candles from the list (most recent 3)
+            List<Candel> recentThreeCandles = candelList.OrderByDescending(c => c.CloseTime).Take(3).ToList();
 
-            // Reverse the list for chronological order
-            lastFiveCandles.Reverse();
+            Candel firstCandle = recentThreeCandles[2];
+            Candel secondCandle = recentThreeCandles[1];
+            Candel thirdCandle = recentThreeCandles[0];
 
-            // Check the conditions for a bullish breakaway pattern
-            bool firstCandleBearish = (bool)lastFiveCandles[0].IsBearish;
-            bool secondCandleGapDown = lastFiveCandles[1].StartPrice < lastFiveCandles[0].EndPrice;
+            // Validate the first candle: bearish with a significant body
+            bool isFirstCandleBearish = (firstCandle.IsBearish ?? false) &&
+                                        (firstCandle.StartPrice - firstCandle.EndPrice) / (firstCandle.HighestPrice - firstCandle.LowestPrice) > 0.6m;
 
-            bool thirdCandleIndecisive = Math.Abs(lastFiveCandles[2].EndPrice - lastFiveCandles[2].StartPrice) <
-                                         (lastFiveCandles[2].HighestPrice - lastFiveCandles[2].LowestPrice) * 0.3m;
+            // Validate the second candle: small body (doji/spinning top) with gaps
+            bool isSecondCandleSmall = Math.Abs(secondCandle.StartPrice - secondCandle.EndPrice) <
+                                       0.1m * (secondCandle.HighestPrice - secondCandle.LowestPrice);
+            bool isSecondCandleGaps = secondCandle.HighestPrice < firstCandle.LowestPrice;
 
-            bool fourthCandleIndecisive = Math.Abs(lastFiveCandles[3].EndPrice - lastFiveCandles[3].StartPrice) <
-                                          (lastFiveCandles[3].HighestPrice - lastFiveCandles[3].LowestPrice) * 0.3m;
+            // Validate the third candle: bullish with a significant body and gaps
+            bool isThirdCandleBullish = (thirdCandle.IsBullish ?? false) &&
+                                        (thirdCandle.EndPrice - thirdCandle.StartPrice) / (thirdCandle.HighestPrice - thirdCandle.LowestPrice) > 0.6m;
+            bool isThirdCandleGaps = thirdCandle.LowestPrice > secondCandle.HighestPrice;
 
-            bool fifthCandleBullish = (bool)lastFiveCandles[4].IsBullish;
-
-            bool fifthCandleClosesWithinFirst = lastFiveCandles[4].EndPrice >= lastFiveCandles[0].StartPrice;
-
-            // Analyze the pattern
-            if (firstCandleBearish &&
-                secondCandleGapDown &&
-                thirdCandleIndecisive &&
-                fourthCandleIndecisive &&
-                fifthCandleBullish &&
-                fifthCandleClosesWithinFirst)
+            // Check for pattern match
+            if (isFirstCandleBearish && isSecondCandleSmall && isSecondCandleGaps && isThirdCandleBullish && isThirdCandleGaps)
             {
                 if (Range == 1)
                 {
-                    BreakawayDb Payload = new BreakawayDb
+                    AbandonedBabyDb Payload = new AbandonedBabyDb
                     {
                         Ticker = latestCandel.Ticker,
                         TickerId = latestCandel.TickerId,
                         Exchange = latestCandel.Exchange,
-                        IsBreakawayDetected = true,
+                        IsAbandonedBabyDetected = true,
                         DetectionRange = 1,
                         DetectionTime = latestCandel.CloseTime,
                         Candels = null
                     };
 
-                    HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/Breakaway",
+                    HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/AbandonedBaby",
                                         new StringContent(JsonConvert.SerializeObject(Payload), Encoding.UTF8, "application/json"));
                 }
                 else if (Range == 5)
                 {
-                    BreakawayDb Payload = new BreakawayDb
+                    AbandonedBabyDb Payload = new AbandonedBabyDb
                     {
                         Ticker = latestCandel.Ticker,
                         TickerId = latestCandel.TickerId,
                         Exchange = latestCandel.Exchange,
-                        IsBreakawayDetected = true,
+                        IsAbandonedBabyDetected = true,
                         DetectionRange = 5,
                         DetectionTime = latestCandel.CloseTime,
                         Candels = null
@@ -83,18 +80,18 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
 
                     if ((latestCandel.CloseTime.Minute - latestCandel.OpenTime.Minute) > 4)
                     {
-                        HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/Breakaway",
+                        HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/AbandonedBaby",
                                             new StringContent(JsonConvert.SerializeObject(Payload), Encoding.UTF8, "application/json"));
                     }
                 }
                 else if (Range == 10)
                 {
-                    BreakawayDb Payload = new BreakawayDb
+                    AbandonedBabyDb Payload = new AbandonedBabyDb
                     {
                         Ticker = latestCandel.Ticker,
                         TickerId = latestCandel.TickerId,
                         Exchange = latestCandel.Exchange,
-                        IsBreakawayDetected = true,
+                        IsAbandonedBabyDetected = true,
                         DetectionRange = 10,
                         DetectionTime = latestCandel.CloseTime,
                         Candels = null
@@ -102,18 +99,18 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
 
                     if ((latestCandel.CloseTime.Minute - latestCandel.OpenTime.Minute) > 9)
                     {
-                        HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/Breakaway",
+                        HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/AbandonedBaby",
                                             new StringContent(JsonConvert.SerializeObject(Payload), Encoding.UTF8, "application/json"));
                     }
                 }
                 else if (Range == 15)
                 {
-                    BreakawayDb Payload = new BreakawayDb
+                    AbandonedBabyDb Payload = new AbandonedBabyDb
                     {
                         Ticker = latestCandel.Ticker,
                         TickerId = latestCandel.TickerId,
                         Exchange = latestCandel.Exchange,
-                        IsBreakawayDetected = true,
+                        IsAbandonedBabyDetected = true,
                         DetectionRange = 15,
                         DetectionTime = latestCandel.CloseTime,
                         Candels = null
@@ -121,7 +118,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
 
                     if ((latestCandel.CloseTime.Minute - latestCandel.OpenTime.Minute) > 14)
                     {
-                        HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/Breakaway",
+                        HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/AbandonedBaby",
                                             new StringContent(JsonConvert.SerializeObject(Payload), Encoding.UTF8, "application/json"));
                     }
                 }
@@ -221,7 +218,6 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
                 Console.WriteLine($"Error analyzing ticker {ticker}: {ex.Message}");
             }
         }
-
 
     }
 }

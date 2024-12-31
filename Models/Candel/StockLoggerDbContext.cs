@@ -2,6 +2,7 @@
 using StockLogger.Models.Candel;
 using StockLogger.Models.Stratergic_Models;
 using StockLogger.Models.Stratergic_Models.Breakaway__Bullish_;
+using StockLogger.Models.Stratergic_Models.Bullish_Abandoned_Baby;
 using StockLogger.Models.Stratergic_Models.Bullish_Engulfing;
 using StockLogger.Models.Stratergic_Models.Bullish_Harami;
 using StockLogger.Models.Stratergic_Models.Dragonfly_Doji;
@@ -73,6 +74,10 @@ namespace StockLogger.Data
         //BREAKAWAY_BULLISH TRADING STARTERGY
         public DbSet<BreakawayDb> BreakawayDb { get; set; }
         public DbSet<BreakawayCandels> BreakawayCandels { get; set; }
+
+        //BULLISH_ABANDONED_BABY TRADING STRATERGY
+        public DbSet<AbandonedBabyDb> AbandonedBabyDb { get; set; }
+        public DbSet<AbandonedBabyCandels> AbandonedBabyCandels { get; set; }
 
     }
 }

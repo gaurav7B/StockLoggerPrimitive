@@ -47,6 +47,9 @@ builder.Services.AddHostedService<TweezerBottomService>();
 builder.Services.AddHttpClient<BreakawayService>();
 builder.Services.AddHostedService<BreakawayService>();
 
+builder.Services.AddHttpClient<AbandonedBabyService>();
+builder.Services.AddHostedService<AbandonedBabyService>();
+
 builder.Services.AddHttpClient<ReporterService>();
 builder.Services.AddHostedService<ReporterService>();
 
