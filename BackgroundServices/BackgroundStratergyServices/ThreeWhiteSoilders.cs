@@ -80,7 +80,9 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
 
             // Combine all conditions to detect the Three White Soldiers pattern
             //if (CandelSample != null)
-            if (allThreeBullish && progressiveCloses && increasingBodySize && smallUpperShadow && smallLowerShadow &&
+            if (allThreeBullish && progressiveCloses && increasingBodySize 
+                //&& smallUpperShadow && smallLowerShadow 
+                &&
             strongBodyRatio && priorConsolidationOrBearish)
                 //if (allThreeBullish && progressiveCloses && increasingBodySize && priorConsolidationOrBearish)
                 {

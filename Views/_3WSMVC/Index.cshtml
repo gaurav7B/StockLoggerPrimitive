@@ -62,86 +62,586 @@
             text-transform: uppercase;
         }
 
+        /* Wrap the buttons in a container and use flexbox */
+        .button-container {
+            display: flex;
+            gap: 10px; /* Space between buttons */
+            justify-content: space-between; /* Align buttons side by side */
+        }
+
+            /* Style the individual button to ensure equal width */
+            .button-container button {
+                width: 48%; 
+                padding: 8px 16px;
+            }
+
+        .form-container {
+            background-color: #f5f5dc;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+
+            .form-container h2 {
+                color: #333;
+                font-size: 168%;
+            }
+
+            .form-container label.correct-prediction {
+                color: green;
+            }
+
+            .form-container label.wrong-prediction {
+                color: red;
+            }
+
+            .form-container label {
+                color: #333;
+                font-size: 1.1em;
+            }
+
+            .form-container input {
+                color: #333;
+                background-color: #fff;
+                border: 1px solid #ccc;
+                padding: 10px;
+                width: 100%;
+                font-size: 1em;
+                border-radius: 4px;
+            }
+
+        button.btn {
+            color: #fff;
+            margin-top: 10px;
+            border: none;
+            padding: 4px 0px; 
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+
+            button.btn:hover {
+                background-color: #4a8fd4;
+            }
+
     </style>
 </head>
 <body>
     <div class="container">
-@*         @for (int i = 1; i <= 50; i++)
-        {
-            <div class="box">
-                <div class="company-name">Company Name</div>
-                <div class="box-content">
-                    <span>3WS Detected here</span>
-                    <div class="red-box" id="red-box-@i"></div>
-                </div>
+        <!-- Hammer Report Section -->
+        <div class="form-container">
+            <h2>Hammer Report</h2>
+            <div class="form-group">
+                <label for="totalPredictions">Total Predictions:</label>
+                <input type="text" id="hammertotalPredictions" class="form-control" placeholder="Total predictions" readonly>
             </div>
-        } *@
-        <button onclick="fetchAllData()">REPORT</button>
+            <div class="form-group">
+                <label for="correctPredictions" class="correct-prediction">Correct Predictions:</label>
+                <input type="text" id="hammercorrectPredictions" class="form-control" placeholder="Correct predictions" readonly>
+            </div>
+            <div class="form-group">
+                <label for="wrongPredictions" class="wrong-prediction">Wrong Predictions:</label>
+                <input type="text" id="hammerwrongPredictions" class="form-control" placeholder="Wrong predictions" readonly>
+            </div>
+            <div class="form-group">
+                <label for="wrongPredictions" class="wrong-prediction">Accuracy:</label>
+                <input type="text" id="hammerAccuracy" class="form-control" placeholder="Accuracy" readonly>
+            </div>
+            <div class="button-container">
+                <button type="button" class="btn btn-primary" id="viewHammer">View Analysis</button>
+                <button type="button" class="btn btn-primary" id="analyzeHammer">Analyze</button>
+            </div>
+        </div>
+
+        <!-- Bullish Engulfing Section -->
+        <div class="form-container">
+            <h2>Bullish Engulfing</h2>
+            <div class="form-group">
+                <label for="totalPredictions">Total Predictions:</label>
+                <input type="text" id="bullishEngulfingtotalPredictions" class="form-control" placeholder="Total predictions" readonly>
+            </div>
+            <div class="form-group">
+                <label for="correctPredictions" class="correct-prediction">Correct Predictions:</label>
+                <input type="text" id="bullishEngulfingcorrectPredictions" class="form-control" placeholder="Correct predictions" readonly>
+            </div>
+            <div class="form-group">
+                <label for="wrongPredictions" class="wrong-prediction">Wrong Predictions:</label>
+                <input type="text" id="bullishEngulfingwrongPredictions" class="form-control" placeholder="Wrong predictions" readonly>
+            </div>
+            <div class="form-group">
+                <label for="wrongPredictions" class="wrong-prediction">Accuracy:</label>
+                <input type="text" id="bullishEngulfingAccuracy" class="form-control" placeholder="Accuracy" readonly>
+            </div>
+            <div class="button-container">
+                <button type="button" class="btn btn-primary" id="viewBullishEngulfing">View Analysis</button>
+                <button type="button" class="btn btn-primary" id="analyzeBullishEngulfing">Analyze</button>
+            </div>
+        </div>
+
+        <!-- Bullish Harami Section -->
+        <div class="form-container">
+            <h2>Bullish Harami</h2>
+            <div class="form-group">
+                <label for="totalPredictions">Total Predictions:</label>
+                <input type="text" id="bullishHaramitotalPredictions" class="form-control" placeholder="Total predictions" readonly>
+            </div>
+            <div class="form-group">
+                <label for="correctPredictions" class="correct-prediction">Correct Predictions:</label>
+                <input type="text" id="bullishHaramicorrectPredictions" class="form-control" placeholder="Correct predictions" readonly>
+            </div>
+            <div class="form-group">
+                <label for="wrongPredictions" class="wrong-prediction">Wrong Predictions:</label>
+                <input type="text" id="bullishHaramiwrongPredictions" class="form-control" placeholder="Wrong predictions" readonly>
+            </div>
+            <div class="form-group">
+                <label for="wrongPredictions" class="wrong-prediction">Accuracy:</label>
+                <input type="text" id="bullishHaramiAccuracy" class="form-control" placeholder="Accuracy" readonly>
+            </div>
+            <div class="button-container">
+                <button type="button" class="btn btn-primary" id="viewbullishHarami">View Analysis</button>
+                <button type="button" class="btn btn-primary" id="analyzebullishHarami">Analyze</button>
+            </div>
+        </div>
+
+        <!-- Dragonfly Doji Section -->
+        <div class="form-container">
+            <h2>Dragonfly Doji</h2>
+            <div class="form-group">
+                <label for="totalPredictions">Total Predictions:</label>
+                <input type="text" id="dragonflyDojitotalPredictions" class="form-control" placeholder="Total predictions" readonly>
+            </div>
+            <div class="form-group">
+                <label for="correctPredictions" class="correct-prediction">Correct Predictions:</label>
+                <input type="text" id="dragonflyDojicorrectPredictions" class="form-control" placeholder="Correct predictions" readonly>
+            </div>
+            <div class="form-group">
+                <label for="wrongPredictions" class="wrong-prediction">Wrong Predictions:</label>
+                <input type="text" id="dragonflyDojiwrongPredictions" class="form-control" placeholder="Wrong predictions" readonly>
+            </div>
+            <div class="form-group">
+                <label for="wrongPredictions" class="wrong-prediction">Accuracy:</label>
+                <input type="text" id="dragonflyDojiAccuracy" class="form-control" placeholder="Accuracy" readonly>
+            </div>
+            <div class="button-container">
+                <button type="button" class="btn btn-primary" id="viewdragonflyDoji">View Analysis</button>
+                <button type="button" class="btn btn-primary" id="analyzedragonflyDoji">Analyze</button>
+            </div>
+        </div>
+
+        <!-- Inverted Hammer Section -->
+        <div class="form-container">
+            <h2>Inverted Hammer</h2>
+            <div class="form-group">
+                <label for="totalPredictions">Total Predictions:</label>
+                <input type="text" id="invertedHammertotalPredictions" class="form-control" placeholder="Total predictions" readonly>
+            </div>
+            <div class="form-group">
+                <label for="correctPredictions" class="correct-prediction">Correct Predictions:</label>
+                <input type="text" id="invertedHammercorrectPredictions" class="form-control" placeholder="Correct predictions" readonly>
+            </div>
+            <div class="form-group">
+                <label for="wrongPredictions" class="wrong-prediction">Wrong Predictions:</label>
+                <input type="text" id="invertedHammerwrongPredictions" class="form-control" placeholder="Wrong predictions" readonly>
+            </div>
+            <div class="form-group">
+                <label for="wrongPredictions" class="wrong-prediction">Accuracy:</label>
+                <input type="text" id="invertedHammerAccuracy" class="form-control" placeholder="Accuracy" readonly>
+            </div>
+            <div class="button-container">
+                <button type="button" class="btn btn-primary" id="viewinvertedHammer">View Analysis</button>
+                <button type="button" class="btn btn-primary" id="analyzeinvertedHammer">Analyze</button>
+            </div>
+        </div>
+
     </div>
 
     <script>
-        // Function to fetch stock data from the first API
-        async function fetchStockTickerData() {
-            try {
-                const response = await fetch('https://localhost:44364/api/StockTickerExchange/GetStockTickerExchanges');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch data from StockTickerExchange API');
-                }
-                const data = await response.json();
-                // console.log('StockTickerExchange Data:', data);  // Log the response from the first API
 
-                // Store the data in a variable for later use
-                let stockTickerData = data;  // You can use `stockTickerData` as needed
-
-            } catch (error) {
-                console.error('Error fetching stock ticker data:', error);
-            }
-        }
-
-        // Function to fetch stock data from the second API
-        async function fetchThreeWhiteSoldierData() {
-            try {
-                const response = await fetch('https://localhost:44364/api/ThreeWhiteSoilderDb');
-                if (!response.ok) {
-                    throw new Error('Failed to fetch data from ThreeWhiteSoilderDb API');
-                }
-                const data = await response.json();
-                // console.log('ThreeWhiteSoldier Data:', data);  // Log the response from the second API
-
-                // Store the data in a variable for later use
-                let threeWhiteSoldierData = data;  // You can use `threeWhiteSoldierData` as needed
-
-            } catch (error) {
-                console.error('Error fetching ThreeWhiteSoldier data:', error);
-            }
-        }
-
-        // Function to start calling both APIs every second
-        function startFetchingData() {
-            setInterval(() => {
-                fetchStockTickerData();  // Call the first API every second
-                fetchThreeWhiteSoldierData();  // Call the second API every second
-            }, 1000); // 1000ms = 1 second
-        }
-
-        // Function to toggle the visibility of the red box
-        function toggleBlinkingEffect() {
-            const redBoxes = document.querySelectorAll('.red-box');
-            redBoxes.forEach((box) => {
-                setInterval(() => {
-                    box.style.opacity = box.style.opacity == '1' ? '0' : '1';
-                }, 250); // Toggles every 500ms
-            });
-        }
-
-        // Run functions on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            startFetchingData();  // Start calling both APIs every second
-            toggleBlinkingEffect(); // Start blinking effect
+        // Prevent page refresh and handle button clicks
+        document.getElementById("analyzeHammer").addEventListener("click", function(event) {
+            event.preventDefault();
         });
+
+        document.getElementById("analyzeBullishEngulfing").addEventListener("click", function(event) {
+            event.preventDefault();
+        });
+
+        const apiHammerUrl = "https://localhost:44364/api/Hammer";
+        const apiBullishEngulfingUrl = "https://localhost:44364/api/BullishEngulfing";
+        const apiBullishHaramiUrl = "https://localhost:44364/api/BullishHarami";
+        const apiDragonflyDojiUrl = "https://localhost:44364/api/DragonflyDoji";
+        const apiInvertedHammerUrl = "https://localhost:44364/api/InvertedHammerDb";
+        const apiMorningStarUrl = "https://localhost:44364/api/MorningStarDb";
+        const apiPiercingLineUrl = "https://localhost:44364/api/PiercingLine";
+        const apiRisingThreeMethodsUrl = "https://localhost:44364/api/RisingThreeMethods";
+        const apiThreeWhiteSoilderDbUrl = "https://localhost:44364/api/ThreeWhiteSoilderDb";
+        const apiTweezerBottomUrl = "https://localhost:44364/api/TweezerBottom";
+        const apiCandelUrl = "https://localhost:44364/api/Candel/getByTimeAndTicker?dateTime=";
+
+        let hammerData = null;
+        let BullishEngulfingData = null;
+        let BullishHaramiData = null;
+        let DragonflyDojiData = null;
+        let InvertedHammerData = null;
+        let MorningStarDbData = null;
+        let PiercingLineData = null;
+        let RisingThreeMethodsData = null;
+        let ThreeWhiteSoilderDbData = null;
+        let TweezerBottomData = null;
+
+        let predictions = {
+            correcthammerPrediction: [],
+            wronghammerPrediction: [],
+
+            correctbullishEngulfingPrediction: [],
+            wrongbullishEngulfingPrediction: [],
+
+            correctbullishHaramiPrediction: [],
+            wrongbullishHaramiPrediction: [],
+
+            correctdragonflyDojiPrediction: [],
+            wrongdragonflyDojiPrediction: [],
+
+            correctinvertedHammerPrediction: [],
+            wronginvertedHammerPrediction: [],
+
+            
+
+            
+        };
+
+        function AnalyzeCandelData(data, Name) {
+
+            const url = `${apiCandelUrl}${data.detectionTime}&ticker=${data.ticker}&tickerId=${data.tickerId}`;
+
+             const url2 = `https://localhost:44364/api/StockPricePerSec/ByDateTime?dateTime=${encodeURIComponent(data.detectionTime)}&tickerId=${data.tickerId}`;
+
+             fetch(url2)
+                .then(response => response.json()) // Parse the JSON response
+                .then(data => {
+
+                    let FirstPrice = data[0];
+                    let SecondPrice = data[1];
+
+
+                
+                }) // Log the response data
+                .catch(error => console.error('Error:', error)); // Catch any errors
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    let DetectionCandel = data[0]
+                    let NextCandel = data[1]
+                    let FarthestCandel = data[2]
+
+                    if (NextCandel.endPrice > DetectionCandel.endPrice) {
+                        predictions[`correct${Name}Prediction`].push(data);
+
+                        let DataLength = predictions[`correct${Name}Prediction`].length;
+                        document.getElementById(`${Name}correctPredictions`).value = DataLength;
+                    } else if (NextCandel.endPrice < DetectionCandel.endPrice) {
+                        if (FarthestCandel.endPrice > DetectionCandel.endPrice) {
+                            predictions[`correct${Name}Prediction`].push(data);
+
+                            let DataLength = predictions[`correct${Name}Prediction`].length;
+                            document.getElementById(`${Name}correctPredictions`).value = DataLength;
+                        } else if (FarthestCandel.endPrice < DetectionCandel.endPrice) {
+                            predictions[`wrong${Name}Prediction`].push(data);
+
+                            let DataLength = predictions[`wrong${Name}Prediction`].length;
+                            document.getElementById(`${Name}wrongPredictions`).value = DataLength;
+
+                            console.log(`${Name}wrongPredictions`, data);
+                        } else {
+                            predictions[`wrong${Name}Prediction`].push(data);
+
+                            let DataLength = predictions[`wrong${Name}Prediction`].length;
+                            document.getElementById(`${Name}wrongPredictions`).value = DataLength;
+
+                            console.log(`${Name}wrongPredictions`, data);
+                        }
+                    }
+
+                    // Calculate accuracy
+                    let totalPredictions = predictions[`correct${Name}Prediction`].length + predictions[`wrong${Name}Prediction`].length;
+                    let accuracy = (totalPredictions > 0) ? (predictions[`correct${Name}Prediction`].length / totalPredictions) * 100 : 0;
+                    document.getElementById(`${Name}Accuracy`).value = `${accuracy.toFixed(2)}%`;
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
+
+        async function fetchData() {
+            try {
+                const response = await fetch(apiHammerUrl);
+                if (!response.ok) {
+                    console.error(`Error fetching Hammer data: ${response.status} ${response.statusText}`);
+                    return;
+                }
+
+                const data = await response.json();
+                hammerData = data;
+                console.log("hammerData:", data);
+
+                let DataLength = data.length;
+                document.getElementById("hammertotalPredictions").value = DataLength;
+
+                data.forEach((item) => {
+                    AnalyzeCandelData(item, "hammer");
+                });
+
+            } catch (error) {
+                console.error("Error during fetch Hammer:", error);
+            }
+        }
+
+
+        async function fetchData2() {
+            try {
+                const response = await fetch(apiBullishEngulfingUrl);
+                if (!response.ok) {
+                    console.error(`Error fetching BullishEngulfing data: ${response.status} ${response.statusText}`);
+                    return;
+                }
+
+                const data = await response.json();
+                BullishEngulfingData = data;
+                console.log("BullishEngulfingData:", data);
+
+                let DataLength = data.length;
+                document.getElementById("bullishEngulfingtotalPredictions").value = DataLength;
+
+               data.forEach((item) => {
+                   AnalyzeCandelData(item,"bullishEngulfing");
+               });
+
+            } catch (error) {
+                console.error("Error during fetch BullishEngulfing:", error);
+            }
+        }
+
+        async function fetchData3() {
+            try {
+                const response = await fetch(apiBullishHaramiUrl);
+                if (!response.ok) {
+                    console.error(`Error fetching BullishHarami data: ${response.status} ${response.statusText}`);
+                    return;
+                }
+
+                const data = await response.json();
+                BullishHaramiData = data;
+                console.log("BullishHaramiData:", data);
+
+                let DataLength = data.length;
+                document.getElementById("bullishHaramitotalPredictions").value = DataLength;
+
+               data.forEach((item) => {
+                   AnalyzeCandelData(item,"bullishHarami");
+               });
+
+            } catch (error) {
+                console.error("Error during fetch BullishHarami:", error);
+            }
+        }
+
+        async function fetchData4() {
+            try {
+                const response = await fetch(apiDragonflyDojiUrl);
+                if (!response.ok) {
+                    console.error(`Error fetching DragonflyDoji data: ${response.status} ${response.statusText}`);
+                    return;
+                }
+
+                const data = await response.json();
+                DragonflyDojiData = data;
+                console.log("DragonflyDojiData:", data);
+
+               let DataLength = data.length;
+               document.getElementById("dragonflyDojitotalPredictions").value = DataLength;
+
+               data.forEach((item) => {
+                   AnalyzeCandelData(item,"dragonflyDoji");
+               });
+
+            } catch (error) {
+                console.error("Error during fetch DragonflyDoji:", error);
+            }
+        }
+
+        async function fetchData5() {
+            try {
+                const response = await fetch(apiInvertedHammerUrl);
+                if (!response.ok) {
+                    console.error(`Error fetching InvertedHammerData: ${response.status} ${response.statusText}`);
+                    return;
+                }
+
+                const data = await response.json();
+                InvertedHammerData = data;
+                console.log("InvertedHammerData:", data);
+
+                
+
+               let DataLength = data.length;
+               document.getElementById("invertedHammertotalPredictions").value = DataLength;
+
+               data.forEach((item) => {
+                   AnalyzeCandelData(item,"invertedHammer");
+               });
+
+            } catch (error) {
+                console.error("Error during fetch InvertedHammerData:", error);
+            }
+        }
+
+        async function fetchData6() {
+            try {
+                const response = await fetch(apiMorningStarUrl);
+                if (!response.ok) {
+                    console.error(`Error fetching MorningStarDb data: ${response.status} ${response.statusText}`);
+                    return;
+                }
+
+                const data = await response.json();
+                MorningStarDbData = data;
+                console.log("MorningStarDbData:", data);
+            } catch (error) {
+                console.error("Error during fetch MorningStarDb:", error);
+            }
+        }
+
+        async function fetchData7() {
+            try {
+                const response = await fetch(apiPiercingLineUrl);
+                if (!response.ok) {
+                    console.error(`Error fetching PiercingLineData: ${response.status} ${response.statusText}`);
+                    return;
+                }
+
+                const data = await response.json();
+                PiercingLineData = data;
+                console.log("PiercingLineData:", data);
+            } catch (error) {
+                console.error("Error during fetch PiercingLineData:", error);
+            }
+        }
+
+        async function fetchData8() {
+            try {
+                const response = await fetch(apiRisingThreeMethodsUrl);
+                if (!response.ok) {
+                    console.error(`Error fetching RisingThreeMethodsData: ${response.status} ${response.statusText}`);
+                    return;
+                }
+
+                const data = await response.json();
+                RisingThreeMethodsData = data;
+                console.log("RisingThreeMethodsData:", data);
+            } catch (error) {
+                console.error("Error during fetch RisingThreeMethodsData:", error);
+            }
+        }
+
+        async function fetchData9() {
+            try {
+                const response = await fetch(apiThreeWhiteSoilderDbUrl);
+                if (!response.ok) {
+                    console.error(`Error fetching ThreeWhiteSoilderDbData: ${response.status} ${response.statusText}`);
+                    return;
+                }
+
+                const data = await response.json();
+                ThreeWhiteSoilderDbData = data;
+                console.log("ThreeWhiteSoilderDbData:", data);
+            } catch (error) {
+                console.error("Error during fetch ThreeWhiteSoilderDbData:", error);
+            }
+        }
+
+        async function fetchData10() {
+            try {
+                const response = await fetch(apiTweezerBottomUrl);
+                if (!response.ok) {
+                    console.error(`Error fetching TweezerBottomData: ${response.status} ${response.statusText}`);
+                    return;
+                }
+
+                const data = await response.json();
+                TweezerBottomData = data;
+                console.log("TweezerBottomData:", data);
+            } catch (error) {
+                console.error("Error during fetch TweezerBottomData:", error);
+            }
+        }
+
+        // Function to fetch data based on ticker, tickerId, and detectionTime
+        function fetchCandelData(data, Name) {
+            const url = `${apiCandelUrl}${data.detectionTime}&ticker=${data.ticker}&tickerId=${data.tickerId}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                            Globalarray.push({ Stratergyname: Name, data: data });
+
+                            let DetectionCandel = data[0]
+                            let NextCandel = data[1]
+                            let FarthestCandel = data[2]
+
+                            console.log("DetectionCandel",DetectionCandel, DetectionCandel.endPrice);
+                            console.log("NextCandel",NextCandel, NextCandel.endPrice);
+
+                            if(NextCandel.endPrice > DetectionCandel.endPrice)
+                            {
+                                correctPrediction.push({ Stratergyname: Name, data : data });
+                            }
+                            else if
+                            (NextCandel.endPrice < DetectionCandel.endPrice)
+                            {
+                                if(FarthestCandel.endPrice > DetectionCandel.endPrice)
+                                {
+                                    correctPrediction.push({ Stratergyname: Name, data : data });
+                                }else if (FarthestCandel.endPrice < DetectionCandel.endPrice)
+                                {
+                                                                        wrongPredictions.push({ Stratergyname: Name, data : data });
+                                }
+                                else
+                                {
+                                   wrongPredictions.push({ Stratergyname: Name, data : data });
+                                }
+
+                            }
+
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
+        }
+
+
+        // Function to run all fetch functions in parallel every second
+        function fetchAllData() {
+            Promise.all([fetchData(), fetchData2(), fetchData3(), fetchData4(), fetchData5(), fetchData6(), fetchData7(), fetchData8(), fetchData9(), fetchData10()])
+                .then(() => {
+                    console.log('All data fetched.');
+
+                })
+                .catch(error => {
+                    console.error("Error fetching one or more API data:", error);
+                });
+        }
+
+
+        // Call fetchAllData when the page loads
+        window.onload = function() {
+            fetchAllData();
+        };
+
     </script>
 
-    <script>
+@*     <script>
         const apiHammerUrl = "https://localhost:44364/api/Hammer";
         const apiBullishEngulfingUrl = "https://localhost:44364/api/BullishEngulfing";
         const apiBullishHaramiUrl = "https://localhost:44364/api/BullishHarami";
@@ -342,50 +842,7 @@
             }
         }
 
-        // Function to fetch data based on ticker, tickerId, and detectionTime
-        // function fetchCandelData(data, Name) {
-        //     const url = `${apiCandelUrl}${data.detectionTime}&ticker=${data.ticker}&tickerId=${data.tickerId}`;
-
-        //     fetch(url)
-        //         .then(response => response.json())
-        //         .then(data => {
-        //                     Globalarray.push({ Stratergyname: Name, data: data });
-
-        //                     let DetectionCandel = data[0]
-        //                     let NextCandel = data[1]
-        //                     let FarthestCandel = data[2]
-
-        //                     console.log("DetectionCandel",DetectionCandel, DetectionCandel.endPrice);
-        //                     console.log("NextCandel",NextCandel, NextCandel.endPrice);
-
-        //                     if(NextCandel.endPrice > DetectionCandel.endPrice)
-        //                     {
-        //                         correctPrediction.push({ Stratergyname: Name, data : data });
-        //                     }
-        //                     else if
-        //                     (NextCandel.endPrice < DetectionCandel.endPrice)
-        //                     {
-        //                         if(FarthestCandel.endPrice > DetectionCandel.endPrice)
-        //                         {
-        //                             correctPrediction.push({ Stratergyname: Name, data : data });
-        //                         }else if (FarthestCandel.endPrice < DetectionCandel.endPrice)
-        //                         {
-        //                                                                 wrongPredictions.push({ Stratergyname: Name, data : data });
-        //                         }
-        //                         else
-        //                         {
-        //                            wrongPredictions.push({ Stratergyname: Name, data : data });
-        //                         }
-                                
-        //                     }
-
-        //         })
-        //         .catch(error => {
-        //             console.error('Error fetching data:', error);
-        //         });
-        // }
-
-                let totalProfit = 0; // Variable to store total profit
+        let totalProfit = 0; // Variable to store total profit
         let totalLoss = 0;   // Variable to store total loss
 
         function fetchCandelData(data, Name) {
@@ -470,10 +927,10 @@
                         fetchCandelData(item, Name); // Pass the initialized hammer value
                     });
 
-                    // DragonflyDojiData.forEach((item) => {
-                    //     let Name = "DragonflyDojiData"; // Initialize hammer directly here
-                    //     fetchCandelData(item, Name); // Pass the initialized hammer value
-                    // });
+                    DragonflyDojiData.forEach((item) => {
+                        let Name = "DragonflyDojiData"; // Initialize hammer directly here
+                        fetchCandelData(item, Name); // Pass the initialized hammer value
+                    });
 
                     InvertedHammerData.forEach((item) => {
                         let Name = "InvertedHammerData"; // Initialize hammer directly here
@@ -515,5 +972,7 @@
                     logProfitAndLoss();
         }
     </script>
+ *@
+
 </body>
 </html>

@@ -24,6 +24,34 @@ namespace StockLogger.Controllers.API_Controllers
             return await _context.StockPricePerSec.ToListAsync();
         }
 
+        // GET: https://localhost:44364/api/StockPricePerSec/ByDateTime
+        [HttpGet("ByDateTime")]
+        public async Task<ActionResult<List<StockPricePerSec>>> GetStockPriceByDateTime(DateTime dateTime, long tickerId)
+        {
+            // Add 1 minute to the provided datetime
+            var targetDateTime = dateTime.AddMinutes(1);
+            var targetDateTime2 = dateTime.AddMinutes(2);
+
+            List<StockPricePerSec> MasterList = new List<StockPricePerSec>();
+
+            // Find the matching records where StockDateTime matches the calculated target datetime
+            var matchingStockPrice = await _context.StockPricePerSec
+                .Where(sp => sp.TickerId == tickerId && sp.StockDateTime == targetDateTime)
+                .FirstOrDefaultAsync(); // Use FirstOrDefaultAsync to get only one result
+
+            MasterList.Add(matchingStockPrice);
+
+            // Find the matching records where StockDateTime matches the calculated target datetime
+            var matchingStockPrice2 = await _context.StockPricePerSec
+                .Where(sp => sp.TickerId == tickerId && sp.StockDateTime == targetDateTime2)
+                .FirstOrDefaultAsync(); // Use FirstOrDefaultAsync to get only one result
+
+            MasterList.Add(matchingStockPrice2);
+
+
+            return MasterList;
+        }
+
 
         //1 MIN
         // GET: https://localhost:44364/api/StockPricePerSec/GetCandel?ticker=INFY
