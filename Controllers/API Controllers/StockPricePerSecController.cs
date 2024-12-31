@@ -38,15 +38,39 @@ namespace StockLogger.Controllers.API_Controllers
             var matchingStockPrice = await _context.StockPricePerSec
                 .Where(sp => sp.TickerId == tickerId && sp.StockDateTime == targetDateTime)
                 .FirstOrDefaultAsync(); // Use FirstOrDefaultAsync to get only one result
+                                        // If no record found, look for data 1 minute ahead and with seconds 58
+            if (matchingStockPrice == null)
+            {
+                matchingStockPrice = await _context.StockPricePerSec
+                    .Where(sp => sp.TickerId == tickerId
+                                && sp.StockDateTime == targetDateTime
+                                && sp.StockDateTime.Second == 58) // Ensure the seconds are 58
+                    .FirstOrDefaultAsync();
+            }
 
-            MasterList.Add(matchingStockPrice);
+            if(matchingStockPrice != null)
+            {
+                MasterList.Add(matchingStockPrice);
+            }
 
             // Find the matching records where StockDateTime matches the calculated target datetime
             var matchingStockPrice2 = await _context.StockPricePerSec
                 .Where(sp => sp.TickerId == tickerId && sp.StockDateTime == targetDateTime2)
                 .FirstOrDefaultAsync(); // Use FirstOrDefaultAsync to get only one result
 
-            MasterList.Add(matchingStockPrice2);
+            if (matchingStockPrice2 == null)
+            {
+                matchingStockPrice2 = await _context.StockPricePerSec
+                    .Where(sp => sp.TickerId == tickerId
+                                && sp.StockDateTime == targetDateTime2
+                                && sp.StockDateTime.Second == 58) // Ensure the seconds are 58
+                    .FirstOrDefaultAsync();
+            }
+
+            if (matchingStockPrice2 != null)
+            {
+                MasterList.Add(matchingStockPrice2);
+            }
 
 
             return MasterList;

@@ -129,6 +129,9 @@
 </head>
 <body>
     <div class="container">
+
+        <button onclick="fetchAllData()">REPORT</button>
+
         <!-- Hammer Report Section -->
         <div class="form-container">
             <h2>Hammer Report</h2>
@@ -254,6 +257,131 @@
             </div>
         </div>
 
+        <!-- Morning Star Section -->
+        <div class="form-container">
+            <h2>Morning Star</h2>
+            <div class="form-group">
+                <label for="totalPredictions">Total Predictions:</label>
+                <input type="text" id="morningStartotalPredictions" class="form-control" placeholder="Total predictions" readonly>
+            </div>
+            <div class="form-group">
+                <label for="correctPredictions" class="correct-prediction">Correct Predictions:</label>
+                <input type="text" id="morningStarcorrectPredictions" class="form-control" placeholder="Correct predictions" readonly>
+            </div>
+            <div class="form-group">
+                <label for="wrongPredictions" class="wrong-prediction">Wrong Predictions:</label>
+                <input type="text" id="morningStarwrongPredictions" class="form-control" placeholder="Wrong predictions" readonly>
+            </div>
+            <div class="form-group">
+                <label for="wrongPredictions" class="wrong-prediction">Accuracy:</label>
+                <input type="text" id="morningStarAccuracy" class="form-control" placeholder="Accuracy" readonly>
+            </div>
+            <div class="button-container">
+                <button type="button" class="btn btn-primary" id="viewmorningStar">View Analysis</button>
+                <button type="button" class="btn btn-primary" id="analyzemorningStar">Analyze</button>
+            </div>
+        </div>
+
+        <!-- Piercing Line Section -->
+        <div class="form-container">
+            <h2>Piercing Line</h2>
+            <div class="form-group">
+                <label for="totalPredictions">Total Predictions:</label>
+                <input type="text" id="piercingLinetotalPredictions" class="form-control" placeholder="Total predictions" readonly>
+            </div>
+            <div class="form-group">
+                <label for="correctPredictions" class="correct-prediction">Correct Predictions:</label>
+                <input type="text" id="piercingLinecorrectPredictions" class="form-control" placeholder="Correct predictions" readonly>
+            </div>
+            <div class="form-group">
+                <label for="wrongPredictions" class="wrong-prediction">Wrong Predictions:</label>
+                <input type="text" id="piercingLinewrongPredictions" class="form-control" placeholder="Wrong predictions" readonly>
+            </div>
+            <div class="form-group">
+                <label for="wrongPredictions" class="wrong-prediction">Accuracy:</label>
+                <input type="text" id="piercingLineAccuracy" class="form-control" placeholder="Accuracy" readonly>
+            </div>
+            <div class="button-container">
+                <button type="button" class="btn btn-primary" id="viewpiercingLine">View Analysis</button>
+                <button type="button" class="btn btn-primary" id="analyzepiercingLine">Analyze</button>
+            </div>
+        </div>
+
+        <!-- Rising Three Section -->
+        <div class="form-container">
+            <h2>Rising Three</h2>
+            <div class="form-group">
+                <label for="totalPredictions">Total Predictions:</label>
+                <input type="text" id="risingThreeMethodstotalPredictions" class="form-control" placeholder="Total predictions" readonly>
+            </div>
+            <div class="form-group">
+                <label for="correctPredictions" class="correct-prediction">Correct Predictions:</label>
+                <input type="text" id="risingThreeMethodscorrectPredictions" class="form-control" placeholder="Correct predictions" readonly>
+            </div>
+            <div class="form-group">
+                <label for="wrongPredictions" class="wrong-prediction">Wrong Predictions:</label>
+                <input type="text" id="risingThreeMethodswrongPredictions" class="form-control" placeholder="Wrong predictions" readonly>
+            </div>
+            <div class="form-group">
+                <label for="wrongPredictions" class="wrong-prediction">Accuracy:</label>
+                <input type="text" id="risingThreeMethodsAccuracy" class="form-control" placeholder="Accuracy" readonly>
+            </div>
+            <div class="button-container">
+                <button type="button" class="btn btn-primary" id="viewrisingThreeMethods">View Analysis</button>
+                <button type="button" class="btn btn-primary" id="analyzerisingThreeMethods">Analyze</button>
+            </div>
+        </div>
+
+        <!-- 3 White S Section -->
+        <div class="form-container">
+            <h2>3 White S</h2>
+            <div class="form-group">
+                <label for="totalPredictions">Total Predictions:</label>
+                <input type="text" id="threeWhiteSoildertotalPredictions" class="form-control" placeholder="Total predictions" readonly>
+            </div>
+            <div class="form-group">
+                <label for="correctPredictions" class="correct-prediction">Correct Predictions:</label>
+                <input type="text" id="threeWhiteSoildercorrectPredictions" class="form-control" placeholder="Correct predictions" readonly>
+            </div>
+            <div class="form-group">
+                <label for="wrongPredictions" class="wrong-prediction">Wrong Predictions:</label>
+                <input type="text" id="threeWhiteSoilderwrongPredictions" class="form-control" placeholder="Wrong predictions" readonly>
+            </div>
+            <div class="form-group">
+                <label for="wrongPredictions" class="wrong-prediction">Accuracy:</label>
+                <input type="text" id="threeWhiteSoilderAccuracy" class="form-control" placeholder="Accuracy" readonly>
+            </div>
+            <div class="button-container">
+                <button type="button" class="btn btn-primary" id="viewthreeWhiteSoilder">View Analysis</button>
+                <button type="button" class="btn btn-primary" id="analyzethreeWhiteSoilder">Analyze</button>
+            </div>
+        </div>
+
+        <!-- Tweezer Bottom Section -->
+        <div class="form-container">
+            <h2>Tweezer B</h2>
+            <div class="form-group">
+                <label for="totalPredictions">Total Predictions:</label>
+                <input type="text" id="tweezerBottomtotalPredictions" class="form-control" placeholder="Total predictions" readonly>
+            </div>
+            <div class="form-group">
+                <label for="correctPredictions" class="correct-prediction">Correct Predictions:</label>
+                <input type="text" id="tweezerBottomcorrectPredictions" class="form-control" placeholder="Correct predictions" readonly>
+            </div>
+            <div class="form-group">
+                <label for="wrongPredictions" class="wrong-prediction">Wrong Predictions:</label>
+                <input type="text" id="tweezerBottomwrongPredictions" class="form-control" placeholder="Wrong predictions" readonly>
+            </div>
+            <div class="form-group">
+                <label for="wrongPredictions" class="wrong-prediction">Accuracy:</label>
+                <input type="text" id="tweezerBottomAccuracy" class="form-control" placeholder="Accuracy" readonly>
+            </div>
+            <div class="button-container">
+                <button type="button" class="btn btn-primary" id="viewtweezerBottom">View Analysis</button>
+                <button type="button" class="btn btn-primary" id="analyzetweezerBottom">Analyze</button>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -306,8 +434,20 @@
             correctinvertedHammerPrediction: [],
             wronginvertedHammerPrediction: [],
 
+            correctmorningStarPrediction: [],
+            wrongmorningStarPrediction: [],
             
+            correctpiercingLinePrediction: [],
+            wrongpiercingLinePrediction: [],
 
+            correctrisingThreeMethodsPrediction: [],
+            wrongrisingThreeMethodsPrediction: [],
+
+            correctthreeWhiteSoilderPrediction: [],
+            wrongthreeWhiteSoilderPrediction: [],
+            
+            correcttweezerBottomPrediction: [],
+            wrongtweezerBottomPrediction: [],
             
         };
 
@@ -317,14 +457,28 @@
 
              const url2 = `https://localhost:44364/api/StockPricePerSec/ByDateTime?dateTime=${encodeURIComponent(data.detectionTime)}&tickerId=${data.tickerId}`;
 
+                    let FirstPrice = null;
+                    let SecondPrice = null;
+                    let DetectionCandel = null;
+
+                    console.log("url2",url2);
+
              fetch(url2)
                 .then(response => response.json()) // Parse the JSON response
                 .then(data => {
 
-                    let FirstPrice = data[0];
-                    let SecondPrice = data[1];
+                    FirstPrice = data[0];
+                    SecondPrice = data[1];
 
+                    if(FirstPrice !=  null)
+                    {
+                    console.log("FirstPrice",FirstPrice);
+                    }
 
+                    if(SecondPrice != null)
+                    {
+                    console.log("SecondPrice",SecondPrice);
+                    }
                 
                 }) // Log the response data
                 .catch(error => console.error('Error:', error)); // Catch any errors
@@ -332,9 +486,12 @@
             fetch(url)
                 .then(response => response.json())
                 .then(data => {
-                    let DetectionCandel = data[0]
+                    DetectionCandel = data[0]
                     let NextCandel = data[1]
                     let FarthestCandel = data[2]
+
+                    console.log("DetectionCandel",DetectionCandel,FirstPrice,SecondPrice);
+
 
                     if (NextCandel.endPrice > DetectionCandel.endPrice) {
                         predictions[`correct${Name}Prediction`].push(data);
@@ -372,6 +529,9 @@
                 .catch(error => {
                     console.error('Error fetching data:', error);
                 });
+
+
+
         }
 
         async function fetchData() {
@@ -481,9 +641,7 @@
 
                 const data = await response.json();
                 InvertedHammerData = data;
-                console.log("InvertedHammerData:", data);
-
-                
+                console.log("InvertedHammerData:", data);                
 
                let DataLength = data.length;
                document.getElementById("invertedHammertotalPredictions").value = DataLength;
@@ -508,6 +666,14 @@
                 const data = await response.json();
                 MorningStarDbData = data;
                 console.log("MorningStarDbData:", data);
+
+               let DataLength = data.length;
+               document.getElementById("morningStartotalPredictions").value = DataLength;
+
+               data.forEach((item) => {
+                   AnalyzeCandelData(item,"morningStar");
+               });
+
             } catch (error) {
                 console.error("Error during fetch MorningStarDb:", error);
             }
@@ -524,6 +690,14 @@
                 const data = await response.json();
                 PiercingLineData = data;
                 console.log("PiercingLineData:", data);
+                
+               let DataLength = data.length;
+               document.getElementById("piercingLinetotalPredictions").value = DataLength;
+
+               data.forEach((item) => {
+                   AnalyzeCandelData(item,"piercingLine");
+               });
+
             } catch (error) {
                 console.error("Error during fetch PiercingLineData:", error);
             }
@@ -540,6 +714,14 @@
                 const data = await response.json();
                 RisingThreeMethodsData = data;
                 console.log("RisingThreeMethodsData:", data);
+
+               let DataLength = data.length;
+               document.getElementById("risingThreeMethodstotalPredictions").value = DataLength;
+
+               data.forEach((item) => {
+                   AnalyzeCandelData(item,"risingThreeMethods");
+               });
+
             } catch (error) {
                 console.error("Error during fetch RisingThreeMethodsData:", error);
             }
@@ -556,6 +738,14 @@
                 const data = await response.json();
                 ThreeWhiteSoilderDbData = data;
                 console.log("ThreeWhiteSoilderDbData:", data);
+
+               let DataLength = data.length;
+               document.getElementById("threeWhiteSoildertotalPredictions").value = DataLength;
+
+               data.forEach((item) => {
+                   AnalyzeCandelData(item,"threeWhiteSoilder");
+               });
+
             } catch (error) {
                 console.error("Error during fetch ThreeWhiteSoilderDbData:", error);
             }
@@ -572,6 +762,14 @@
                 const data = await response.json();
                 TweezerBottomData = data;
                 console.log("TweezerBottomData:", data);
+
+               let DataLength = data.length;
+               document.getElementById("tweezerBottomtotalPredictions").value = DataLength;
+
+               data.forEach((item) => {
+                   AnalyzeCandelData(item,"tweezerBottom");
+               });
+
             } catch (error) {
                 console.error("Error during fetch TweezerBottomData:", error);
             }
@@ -844,6 +1042,7 @@
 
         let totalProfit = 0; // Variable to store total profit
         let totalLoss = 0;   // Variable to store total loss
+        let totalInvestment = 0; // Variable to track total investment
 
         function fetchCandelData(data, Name) {
             const url = `${apiCandelUrl}${data.detectionTime}&ticker=${data.ticker}&tickerId=${data.tickerId}`;
@@ -859,6 +1058,9 @@
 
                     console.log("DetectionCandel", DetectionCandel, DetectionCandel.endPrice);
                     console.log("NextCandel", NextCandel, NextCandel.endPrice);
+
+                    // Add DetectionCandel's end price to total investment
+                    totalInvestment += DetectionCandel.endPrice;
 
                     if (NextCandel.endPrice > DetectionCandel.endPrice) {
                         correctPrediction.push({ Stratergyname: Name, data: data });
@@ -897,10 +1099,12 @@
         function logProfitAndLoss() {
             console.log("Total Profit:", totalProfit);
             console.log("Total Loss:", totalLoss);
+            console.log("Total Investment:", totalInvestment);
 
             let netResult = totalProfit - totalLoss;
             console.log("Net Result (Profit - Loss):", netResult);
         }
+
 
         // Function to run all fetch functions in parallel every second
         function fetchAllData() {
