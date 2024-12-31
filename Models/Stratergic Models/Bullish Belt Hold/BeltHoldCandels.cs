@@ -56,4 +56,3 @@ namespace StockLogger.Models.Stratergic_Models.Bullish_Belt_Hold
         }
     }
 }
-}

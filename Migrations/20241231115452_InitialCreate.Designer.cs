@@ -12,7 +12,7 @@ using StockLogger.Data;
 namespace StockLogger.Migrations
 {
     [DbContext(typeof(StockLoggerDbContext))]
-    [Migration("20241226111947_InitialCreate")]
+    [Migration("20241231115452_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -290,6 +290,282 @@ namespace StockLogger.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("StockTickerExchanges");
+                });
+
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Breakaway__Bullish_.BreakawayCandels", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("BreakawayDbId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CloseTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("EndPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Exchange")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("HighestPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool?>("IsBearish")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsBullish")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("LowestPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("OpenTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("PriceChange")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("PriceChangePercentage")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("StartPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("TickerId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BreakawayDbId");
+
+                    b.ToTable("BreakawayCandels");
+                });
+
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Breakaway__Bullish_.BreakawayDb", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("DetectionRange")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DetectionTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Exchange")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsBreakawayDetected")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("TickerId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BreakawayDb");
+                });
+
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Bullish_Abandoned_Baby.AbandonedBabyCandels", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("AbandonedBabyDbId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CloseTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("EndPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Exchange")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("HighestPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool?>("IsBearish")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsBullish")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("LowestPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("OpenTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("PriceChange")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("PriceChangePercentage")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("StartPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("TickerId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AbandonedBabyDbId");
+
+                    b.ToTable("AbandonedBabyCandels");
+                });
+
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Bullish_Abandoned_Baby.AbandonedBabyDb", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("DetectionRange")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DetectionTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Exchange")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsAbandonedBabyDetected")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("TickerId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AbandonedBabyDb");
+                });
+
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Bullish_Belt_Hold.BeltHoldCandels", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<long?>("BeltHoldDbId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CloseTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("EndPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Exchange")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("HighestPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool?>("IsBearish")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsBullish")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("LowestPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("OpenTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("PriceChange")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("PriceChangePercentage")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("StartPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("TickerId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BeltHoldDbId");
+
+                    b.ToTable("BeltHoldCandels");
+                });
+
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Bullish_Belt_Hold.BeltHoldDb", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("DetectionRange")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DetectionTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Exchange")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsBeltHoldDetected")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("TickerId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("BeltHoldDb");
                 });
 
             modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Bullish_Engulfing.BullishEngulfingCandels", b =>
@@ -752,6 +1028,98 @@ namespace StockLogger.Migrations
                     b.ToTable("InvertedHammerDb");
                 });
 
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Marubozu__Bullish_.MarubozuCandels", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CloseTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("EndPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Exchange")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("HighestPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool?>("IsBearish")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsBullish")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("LowestPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<long?>("MarubozuDbId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("OpenTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("PriceChange")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("PriceChangePercentage")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("StartPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("TickerId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MarubozuDbId");
+
+                    b.ToTable("MarubozuCandels");
+                });
+
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Marubozu__Bullish_.MarubozuDb", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("DetectionRange")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DetectionTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Exchange")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsMarubozuDetected")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("TickerId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MarubozuDb");
+                });
+
             modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Morning_Star.MorningStarCandels", b =>
                 {
                     b.Property<long>("Id")
@@ -934,6 +1302,98 @@ namespace StockLogger.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("PiercingLineDb");
+                });
+
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Rising_Sun.RisingSunCandels", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CloseTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("EndPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Exchange")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("HighestPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool?>("IsBearish")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsBullish")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("LowestPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("OpenTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("PriceChange")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("PriceChangePercentage")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<long?>("RisingSunDbId")
+                        .HasColumnType("bigint");
+
+                    b.Property<decimal>("StartPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("TickerId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RisingSunDbId");
+
+                    b.ToTable("RisingSunCandels");
+                });
+
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Rising_Sun.RisingSunDb", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("DetectionRange")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DetectionTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Exchange")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsRisingSunDetected")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("TickerId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("RisingSunDb");
                 });
 
             modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Rising_Three_Methods.RisingThreeMethodsCandels", b =>
@@ -1120,6 +1580,98 @@ namespace StockLogger.Migrations
                     b.ToTable("ThreeWhiteSoilderDbs");
                 });
 
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Tower_Bottom.TowerBottomCandels", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CloseTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("EndPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Exchange")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("HighestPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool?>("IsBearish")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("IsBullish")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("LowestPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("OpenTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("PriceChange")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("PriceChangePercentage")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("StartPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("TickerId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("TowerBottomDbId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TowerBottomDbId");
+
+                    b.ToTable("TowerBottomCandels");
+                });
+
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Tower_Bottom.TowerBottomDb", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<int>("DetectionRange")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DetectionTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Exchange")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsTowerBottomDetected")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Ticker")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("TickerId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("TowerBottomDb");
+                });
+
             modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Tweezer_Bottom.TweezerBottomCandels", b =>
                 {
                     b.Property<long>("Id")
@@ -1212,6 +1764,27 @@ namespace StockLogger.Migrations
                     b.ToTable("TweezerBottomDb");
                 });
 
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Breakaway__Bullish_.BreakawayCandels", b =>
+                {
+                    b.HasOne("StockLogger.Models.Stratergic_Models.Breakaway__Bullish_.BreakawayDb", null)
+                        .WithMany("Candels")
+                        .HasForeignKey("BreakawayDbId");
+                });
+
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Bullish_Abandoned_Baby.AbandonedBabyCandels", b =>
+                {
+                    b.HasOne("StockLogger.Models.Stratergic_Models.Bullish_Abandoned_Baby.AbandonedBabyDb", null)
+                        .WithMany("Candels")
+                        .HasForeignKey("AbandonedBabyDbId");
+                });
+
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Bullish_Belt_Hold.BeltHoldCandels", b =>
+                {
+                    b.HasOne("StockLogger.Models.Stratergic_Models.Bullish_Belt_Hold.BeltHoldDb", null)
+                        .WithMany("Candels")
+                        .HasForeignKey("BeltHoldDbId");
+                });
+
             modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Bullish_Engulfing.BullishEngulfingCandels", b =>
                 {
                     b.HasOne("StockLogger.Models.Stratergic_Models.Bullish_Engulfing.BullishEngulfingDb", null)
@@ -1247,6 +1820,13 @@ namespace StockLogger.Migrations
                         .HasForeignKey("InvertedHammerDbId");
                 });
 
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Marubozu__Bullish_.MarubozuCandels", b =>
+                {
+                    b.HasOne("StockLogger.Models.Stratergic_Models.Marubozu__Bullish_.MarubozuDb", null)
+                        .WithMany("Candels")
+                        .HasForeignKey("MarubozuDbId");
+                });
+
             modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Morning_Star.MorningStarCandels", b =>
                 {
                     b.HasOne("StockLogger.Models.Stratergic_Models.Morning_Star.MorningStarDb", null)
@@ -1259,6 +1839,13 @@ namespace StockLogger.Migrations
                     b.HasOne("StockLogger.Models.Stratergic_Models.Piercing_Line.PiercingLineDb", null)
                         .WithMany("PiercingLineCandels")
                         .HasForeignKey("PiercingLineDbId");
+                });
+
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Rising_Sun.RisingSunCandels", b =>
+                {
+                    b.HasOne("StockLogger.Models.Stratergic_Models.Rising_Sun.RisingSunDb", null)
+                        .WithMany("Candels")
+                        .HasForeignKey("RisingSunDbId");
                 });
 
             modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Rising_Three_Methods.RisingThreeMethodsCandels", b =>
@@ -1275,11 +1862,33 @@ namespace StockLogger.Migrations
                         .HasForeignKey("ThreeWhiteSoilderDbId");
                 });
 
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Tower_Bottom.TowerBottomCandels", b =>
+                {
+                    b.HasOne("StockLogger.Models.Stratergic_Models.Tower_Bottom.TowerBottomDb", null)
+                        .WithMany("Candels")
+                        .HasForeignKey("TowerBottomDbId");
+                });
+
             modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Tweezer_Bottom.TweezerBottomCandels", b =>
                 {
                     b.HasOne("StockLogger.Models.Stratergic_Models.Tweezer_Bottom.TweezerBottomDb", null)
                         .WithMany("TweezerBottomCandels")
                         .HasForeignKey("TweezerBottomDbId");
+                });
+
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Breakaway__Bullish_.BreakawayDb", b =>
+                {
+                    b.Navigation("Candels");
+                });
+
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Bullish_Abandoned_Baby.AbandonedBabyDb", b =>
+                {
+                    b.Navigation("Candels");
+                });
+
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Bullish_Belt_Hold.BeltHoldDb", b =>
+                {
+                    b.Navigation("Candels");
                 });
 
             modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Bullish_Engulfing.BullishEngulfingDb", b =>
@@ -1307,6 +1916,11 @@ namespace StockLogger.Migrations
                     b.Navigation("InvertedHammerCandels");
                 });
 
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Marubozu__Bullish_.MarubozuDb", b =>
+                {
+                    b.Navigation("Candels");
+                });
+
             modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Morning_Star.MorningStarDb", b =>
                 {
                     b.Navigation("MorningStarCandels");
@@ -1317,6 +1931,11 @@ namespace StockLogger.Migrations
                     b.Navigation("PiercingLineCandels");
                 });
 
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Rising_Sun.RisingSunDb", b =>
+                {
+                    b.Navigation("Candels");
+                });
+
             modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Rising_Three_Methods.RisingThreeMethodsDb", b =>
                 {
                     b.Navigation("RisingThreeMethodsCandels");
@@ -1325,6 +1944,11 @@ namespace StockLogger.Migrations
             modelBuilder.Entity("StockLogger.Models.Stratergic_Models.ThreeWhiteSoilderDb", b =>
                 {
                     b.Navigation("ThreeWhiteSoilderCandels");
+                });
+
+            modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Tower_Bottom.TowerBottomDb", b =>
+                {
+                    b.Navigation("Candels");
                 });
 
             modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Tweezer_Bottom.TweezerBottomDb", b =>
