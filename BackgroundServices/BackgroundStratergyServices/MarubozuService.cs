@@ -1,13 +1,16 @@
-﻿using StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers;
+﻿using Newtonsoft.Json;
+using StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers;
 using StockLogger.Models.Candel;
 using System.Diagnostics;
+using System.Net.Http.Headers;
+using System.Text;
 
 namespace StockLogger.BackgroundServices.BackgroundStratergyServices
 {
     public class MarubozuService : BackgroundService
     {
         private readonly HttpClient _httpClient;
-        private readonly List<(string ticker, string exchange, string name, long id)> _stocks;
+        private readonly List<(string ticker, string exchange, string name, long id, string symboltoken)> _stocks;
         private readonly MarubozuAnalyzer _analyzer;
 
         public MarubozuService(HttpClient httpClient)

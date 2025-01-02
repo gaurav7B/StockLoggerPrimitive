@@ -9,7 +9,7 @@ namespace StockLogger.BackgroundServices
     public class CandelMakerService : BackgroundService
     {
         private readonly HttpClient _httpClient;
-        private readonly List<(string ticker, string exchange, string name, long id)> _stocks;
+        private readonly List<(string ticker, string exchange, string name, long id, string symboltoken)> _stocks;
 
         public CandelMakerService(HttpClient httpClient)
         {

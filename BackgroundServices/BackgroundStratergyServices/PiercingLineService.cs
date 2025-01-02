@@ -7,7 +7,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
     public class PiercingLineService : BackgroundService
     {
         private readonly HttpClient _httpClient;
-        private readonly List<(string ticker, string exchange, string name, long id)> _stocks;
+        private readonly List<(string ticker, string exchange, string name, long id, string symboltoken)> _stocks;
         private readonly PiercingLineAnalyzer _analyzer;
 
         public PiercingLineService(HttpClient httpClient)

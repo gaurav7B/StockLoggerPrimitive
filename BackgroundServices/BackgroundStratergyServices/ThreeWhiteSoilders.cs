@@ -12,7 +12,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
     public class ThreeWhiteSoilders : BackgroundService
     {
         private readonly HttpClient _httpClient;
-        private readonly List<(string ticker, string exchange, string name, long id)> _stocks;
+        private readonly List<(string ticker, string exchange, string name, long id, string symboltoken)> _stocks;
         public List<List<Candel>> MasterCandelListFor1MinCandel3WS = new List<List<Candel>>();
         public List<List<Candel>> MasterCandelListFor5MinCandel3WS = new List<List<Candel>>();
         public List<List<Candel>> MasterCandelListFor10MinCandel3WS = new List<List<Candel>>();
