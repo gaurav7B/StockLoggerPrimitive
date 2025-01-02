@@ -112,86 +112,6 @@ namespace StockLogger.BackgroundServices
                 Console.WriteLine("Error: " + e.Message);
             }
 
-            while (!stoppingToken.IsCancellationRequested)
-            {
-                //    var nextRunTime = DateTime.UtcNow.AddMinutes(1).AddSeconds(-DateTime.UtcNow.Second); // Calculate next full minute
-                //    var delay = nextRunTime - DateTime.UtcNow; // Calculate the delay to the next minute
-
-                //    if (delay > TimeSpan.Zero)
-                //    {
-                //        await Task.Delay(delay, stoppingToken); // Wait until the next full minute
-                //    }
-
-                //    var stopwatch = Stopwatch.StartNew();
-
-                //    var tasks = _stocks.Select(stock => Task.Run(async () =>
-                //    {
-                //        string fromdate = DateTime.Today.AddHours(9).ToString("yyyy-MM-dd HH:mm");
-                //        string todate = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
-
-                //        var data = new
-                //        {
-                //            exchange = "NSE",
-                //            symboltoken = stock.symboltoken,
-                //            interval = "ONE_MINUTE",
-                //            fromdate = fromdate,
-                //            todate = todate
-                //        };
-
-                //        var jsonData = JsonConvert.SerializeObject(data);
-                //        var client = new HttpClient();
-
-                //        var requestMessage = new HttpRequestMessage(HttpMethod.Post, "https://apiconnect.angelone.in/rest/secure/angelbroking/historical/v1/getCandleData")
-                //        {
-                //            Content = new StringContent(jsonData, Encoding.UTF8, "application/json")
-                //        };
-
-                //        // Set the headers
-                //        requestMessage.Headers.Add("Accept", "application/json");
-                //        requestMessage.Headers.Add("X-SourceID", "WEB");
-                //        requestMessage.Headers.Add("X-ClientLocalIP", "192.168.56.177"); // Replace with your actual IP
-                //        requestMessage.Headers.Add("X-ClientPublicIP", publicIp);
-                //        requestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX"); // Replace with your actual MAC address
-                //        requestMessage.Headers.Add("X-UserType", "USER");
-                //        requestMessage.Headers.Add("Authorization", "Bearer " + authorizationToken);
-                //        requestMessage.Headers.Add("X-PrivateKey", "DcsJlRJp"); // Your actual API Key
-
-                //        try
-                //        {
-                //            // Send request to get historical data
-                //            HttpResponseMessage response = await client.SendAsync(requestMessage);
-                //            response.EnsureSuccessStatusCode(); // Throws an exception if not successful
-
-                //            // Read and display the response
-                //            string responseContent = await response.Content.ReadAsStringAsync();
-                //            dynamic responseJson = JsonConvert.DeserializeObject(responseContent);
-
-                //            // Check if the request is successful and print the data
-                //            if (responseJson.status == true)
-                //            {
-                //                Console.WriteLine("Historical Data: " + JsonConvert.SerializeObject(responseJson.data, Formatting.Indented));
-                //            }
-                //            else
-                //            {
-                //                Console.WriteLine("Failed to fetch data: " + responseJson.message);
-                //            }
-                //        }
-                //        catch (Exception e)
-                //        {
-                //            Console.WriteLine("Error fetching historical data: " + e.Message);
-                //        }
-                //    }, stoppingToken));
-
-                //    // Wait for all tasks to complete.
-                //    await Task.WhenAll(tasks);
-                //    stopwatch.Stop();
-
-                //    // Trigger garbage collection periodically
-                //    GC.Collect();
-                //    GC.WaitForPendingFinalizers();
-                //}
-
-
                 while (!stoppingToken.IsCancellationRequested)
                 {
                     var stopwatch = Stopwatch.StartNew();
@@ -237,7 +157,7 @@ namespace StockLogger.BackgroundServices
                         {
                             // Send request to get historical data
                             HttpResponseMessage response = await client.SendAsync(requestMessage);
-                            response.EnsureSuccessStatusCode();  // Throws an exception if not successful
+                            response.EnsureSuccessStatusCode();  
 
                             // Read and display the response
                             string responseContent = await response.Content.ReadAsStringAsync();
@@ -250,25 +170,24 @@ namespace StockLogger.BackgroundServices
                                 Candel rawCandel = new Candel
                                 {
                                     OpenTime = DateTime.Parse(c[0].ToString()),
-                                    CloseTime = DateTime.Parse(c[0].ToString()).AddMinutes(1), // Assuming 1-minute candlesticks
+                                    CloseTime = DateTime.Parse(c[0].ToString()).AddMinutes(1), 
 
                                     StartPrice = Convert.ToDecimal(c[1]),
                                     HighestPrice = Convert.ToDecimal(c[2]),
                                     LowestPrice = Convert.ToDecimal(c[3]),
                                     EndPrice = Convert.ToDecimal(c[4]),
 
-                                    Ticker = Ticker, // Assuming these are defined in the scope
+                                    Ticker = Ticker, 
                                     TickerId = TickeId,
                                     Exchange = Exchange,
 
-                                    Volume = Convert.ToDecimal(c[5]), // Parse volume
+                                    Volume = Convert.ToDecimal(c[5]), 
                                 };
 
-                                // Calculate and set derived properties
-                                rawCandel.SetBullBearStatus(); // Sets IsBullish and IsBearish
-                                rawCandel.SetPriceChange();    // Sets PriceChange and PriceChangePercentage
+                                rawCandel.SetBullBearStatus(); 
+                                rawCandel.SetPriceChange();  
 
-                                RC.Add(rawCandel); // Add to list
+                                RC.Add(rawCandel); 
 
                                 HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/Candel",
                                       new StringContent(JsonConvert.SerializeObject(rawCandel), Encoding.UTF8, "application/json"),
@@ -276,7 +195,6 @@ namespace StockLogger.BackgroundServices
 
                             }
 
-                            // Check if the request is successful and print the data
                             if (responseJson.status == true)
                             {
                                 Console.WriteLine("Historical Data: " + JsonConvert.SerializeObject(responseJson.data, Formatting.Indented));
@@ -299,12 +217,8 @@ namespace StockLogger.BackgroundServices
                     // Trigger garbage collection periodically
                     GC.Collect();
                     GC.WaitForPendingFinalizers();
-
-                    // Delay for half a second (if needed)
-                    //await Task.Delay(20, stoppingToken);
                 }
 
-            }
         }
 
     }
