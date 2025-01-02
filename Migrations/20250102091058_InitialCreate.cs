@@ -113,6 +113,7 @@ namespace StockLogger.Migrations
                     EndPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     OpenTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CloseTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Volume = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Ticker = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TickerId = table.Column<long>(type: "bigint", nullable: false),
                     Exchange = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -138,6 +139,7 @@ namespace StockLogger.Migrations
                     EndPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     OpenTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CloseTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Volume = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Ticker = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TickerId = table.Column<long>(type: "bigint", nullable: false),
                     Exchange = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -163,6 +165,7 @@ namespace StockLogger.Migrations
                     EndPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     OpenTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CloseTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Volume = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Ticker = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TickerId = table.Column<long>(type: "bigint", nullable: false),
                     Exchange = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -188,6 +191,7 @@ namespace StockLogger.Migrations
                     EndPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     OpenTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CloseTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Volume = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Ticker = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TickerId = table.Column<long>(type: "bigint", nullable: false),
                     Exchange = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -449,6 +453,7 @@ namespace StockLogger.Migrations
                     IsBearish = table.Column<bool>(type: "bit", nullable: true),
                     PriceChange = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     PriceChangePercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Volume = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     AbandonedBabyDbId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
@@ -480,6 +485,7 @@ namespace StockLogger.Migrations
                     IsBearish = table.Column<bool>(type: "bit", nullable: true),
                     PriceChange = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     PriceChangePercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Volume = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     BeltHoldDbId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
@@ -511,6 +517,7 @@ namespace StockLogger.Migrations
                     IsBearish = table.Column<bool>(type: "bit", nullable: true),
                     PriceChange = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     PriceChangePercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Volume = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     BreakawayDbId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
@@ -542,6 +549,7 @@ namespace StockLogger.Migrations
                     IsBearish = table.Column<bool>(type: "bit", nullable: true),
                     PriceChange = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     PriceChangePercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Volume = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     BullishEngulfingDbId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
@@ -573,6 +581,7 @@ namespace StockLogger.Migrations
                     IsBearish = table.Column<bool>(type: "bit", nullable: true),
                     PriceChange = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     PriceChangePercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Volume = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     BullishHaramiDbId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
@@ -604,6 +613,7 @@ namespace StockLogger.Migrations
                     IsBearish = table.Column<bool>(type: "bit", nullable: true),
                     PriceChange = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     PriceChangePercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Volume = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     DragonflyDojiDbId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
@@ -635,6 +645,7 @@ namespace StockLogger.Migrations
                     IsBearish = table.Column<bool>(type: "bit", nullable: true),
                     PriceChange = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     PriceChangePercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Volume = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     HammerDbId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
@@ -666,6 +677,7 @@ namespace StockLogger.Migrations
                     IsBearish = table.Column<bool>(type: "bit", nullable: true),
                     PriceChange = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     PriceChangePercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Volume = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     InvertedHammerDbId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
@@ -697,6 +709,7 @@ namespace StockLogger.Migrations
                     IsBearish = table.Column<bool>(type: "bit", nullable: true),
                     PriceChange = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     PriceChangePercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Volume = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     MarubozuDbId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
@@ -728,6 +741,7 @@ namespace StockLogger.Migrations
                     IsBearish = table.Column<bool>(type: "bit", nullable: true),
                     PriceChange = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     PriceChangePercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Volume = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     MorningStarDbId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
@@ -759,6 +773,7 @@ namespace StockLogger.Migrations
                     IsBearish = table.Column<bool>(type: "bit", nullable: true),
                     PriceChange = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     PriceChangePercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Volume = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     PiercingLineDbId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
@@ -790,6 +805,7 @@ namespace StockLogger.Migrations
                     IsBearish = table.Column<bool>(type: "bit", nullable: true),
                     PriceChange = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     PriceChangePercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Volume = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     RisingSunDbId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
@@ -821,6 +837,7 @@ namespace StockLogger.Migrations
                     IsBearish = table.Column<bool>(type: "bit", nullable: true),
                     PriceChange = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     PriceChangePercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Volume = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     RisingThreeMethodsDbId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
@@ -852,6 +869,7 @@ namespace StockLogger.Migrations
                     IsBearish = table.Column<bool>(type: "bit", nullable: true),
                     PriceChange = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     PriceChangePercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Volume = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     ThreeWhiteSoilderDbId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
@@ -883,6 +901,7 @@ namespace StockLogger.Migrations
                     IsBearish = table.Column<bool>(type: "bit", nullable: true),
                     PriceChange = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     PriceChangePercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Volume = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     TowerBottomDbId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
@@ -914,6 +933,7 @@ namespace StockLogger.Migrations
                     IsBearish = table.Column<bool>(type: "bit", nullable: true),
                     PriceChange = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     PriceChangePercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Volume = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     TweezerBottomDbId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>

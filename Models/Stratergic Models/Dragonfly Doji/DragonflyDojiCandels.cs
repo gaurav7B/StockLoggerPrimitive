@@ -55,5 +55,8 @@ namespace StockLogger.Models.Stratergic_Models.Dragonfly_Doji
             PriceChangePercentage = StartPrice != 0 ? (PriceChange / StartPrice) * 100 : 0;
         }
 
+        // Volume data
+        public decimal Volume { get; set; }
+
     }
 }

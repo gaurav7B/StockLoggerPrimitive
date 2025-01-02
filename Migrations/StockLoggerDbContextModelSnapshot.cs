@@ -71,6 +71,9 @@ namespace StockLogger.Migrations
                     b.Property<long>("TickerId")
                         .HasColumnType("bigint");
 
+                    b.Property<decimal>("Volume")
+                        .HasColumnType("decimal(18,2)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Candel");
@@ -124,6 +127,9 @@ namespace StockLogger.Migrations
 
                     b.Property<long>("TickerId")
                         .HasColumnType("bigint");
+
+                    b.Property<decimal>("Volume")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -179,6 +185,9 @@ namespace StockLogger.Migrations
                     b.Property<long>("TickerId")
                         .HasColumnType("bigint");
 
+                    b.Property<decimal>("Volume")
+                        .HasColumnType("decimal(18,2)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Candel15min");
@@ -232,6 +241,9 @@ namespace StockLogger.Migrations
 
                     b.Property<long>("TickerId")
                         .HasColumnType("bigint");
+
+                    b.Property<decimal>("Volume")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -341,6 +353,9 @@ namespace StockLogger.Migrations
                     b.Property<long>("TickerId")
                         .HasColumnType("bigint");
 
+                    b.Property<decimal>("Volume")
+                        .HasColumnType("decimal(18,2)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("BreakawayDbId");
@@ -432,6 +447,9 @@ namespace StockLogger.Migrations
 
                     b.Property<long>("TickerId")
                         .HasColumnType("bigint");
+
+                    b.Property<decimal>("Volume")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -525,6 +543,9 @@ namespace StockLogger.Migrations
                     b.Property<long>("TickerId")
                         .HasColumnType("bigint");
 
+                    b.Property<decimal>("Volume")
+                        .HasColumnType("decimal(18,2)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("BeltHoldDbId");
@@ -616,6 +637,9 @@ namespace StockLogger.Migrations
 
                     b.Property<long>("TickerId")
                         .HasColumnType("bigint");
+
+                    b.Property<decimal>("Volume")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -709,6 +733,9 @@ namespace StockLogger.Migrations
                     b.Property<long>("TickerId")
                         .HasColumnType("bigint");
 
+                    b.Property<decimal>("Volume")
+                        .HasColumnType("decimal(18,2)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("BullishHaramiDbId");
@@ -800,6 +827,9 @@ namespace StockLogger.Migrations
 
                     b.Property<long>("TickerId")
                         .HasColumnType("bigint");
+
+                    b.Property<decimal>("Volume")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -893,6 +923,9 @@ namespace StockLogger.Migrations
                     b.Property<long>("TickerId")
                         .HasColumnType("bigint");
 
+                    b.Property<decimal>("Volume")
+                        .HasColumnType("decimal(18,2)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("HammerDbId");
@@ -984,6 +1017,9 @@ namespace StockLogger.Migrations
 
                     b.Property<long>("TickerId")
                         .HasColumnType("bigint");
+
+                    b.Property<decimal>("Volume")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -1077,6 +1113,9 @@ namespace StockLogger.Migrations
                     b.Property<long>("TickerId")
                         .HasColumnType("bigint");
 
+                    b.Property<decimal>("Volume")
+                        .HasColumnType("decimal(18,2)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("MarubozuDbId");
@@ -1168,6 +1207,9 @@ namespace StockLogger.Migrations
 
                     b.Property<long>("TickerId")
                         .HasColumnType("bigint");
+
+                    b.Property<decimal>("Volume")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -1261,6 +1303,9 @@ namespace StockLogger.Migrations
                     b.Property<long>("TickerId")
                         .HasColumnType("bigint");
 
+                    b.Property<decimal>("Volume")
+                        .HasColumnType("decimal(18,2)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("PiercingLineDbId");
@@ -1352,6 +1397,9 @@ namespace StockLogger.Migrations
 
                     b.Property<long>("TickerId")
                         .HasColumnType("bigint");
+
+                    b.Property<decimal>("Volume")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -1445,6 +1493,9 @@ namespace StockLogger.Migrations
                     b.Property<long>("TickerId")
                         .HasColumnType("bigint");
 
+                    b.Property<decimal>("Volume")
+                        .HasColumnType("decimal(18,2)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("RisingThreeMethodsDbId");
@@ -1536,6 +1587,9 @@ namespace StockLogger.Migrations
 
                     b.Property<long>("TickerId")
                         .HasColumnType("bigint");
+
+                    b.Property<decimal>("Volume")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -1629,6 +1683,9 @@ namespace StockLogger.Migrations
                     b.Property<long?>("TowerBottomDbId")
                         .HasColumnType("bigint");
 
+                    b.Property<decimal>("Volume")
+                        .HasColumnType("decimal(18,2)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("TowerBottomDbId");
@@ -1720,6 +1777,9 @@ namespace StockLogger.Migrations
 
                     b.Property<long?>("TweezerBottomDbId")
                         .HasColumnType("bigint");
+
+                    b.Property<decimal>("Volume")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 

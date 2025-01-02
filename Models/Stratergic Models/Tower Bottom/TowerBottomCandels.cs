@@ -55,6 +55,8 @@ namespace StockLogger.Models.Stratergic_Models.Tower_Bottom
             PriceChangePercentage = StartPrice != 0 ? (PriceChange / StartPrice) * 100 : 0;
         }
 
+        // Volume data
+        public decimal Volume { get; set; }
 
     }
 }

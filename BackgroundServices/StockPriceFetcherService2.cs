@@ -111,85 +111,165 @@ namespace StockLogger.BackgroundServices
                 Console.WriteLine("Error: " + e.Message);
             }
 
-            List<double> iterationTimes = new();
-
             while (!stoppingToken.IsCancellationRequested)
             {
-                var stopwatch = Stopwatch.StartNew();
+                //    var nextRunTime = DateTime.UtcNow.AddMinutes(1).AddSeconds(-DateTime.UtcNow.Second); // Calculate next full minute
+                //    var delay = nextRunTime - DateTime.UtcNow; // Calculate the delay to the next minute
 
-                var tasks = _stocks.Select(stock => Task.Run(async () =>
+                //    if (delay > TimeSpan.Zero)
+                //    {
+                //        await Task.Delay(delay, stoppingToken); // Wait until the next full minute
+                //    }
+
+                //    var stopwatch = Stopwatch.StartNew();
+
+                //    var tasks = _stocks.Select(stock => Task.Run(async () =>
+                //    {
+                //        string fromdate = DateTime.Today.AddHours(9).ToString("yyyy-MM-dd HH:mm");
+                //        string todate = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
+
+                //        var data = new
+                //        {
+                //            exchange = "NSE",
+                //            symboltoken = stock.symboltoken,
+                //            interval = "ONE_MINUTE",
+                //            fromdate = fromdate,
+                //            todate = todate
+                //        };
+
+                //        var jsonData = JsonConvert.SerializeObject(data);
+                //        var client = new HttpClient();
+
+                //        var requestMessage = new HttpRequestMessage(HttpMethod.Post, "https://apiconnect.angelone.in/rest/secure/angelbroking/historical/v1/getCandleData")
+                //        {
+                //            Content = new StringContent(jsonData, Encoding.UTF8, "application/json")
+                //        };
+
+                //        // Set the headers
+                //        requestMessage.Headers.Add("Accept", "application/json");
+                //        requestMessage.Headers.Add("X-SourceID", "WEB");
+                //        requestMessage.Headers.Add("X-ClientLocalIP", "192.168.56.177"); // Replace with your actual IP
+                //        requestMessage.Headers.Add("X-ClientPublicIP", publicIp);
+                //        requestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX"); // Replace with your actual MAC address
+                //        requestMessage.Headers.Add("X-UserType", "USER");
+                //        requestMessage.Headers.Add("Authorization", "Bearer " + authorizationToken);
+                //        requestMessage.Headers.Add("X-PrivateKey", "DcsJlRJp"); // Your actual API Key
+
+                //        try
+                //        {
+                //            // Send request to get historical data
+                //            HttpResponseMessage response = await client.SendAsync(requestMessage);
+                //            response.EnsureSuccessStatusCode(); // Throws an exception if not successful
+
+                //            // Read and display the response
+                //            string responseContent = await response.Content.ReadAsStringAsync();
+                //            dynamic responseJson = JsonConvert.DeserializeObject(responseContent);
+
+                //            // Check if the request is successful and print the data
+                //            if (responseJson.status == true)
+                //            {
+                //                Console.WriteLine("Historical Data: " + JsonConvert.SerializeObject(responseJson.data, Formatting.Indented));
+                //            }
+                //            else
+                //            {
+                //                Console.WriteLine("Failed to fetch data: " + responseJson.message);
+                //            }
+                //        }
+                //        catch (Exception e)
+                //        {
+                //            Console.WriteLine("Error fetching historical data: " + e.Message);
+                //        }
+                //    }, stoppingToken));
+
+                //    // Wait for all tasks to complete.
+                //    await Task.WhenAll(tasks);
+                //    stopwatch.Stop();
+
+                //    // Trigger garbage collection periodically
+                //    GC.Collect();
+                //    GC.WaitForPendingFinalizers();
+                //}
+
+
+                while (!stoppingToken.IsCancellationRequested)
                 {
-                    string fromdate = DateTime.Today.AddHours(9).ToString("yyyy-MM-dd HH:mm");
-                    string todate = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
+                    var stopwatch = Stopwatch.StartNew();
 
-                    var data = new
+                    var tasks = _stocks.Select(stock => Task.Run(async () =>
                     {
-                        exchange = "NSE",
-                        symboltoken = stock.symboltoken,
-                        interval = "ONE_MINUTE",
-                        fromdate = fromdate,
-                        todate = todate
-                    };
+                        string fromdate = DateTime.Today.AddHours(9).ToString("yyyy-MM-dd HH:mm");
+                        string todate = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
 
-                    var jsonData = JsonConvert.SerializeObject(data);
-                    var client = new HttpClient();
-
-                    var requestMessage = new HttpRequestMessage(HttpMethod.Post, "https://apiconnect.angelone.in/rest/secure/angelbroking/historical/v1/getCandleData")
-                    {
-                        Content = new StringContent(jsonData, Encoding.UTF8, "application/json")
-                    };
-
-                    // Set the headers
-                    requestMessage.Headers.Add("Accept", "application/json");
-                    requestMessage.Headers.Add("X-SourceID", "WEB");
-                    requestMessage.Headers.Add("X-ClientLocalIP", "192.168.56.177");  // Your local IP from ipconfig
-                    requestMessage.Headers.Add("X-ClientPublicIP", publicIp);
-                    requestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX"); // Replace with your actual MAC address
-                    requestMessage.Headers.Add("X-UserType", "USER");
-                    requestMessage.Headers.Add("Authorization", "Bearer " + authorizationToken);
-                    requestMessage.Headers.Add("X-PrivateKey", "DcsJlRJp"); // Your actual API Key
-                                                                            //requestMessage.Headers.Add("Content-Type", "application/json");
-
-                    try
-                    {
-                        // Send request to get historical data
-                        HttpResponseMessage response = await client.SendAsync(requestMessage);
-                        response.EnsureSuccessStatusCode();  // Throws an exception if not successful
-
-                        // Read and display the response
-                        string responseContent = await response.Content.ReadAsStringAsync();
-                        dynamic responseJson = JsonConvert.DeserializeObject(responseContent);
-
-                        // Check if the request is successful and print the data
-                        if (responseJson.status == true)
+                        var data = new
                         {
-                            Console.WriteLine("Historical Data: " + JsonConvert.SerializeObject(responseJson.data, Formatting.Indented));
-                        }
-                        else
+                            exchange = "NSE",
+                            symboltoken = stock.symboltoken,
+                            interval = "ONE_MINUTE",
+                            fromdate = fromdate,
+                            todate = todate
+                        };
+
+                        var jsonData = JsonConvert.SerializeObject(data);
+                        var client = new HttpClient();
+
+                        var requestMessage = new HttpRequestMessage(HttpMethod.Post, "https://apiconnect.angelone.in/rest/secure/angelbroking/historical/v1/getCandleData")
                         {
-                            Console.WriteLine("Failed to fetch data: " + responseJson.message);
+                            Content = new StringContent(jsonData, Encoding.UTF8, "application/json")
+                        };
+
+                        // Set the headers
+                        requestMessage.Headers.Add("Accept", "application/json");
+                        requestMessage.Headers.Add("X-SourceID", "WEB");
+                        requestMessage.Headers.Add("X-ClientLocalIP", "192.168.56.177");  // Your local IP from ipconfig
+                        requestMessage.Headers.Add("X-ClientPublicIP", publicIp);
+                        requestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX"); // Replace with your actual MAC address
+                        requestMessage.Headers.Add("X-UserType", "USER");
+                        requestMessage.Headers.Add("Authorization", "Bearer " + authorizationToken);
+                        requestMessage.Headers.Add("X-PrivateKey", "DcsJlRJp"); // Your actual API Key
+
+                        try
+                        {
+                            // Send request to get historical data
+                            HttpResponseMessage response = await client.SendAsync(requestMessage);
+                            response.EnsureSuccessStatusCode();  // Throws an exception if not successful
+
+                            // Read and display the response
+                            string responseContent = await response.Content.ReadAsStringAsync();
+                            dynamic responseJson = JsonConvert.DeserializeObject(responseContent);
+
+                            List<RawCandel> RC = new List<RawCandel>();
+                            var Can = responseJson.data;
+
+                            // Check if the request is successful and print the data
+                            if (responseJson.status == true)
+                            {
+                                Console.WriteLine("Historical Data: " + JsonConvert.SerializeObject(responseJson.data, Formatting.Indented));
+                            }
+                            else
+                            {
+                                Console.WriteLine("Failed to fetch data: " + responseJson.message);
+                            }
                         }
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("Error fetching historical data: " + e.Message);
-                    }
-                }, stoppingToken));
+                        catch (Exception e)
+                        {
+                            Console.WriteLine("Error fetching historical data: " + e.Message);
+                        }
+                    }, stoppingToken));
 
-                // Wait for all tasks to complete.
-                await Task.WhenAll(tasks);
-                stopwatch.Stop();
+                    // Wait for all tasks to complete.
+                    await Task.WhenAll(tasks);
+                    stopwatch.Stop();
 
-                iterationTimes.Add(stopwatch.Elapsed.TotalMilliseconds);
+                    // Trigger garbage collection periodically
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
 
-                // Trigger garbage collection periodically
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
+                    // Delay for half a second (if needed)
+                    //await Task.Delay(20, stoppingToken);
+                }
 
-                // Delay for half a second (if needed)
-                //await Task.Delay(20, stoppingToken);
             }
         }
-    }
 
+    }
 }

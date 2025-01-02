@@ -55,5 +55,8 @@ namespace StockLogger.Models.Stratergic_Models.Marubozu__Bullish_
             PriceChangePercentage = StartPrice != 0 ? (PriceChange / StartPrice) * 100 : 0;
         }
 
+        // Volume data
+        public decimal Volume { get; set; }
+
     }
 }

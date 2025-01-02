@@ -18,7 +18,7 @@ namespace StockLogger.Models.Candel
         public DateTime CloseTime { get; set; }
 
         // Volume data
-        //public decimal Volume { get; set; }
+        public decimal Volume { get; set; }
         //public decimal Turnover { get; set; }  // Optional, for total trade value
 
         // Meta-information

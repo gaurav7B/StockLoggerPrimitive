@@ -17,10 +17,6 @@ namespace StockLogger.Models.Candel
         public DateTime OpenTime { get; set; }
         public DateTime CloseTime { get; set; }
 
-        // Volume data
-        //public decimal Volume { get; set; }
-        //public decimal Turnover { get; set; }  // Optional, for total trade value
-
         // Meta-information
         public string Ticker { get; set; }
         public long TickerId { get; set; }
@@ -58,6 +54,10 @@ namespace StockLogger.Models.Candel
             PriceChange = EndPrice - StartPrice;
             PriceChangePercentage = StartPrice != 0 ? (PriceChange / StartPrice) * 100 : 0;
         }
+
+        //Volume data
+        public decimal Volume { get; set; }
+        //public decimal Turnover { get; set; }  // Optional, for total trade value
 
         //// Calculated properties (moving average and Bollinger bands)
         //public decimal? MovingAverage { get; private set; }

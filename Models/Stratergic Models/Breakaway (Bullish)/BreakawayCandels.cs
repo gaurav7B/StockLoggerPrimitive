@@ -54,5 +54,9 @@ namespace StockLogger.Models.Stratergic_Models.Breakaway__Bullish_
             PriceChange = EndPrice - StartPrice;
             PriceChangePercentage = StartPrice != 0 ? (PriceChange / StartPrice) * 100 : 0;
         }
+
+        // Volume data
+        public decimal Volume { get; set; }
+
     }
 }
