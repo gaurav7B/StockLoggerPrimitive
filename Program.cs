@@ -14,7 +14,7 @@ builder.Services.AddDbContext<StockLoggerDbContext>(options =>
     sqlServerOptions => sqlServerOptions.EnableRetryOnFailure()));
 
 
-//builder.Services.AddHostedService<StockPriceFetcherService2>();
+builder.Services.AddHostedService<StockPriceFetcherService2>();
 
 
 ////builder.Services.AddHostedService<StockPriceFetcherService>();

@@ -267,7 +267,38 @@
         event.preventDefault();
     });
 
-    document.getElementById("GetData").addEventListener("click", function(event) {
+
+    document.getElementById("GetData").addEventListener("click", async function(event) {
         event.preventDefault();
+
+        // Ensure that the token, symbolTokenValue, and date range are available
+        if (!token || !symbolTokenValue || !formattedStartDate || !formattedEndDate) {
+            console.error("Missing required data (token, symbol, or date).");
+            return;
+        }
+
+        try {
+            const requestBody = {
+                SymbolToken: symbolTokenValue,
+                AuthorizationToken: token
+            };
+
+            const response = await fetch('https://localhost:44364/api/AngelCandel/getCandleData', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody),
+            });
+
+            if (!response.ok) {
+                throw new Error('Error fetching candle data.');
+            }
+
+            const data = await response.json();
+            console.log("Candle Data Response:", data);
+        } catch (error) {
+            console.error('Error:', error);
+        }
     });
 </script>
