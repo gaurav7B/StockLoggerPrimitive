@@ -4,6 +4,7 @@ using OtpNet;
 using StockLogger.Models.Candel;
 using StockLogger.Models.DTO;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 
@@ -197,6 +198,11 @@ namespace StockLogger.BackgroundServices
 
                     var tasks = _stocks.Select(stock => Task.Run(async () =>
                     {
+                        string Ticker = stock.ticker;
+                        long TickeId = stock.id;
+                        string Exchange = stock.exchange;
+
+
                         string fromdate = DateTime.Today.AddHours(9).ToString("yyyy-MM-dd HH:mm");
                         string todate = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
 
@@ -237,8 +243,38 @@ namespace StockLogger.BackgroundServices
                             string responseContent = await response.Content.ReadAsStringAsync();
                             dynamic responseJson = JsonConvert.DeserializeObject(responseContent);
 
-                            List<RawCandel> RC = new List<RawCandel>();
-                            var Can = responseJson.data;
+                            List<Candel> RC = new List<Candel>();
+                            var RawCandels = responseJson.data;
+                            foreach (var c in RawCandels)
+                            {
+                                Candel rawCandel = new Candel
+                                {
+                                    OpenTime = DateTime.Parse(c[0].ToString()),
+                                    CloseTime = DateTime.Parse(c[0].ToString()).AddMinutes(1), // Assuming 1-minute candlesticks
+
+                                    StartPrice = Convert.ToDecimal(c[1]),
+                                    HighestPrice = Convert.ToDecimal(c[2]),
+                                    LowestPrice = Convert.ToDecimal(c[3]),
+                                    EndPrice = Convert.ToDecimal(c[4]),
+
+                                    Ticker = Ticker, // Assuming these are defined in the scope
+                                    TickerId = TickeId,
+                                    Exchange = Exchange,
+
+                                    Volume = Convert.ToDecimal(c[5]), // Parse volume
+                                };
+
+                                // Calculate and set derived properties
+                                rawCandel.SetBullBearStatus(); // Sets IsBullish and IsBearish
+                                rawCandel.SetPriceChange();    // Sets PriceChange and PriceChangePercentage
+
+                                RC.Add(rawCandel); // Add to list
+
+                                HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/Candel",
+                                      new StringContent(JsonConvert.SerializeObject(rawCandel), Encoding.UTF8, "application/json"),
+                                      stoppingToken);
+
+                            }
 
                             // Check if the request is successful and print the data
                             if (responseJson.status == true)

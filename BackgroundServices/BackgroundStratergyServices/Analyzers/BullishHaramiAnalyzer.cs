@@ -25,11 +25,6 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
 
             Candel currentCandle = recentTwoCandles[0];
 
-            if (currentCandle.CloseTime.Second < 58)
-            {
-                return;
-            }
-
             // Check if the first candle is bearish
             bool firstCandleBearish = firstCandle.IsBearish == true;
 

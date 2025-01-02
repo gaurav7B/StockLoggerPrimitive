@@ -46,11 +46,6 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
 
             Candel latestCandel = recentThreeCandles.FirstOrDefault();
 
-            if (latestCandel.CloseTime.Second < 58)
-            {
-                return;
-            }
-
             // Check if all three candles are bullish
             bool allThreeBullish = recentThreeCandles.All(c => c.IsBullish == true);
 
@@ -185,11 +180,6 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
             if (recentCandle == null)
             {
                 Console.WriteLine("No candle data available.");
-                return;
-            }
-
-            if(recentCandle.CloseTime.Second < 58)
-            {
                 return;
             }
 

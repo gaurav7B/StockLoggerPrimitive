@@ -26,11 +26,6 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
             // Get the last (most recent) candle
             Candel latestCandel = candelList.OrderByDescending(c => c.CloseTime).First();
 
-            if (latestCandel.CloseTime.Second < 58)
-            {
-                return;
-            }
-
             // Check conditions for Piercing Line pattern
             bool firstCandleBearish = firstCandle.IsBearish == true;
             bool secondCandleBullish = secondCandle.IsBullish == true;

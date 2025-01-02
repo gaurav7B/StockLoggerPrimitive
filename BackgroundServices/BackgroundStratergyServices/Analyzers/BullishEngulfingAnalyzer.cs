@@ -22,11 +22,6 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
             Candel previousCandle = recentTwoCandles[1];
             Candel currentCandle = recentTwoCandles[0];
 
-            if (currentCandle.CloseTime.Second < 58)
-            {
-                return;
-            }
-
             // Check conditions for Bullish Engulfing pattern
             bool previousBearish = previousCandle.IsBearish == true; // Previous candle is bearish
             bool currentBullish = currentCandle.IsBullish == true;   // Current candle is bullish

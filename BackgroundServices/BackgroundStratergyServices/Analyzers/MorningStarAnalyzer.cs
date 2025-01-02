@@ -23,11 +23,6 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
             // Get the latest candel (top-most from the recentThreeCandles list)
             Candel latestCandel = recentThreeCandles.FirstOrDefault();
 
-            if (latestCandel.CloseTime.Second < 58)
-            {
-                return;
-            }
-
             // Condition 1: The first candle should be bearish with a large body
             bool firstBearish = recentThreeCandles[2].IsBearish == true &&
                                 (recentThreeCandles[2].StartPrice - recentThreeCandles[2].EndPrice) >

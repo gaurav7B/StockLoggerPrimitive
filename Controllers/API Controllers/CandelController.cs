@@ -36,15 +36,21 @@ namespace StockLogger.Controllers.API_Controllers
                 existingCandel.HighestPrice = candel.HighestPrice;
                 existingCandel.LowestPrice = candel.LowestPrice;
                 existingCandel.EndPrice = candel.EndPrice;
+
                 existingCandel.OpenTime = candel.OpenTime;
                 existingCandel.CloseTime = candel.CloseTime;
+
                 existingCandel.Ticker = candel.Ticker;
                 existingCandel.TickerId = candel.TickerId;
                 existingCandel.Exchange = candel.Exchange;
+
                 existingCandel.IsBullish = candel.IsBullish;
                 existingCandel.IsBearish = candel.IsBearish;
+
                 existingCandel.PriceChange = candel.PriceChange;
                 existingCandel.PriceChangePercentage = candel.PriceChangePercentage;
+                
+                existingCandel.Volume = candel.Volume;
 
                 // Save the changes to the database
                 await _context.SaveChangesAsync();
