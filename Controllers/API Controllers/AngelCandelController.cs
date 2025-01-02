@@ -7,7 +7,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using OtpNet;  // Add the NuGet package for TOTP (OtpNet)
+using OtpNet;
 using System;
 
 namespace StockLogger.Controllers.API_Controllers

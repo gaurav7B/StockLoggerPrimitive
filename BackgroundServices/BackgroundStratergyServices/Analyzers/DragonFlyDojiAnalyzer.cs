@@ -12,7 +12,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
         public async void DragonFlyDojiAnalyzerLogic(List<Candel> candelList , HttpClient _httpClient, int Range)
         {
             // Ensure there are at least 2 candles in the list
-            if (candelList.Count < 2)
+            if (candelList.Count < 1)
             {
                 Console.WriteLine("The list must contain at least 2 candles.");
                 return;
@@ -30,11 +30,12 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
             // The body of the candle should be at the top of the range
             bool smallBodyAtTop = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.3m;
 
-            // Check if the last candle is followed by a bullish candle (suggesting potential for a bullish trend)
-            bool bullishFollowUp = candelList.Count > 1 && candelList[1].IsBullish == true;
+            //// Check if the last candle is followed by a bullish candle (suggesting potential for a bullish trend)
+            //bool bullishFollowUp = candelList.Count > 1 && candelList[1].IsBullish == true;
 
             // Combine all conditions to detect the Dragonfly Doji Bullish pattern
-            if (isDoji && longLowerShadow && smallBodyAtTop && bullishFollowUp)
+            //if (isDoji && longLowerShadow && smallBodyAtTop && bullishFollowUp)
+            if (isDoji && longLowerShadow && smallBodyAtTop)
             {
                 if (Range == 1)
                 {
