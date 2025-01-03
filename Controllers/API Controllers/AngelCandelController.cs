@@ -17,10 +17,14 @@ namespace StockLogger.Controllers.API_Controllers
     public class AngelCandelController : ControllerBase
     {
         private readonly StockLoggerDbContext _context;
+        private readonly List<(string ticker, string exchange, string name, long id, string symboltoken)> _stocks;
 
         public AngelCandelController(StockLoggerDbContext context)
         {
             _context = context;
+
+            // Fetch stocks from StockList
+            _stocks = StockList.GetStocks();
         }
 
         // POST api/angelcandel/login
@@ -85,21 +89,25 @@ namespace StockLogger.Controllers.API_Controllers
         [HttpPost("getCandleData")]
         public async Task<IActionResult> GetCandleData([FromBody] StockRequest stockRequest)
         {
-            if (string.IsNullOrEmpty(stockRequest.SymbolToken) || string.IsNullOrEmpty(stockRequest.AuthorizationToken))
-            {
-                return BadRequest(new { Message = "Invalid symbol or authorization token." });
-            }
+            // Extract only the date part from StartDate
+            var startDateOnly = stockRequest.StartDate.Date;
+            var EndDateOnly = stockRequest.EndDate.Date;
 
-            string fromdate = DateTime.Today.AddHours(9).ToString("yyyy-MM-dd HH:mm");
-            string todate = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
+            var matchingStock = _stocks.FirstOrDefault(s => s.symboltoken == stockRequest.SymbolToken);
+
+            // Create start date with time 9:15 AM
+            var startDateWithTime900 = startDateOnly.AddHours(9).AddMinutes(00);
+
+            // Create start date with time 3:30 PM
+            var startDateWithTime330 = startDateOnly.AddHours(15).AddMinutes(30);
 
             var data = new
             {
                 exchange = "NSE",
                 symboltoken = stockRequest.SymbolToken,
                 interval = "ONE_MINUTE",
-                fromdate = fromdate,
-                todate = todate
+                fromdate = startDateWithTime900.ToString("yyyy-MM-dd HH:mm"),
+                todate = startDateWithTime330.ToString("yyyy-MM-dd HH:mm")
             };
 
             var jsonData = JsonConvert.SerializeObject(data);
@@ -126,10 +134,35 @@ namespace StockLogger.Controllers.API_Controllers
                 HttpResponseMessage response = await client.SendAsync(requestMessage);
                 response.EnsureSuccessStatusCode();
                 string responseContent = await response.Content.ReadAsStringAsync();
-                var candleData = JsonConvert.DeserializeObject(responseContent);
-                //var payload = candleData.data;
+                dynamic candleData = JsonConvert.DeserializeObject(responseContent);
+                var rawCandelData = candleData.data;
 
-                return Ok(candleData);  // Return the fetched historical candle data
+                List<Candel> ModifiedCandelDataList = new List<Candel>();
+                foreach(var rawCandel in rawCandelData)
+                {
+                    Candel newCandel = new Candel
+                    {
+                        OpenTime = DateTime.Parse(rawCandel[0].ToString()),
+                        CloseTime = DateTime.Parse(rawCandel[0].ToString()).AddMinutes(1),
+
+                        StartPrice = Convert.ToDecimal(rawCandel[1]),
+                        HighestPrice = Convert.ToDecimal(rawCandel[2]),
+                        LowestPrice = Convert.ToDecimal(rawCandel[3]),
+                        EndPrice = Convert.ToDecimal(rawCandel[4]),
+
+                        Ticker = matchingStock.ticker,
+                        TickerId = matchingStock.id,
+                        Exchange = matchingStock.exchange,
+
+                        Volume = Convert.ToDecimal(rawCandel[5]),
+                    };
+                    newCandel.SetBullBearStatus();
+                    newCandel.SetPriceChange();
+
+                    ModifiedCandelDataList.Add(newCandel);
+                }
+
+                return Ok(ModifiedCandelDataList);  // Return the fetched historical candle data
             }
             catch (Exception ex)
             {
@@ -171,6 +204,8 @@ namespace StockLogger.Controllers.API_Controllers
     {
         public string SymbolToken { get; set; }
         public string AuthorizationToken { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
     }
 }
 

@@ -200,6 +200,31 @@
     let formattedStartDate ;
     let formattedEndDate ;
     let symbolTokenValue = '';
+     let CandelData = []; // Sample data: Ensure the structure here is [startPrice, endPrice, highestPrice, lowestPrice, IsBullish]
+
+    async function DrgoFlyDoji() {
+        console.log("DragonFlyDojiFunctionRunning");
+
+
+            const response = await fetch('https://localhost:44364/api/Test/DragonFly', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(CandelData),
+            });
+
+            if (!response.ok) {
+                throw new Error('Error fetching candle data.');
+            }
+
+            const data = await response.json();
+            console.log("DragonFlyData:", data);
+
+    }
+
+
+
 
     async function getToken() {
         try {
@@ -236,13 +261,16 @@
         return `${year}-${month}-${day} ${hours}:${minutes}`;
     }
 
+            let startDate;
+            let endDate;
+
     // Event listener for when the date is selected
     document.getElementById("date").addEventListener("change", function(event) {
         const selectedDate = event.target.value;
 
         if (selectedDate) {
-            const startDate = new Date(selectedDate + 'T09:00:00'); // 9 AM of the selected date
-            const endDate = new Date(selectedDate + 'T15:30:00'); // 3:30 PM of the selected date
+            startDate = new Date(selectedDate);
+            endDate = new Date(selectedDate);
 
             // Format the dates to "yyyy-MM-dd HH:mm"
             formattedStartDate = formatDate(startDate);
@@ -265,6 +293,7 @@
 
     document.getElementById("TestData").addEventListener("click", function(event) {
         event.preventDefault();
+        DrgoFlyDoji();
     });
 
 
@@ -280,7 +309,9 @@
         try {
             const requestBody = {
                 SymbolToken: symbolTokenValue,
-                AuthorizationToken: token
+                AuthorizationToken: token,
+                StartDate: startDate.toISOString(), // Convert to ISO string
+                EndDate: endDate.toISOString()     // Convert to ISO string
             };
 
             const response = await fetch('https://localhost:44364/api/AngelCandel/getCandleData', {
@@ -296,7 +327,8 @@
             }
 
             const data = await response.json();
-            console.log("Candle Data Response:", data);
+            CandelData = data;
+            console.log("CandelData:", CandelData);
         } catch (error) {
             console.error('Error:', error);
         }
