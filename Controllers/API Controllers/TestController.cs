@@ -45,38 +45,60 @@ namespace StockLogger.Controllers.API_Controllers
             {
                 Candel recentCandel = c;
 
-                // Check if it is a Doji with a small body
+                // Check if it is a Doji
                 bool isDoji = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.1m;
 
-                // Check for a long lower shadow (shadow size relative to the body)
+                // Check for a long lower shadow (the shadow should be at least twice the size of the body)
                 bool longLowerShadow = (recentCandel.StartPrice - recentCandel.LowestPrice) > 3 * (recentCandel.EndPrice - recentCandel.StartPrice);
 
-                // The body of the candle should be small and at the top of the range
+                // The body of the candle should be at the top of the range
                 bool smallBodyAtTop = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.3m;
 
-                // Preceding candle's trend should be bullish (for confirming upward momentum)
-                bool precedingBullishTrend = CandelData.Where(x => x.CloseTime < recentCandel.OpenTime)
-                                                       .OrderByDescending(x => x.CloseTime)
-                                                       .Take(3)
-                                                       .All(x => x.EndPrice > x.StartPrice); // At least the last 3 candles should be bullish
-
-                // Check for higher volume
-                bool higherVolume = recentCandel.Volume > CandelData.Average(x => x.Volume);
-
-                //// The next candle should also be bullish for confirmation
-                //bool nextCandleBullish = CandelData.Where(x => x.OpenTime > recentCandel.CloseTime)
-                //                                   .OrderBy(x => x.OpenTime)
-                //                                   .FirstOrDefault()?.EndPrice > recentCandel.EndPrice;
-
-                // If all conditions match, then it's a Dragonfly Doji with high probability of upward movement
-                if (isDoji && longLowerShadow && smallBodyAtTop && precedingBullishTrend && higherVolume )
+                // If the condition matches (Doji with a long lower shadow and a small body at the top), perform any actions
+                if (isDoji && longLowerShadow && smallBodyAtTop)
                 {
                     DrafonFlyDojiCandels.Add(recentCandel);
                 }
             }
 
+            //foreach (var c in CandelData)
+            //{
+            //    Candel recentCandel = c;
+
+            //    // Check if it is a Doji with a small body
+            //    bool isDoji = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.1m;
+
+            //    // Check for a long lower shadow (shadow size relative to the body)
+            //    bool longLowerShadow = (recentCandel.StartPrice - recentCandel.LowestPrice) > 3 * (recentCandel.EndPrice - recentCandel.StartPrice);
+
+            //    // The body of the candle should be small and at the top of the range
+            //    bool smallBodyAtTop = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.3m;
+
+            //    // Preceding candle's trend should be bullish (for confirming upward momentum)
+            //    bool precedingBullishTrend = CandelData.Where(x => x.CloseTime < recentCandel.OpenTime)
+            //                                           .OrderByDescending(x => x.CloseTime)
+            //                                           .Take(3)
+            //                                           .All(x => x.EndPrice > x.StartPrice); // At least the last 3 candles should be bullish
+
+            //    // Check for higher volume
+            //    bool higherVolume = recentCandel.Volume > CandelData.Average(x => x.Volume);
+
+            //    //// The next candle should also be bullish for confirmation
+            //    //bool nextCandleBullish = CandelData.Where(x => x.OpenTime > recentCandel.CloseTime)
+            //    //                                   .OrderBy(x => x.OpenTime)
+            //    //                                   .FirstOrDefault()?.EndPrice > recentCandel.EndPrice;
+
+            //    // If all conditions match, then it's a Dragonfly Doji with high probability of upward movement
+            //    if (isDoji && longLowerShadow && smallBodyAtTop && precedingBullishTrend && higherVolume)
+            //    {
+            //        DrafonFlyDojiCandels.Add(recentCandel);
+            //    }
+            //}
+
             decimal loss = 0;
             decimal profit = 0;
+            List<int> ints = new List<int>();
+
 
             foreach (Candel DetectedCandels in DrafonFlyDojiCandels)
             {
@@ -84,8 +106,9 @@ namespace StockLogger.Controllers.API_Controllers
                 Candel nextCandel = CandelData.FirstOrDefault(c => c.CloseTime > DetectedCandels.CloseTime);
                 Candel nextCandel2 = CandelData.FirstOrDefault(c => c.CloseTime > nextCandel?.CloseTime);
                 Candel nextCandel3 = CandelData.FirstOrDefault(c => c.CloseTime > nextCandel2?.CloseTime);
+                List<Candel> FurtherCandel = new List<Candel>();
 
-                if(nextCandel == null || nextCandel2 == null || nextCandel3 == null)
+                if (nextCandel == null || nextCandel2 == null || nextCandel3 == null)
                 {
                     MisleniousList.Add(DetectedCandels);
                 }
@@ -126,6 +149,29 @@ namespace StockLogger.Controllers.API_Controllers
 
                                 decimal calculatedloss = (DetectedCandels.EndPrice - nextCandel3.EndPrice);
                                 loss = loss + calculatedloss;
+
+                                FurtherCandel = CandelData.Where(candel => candel.CloseTime > DetectedCandels.CloseTime)
+                                               .OrderBy(candel => candel.CloseTime) // Sorting by CloseTime if needed
+                                               .ToList();
+                                // Find the first candle in FurtherCandel where EndPrice > DetectedCandels.EndPrice
+                                var matchingCandel = FurtherCandel.FirstOrDefault(candel => candel.EndPrice > DetectedCandels.EndPrice);
+
+                                if (matchingCandel != null)
+                                {
+                                    // Get the index of the matching candle in the original CandelData list
+                                    int matchingCandelIndex = CandelData.IndexOf(matchingCandel);
+
+                                    // Get the index of the DetectedCandels in the original list
+                                    int detectedCandelIndex = CandelData.IndexOf(DetectedCandels);
+
+                                    // Calculate how many candles later it was detected
+                                    int candlesAfterDetected = matchingCandelIndex - detectedCandelIndex;
+
+                                    ints.Add(candlesAfterDetected);
+
+                                    // Optional: You can log or use the count of candles after detection
+                                    Console.WriteLine($"Candle was detected {candlesAfterDetected} candles after DetectedCandels.");
+                                }
                             }
                             else
                             {
