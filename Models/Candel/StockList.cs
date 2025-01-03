@@ -16,6 +16,7 @@
                 ("KOTAKBANK-EQ", "NSE", "Kotak Mahindra Bank", 8, "1922"),
                 ("LT-EQ", "NSE", "Larsen & Toubro", 9, "11483"),
                 ("SBIN-EQ", "NSE", "State Bank of India", 10, "3045"),
+                ("COALINDIA-EQ", "NSE", "Coal India", 11, "20374"),
 
                 //("AXISBANK", "NSE", "Axis Bank", 11),
                 //("BAJFINANCE", "NSE", "Bajaj Finance", 12),

@@ -147,6 +147,7 @@ namespace StockLogger.Controllers.API_Controllers
             return Ok(new
             {
                 Profit = (correctPredictionsSum + wrongPredictionsSum + MissleniousSum) - sumEndPrice,
+
                 Accuracy = accuracy,
                 Investment = sumEndPrice,
                 InvestmentNow = correctPredictionsSum + wrongPredictionsSum + MissleniousSum,
