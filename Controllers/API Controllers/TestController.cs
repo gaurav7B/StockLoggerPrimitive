@@ -45,17 +45,31 @@ namespace StockLogger.Controllers.API_Controllers
             {
                 Candel recentCandel = c;
 
-                // Check if it is a Doji
+                // Check if it is a Doji with a small body
                 bool isDoji = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.1m;
 
-                // Check for a long lower shadow (the shadow should be at least twice the size of the body)
-                bool longLowerShadow = (recentCandel.StartPrice - recentCandel.LowestPrice) > 2 * (recentCandel.EndPrice - recentCandel.StartPrice);
+                // Check for a long lower shadow (shadow size relative to the body)
+                bool longLowerShadow = (recentCandel.StartPrice - recentCandel.LowestPrice) > 3 * (recentCandel.EndPrice - recentCandel.StartPrice);
 
-                // The body of the candle should be at the top of the range
+                // The body of the candle should be small and at the top of the range
                 bool smallBodyAtTop = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.3m;
 
-                // If the condition matches (Doji with a long lower shadow and a small body at the top), perform any actions
-                if (isDoji && longLowerShadow && smallBodyAtTop)
+                // Preceding candle's trend should be bullish (for confirming upward momentum)
+                bool precedingBullishTrend = CandelData.Where(x => x.CloseTime < recentCandel.OpenTime)
+                                                       .OrderByDescending(x => x.CloseTime)
+                                                       .Take(3)
+                                                       .All(x => x.EndPrice > x.StartPrice); // At least the last 3 candles should be bullish
+
+                // Check for higher volume
+                bool higherVolume = recentCandel.Volume > CandelData.Average(x => x.Volume);
+
+                //// The next candle should also be bullish for confirmation
+                //bool nextCandleBullish = CandelData.Where(x => x.OpenTime > recentCandel.CloseTime)
+                //                                   .OrderBy(x => x.OpenTime)
+                //                                   .FirstOrDefault()?.EndPrice > recentCandel.EndPrice;
+
+                // If all conditions match, then it's a Dragonfly Doji with high probability of upward movement
+                if (isDoji && longLowerShadow && smallBodyAtTop && precedingBullishTrend && higherVolume )
                 {
                     DrafonFlyDojiCandels.Add(recentCandel);
                 }
