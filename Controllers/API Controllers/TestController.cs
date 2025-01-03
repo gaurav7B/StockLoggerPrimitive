@@ -36,6 +36,8 @@ namespace StockLogger.Controllers.API_Controllers
             List<Candel> CorrectPredictedCandels = new List<Candel>();
             List<Candel> WrongPredictedCandels = new List<Candel>();
 
+            List<Candel> LossList = new List<Candel>();
+
             List<Candel> MisleniousList = new List<Candel>();
 
 
@@ -59,6 +61,9 @@ namespace StockLogger.Controllers.API_Controllers
                 }
             }
 
+            decimal loss = 0;
+            decimal profit = 0;
+
             foreach (Candel DetectedCandels in DrafonFlyDojiCandels)
             {
                 // Match the detected candel with the next candel based on time
@@ -78,22 +83,35 @@ namespace StockLogger.Controllers.API_Controllers
                     if (nextCandel.EndPrice > DetectedCandels.EndPrice)
                     {
                         CorrectPredictedCandels.Add(DetectedCandels);
+                        decimal calculatedProfit = (nextCandel.EndPrice - DetectedCandels.EndPrice);
+                        profit = profit + calculatedProfit;
                     }
                     else if (DetectedCandels.EndPrice > nextCandel.EndPrice)
                     {
                         if (nextCandel2.EndPrice > DetectedCandels.EndPrice)
                         {
                             CorrectPredictedCandels.Add(DetectedCandels);
+                            decimal calculatedProfit = (nextCandel2.EndPrice - DetectedCandels.EndPrice);
+                            profit = profit + calculatedProfit;
+
                         }
                         else if (nextCandel2.EndPrice < DetectedCandels.EndPrice)
                         {
                             if (nextCandel3.EndPrice > DetectedCandels.EndPrice)
                             {
                                 CorrectPredictedCandels.Add(DetectedCandels);
+
+                                decimal calculatedProfit = (nextCandel3.EndPrice - DetectedCandels.EndPrice);
+                                profit = profit + calculatedProfit;
+
                             }
                             else if (nextCandel3.EndPrice < DetectedCandels.EndPrice)
                             {
                                 WrongPredictedCandels.Add(DetectedCandels);
+                                LossList.Add(nextCandel3);
+
+                                decimal calculatedloss = (DetectedCandels.EndPrice - nextCandel3.EndPrice);
+                                loss = loss + calculatedloss;
                             }
                             else
                             {
@@ -106,16 +124,25 @@ namespace StockLogger.Controllers.API_Controllers
                         if (nextCandel2.EndPrice > DetectedCandels.EndPrice)
                         {
                             CorrectPredictedCandels.Add(DetectedCandels);
+
+                            decimal calculatedProfit = (nextCandel2.EndPrice - DetectedCandels.EndPrice);
+                            profit = profit + calculatedProfit;
                         }
                         else if (nextCandel2.EndPrice < DetectedCandels.EndPrice)
                         {
                             if (nextCandel3.EndPrice > DetectedCandels.EndPrice)
                             {
                                 CorrectPredictedCandels.Add(DetectedCandels);
+
+                                decimal calculatedProfit = (nextCandel3.EndPrice - DetectedCandels.EndPrice);
+                                profit = profit + calculatedProfit;
                             }
                             else if (nextCandel3.EndPrice < DetectedCandels.EndPrice)
                             {
                                 WrongPredictedCandels.Add(DetectedCandels);
+                                LossList.Add(nextCandel3);
+                                decimal calculatedloss = (DetectedCandels.EndPrice - nextCandel3.EndPrice);
+                                loss = loss + calculatedloss;
                             }
                         }
                     }
@@ -146,11 +173,11 @@ namespace StockLogger.Controllers.API_Controllers
             // Return an anonymous object containing the lists
             return Ok(new
             {
-                Profit = (correctPredictionsSum + wrongPredictionsSum + MissleniousSum) - sumEndPrice,
-
+                profit,
+                loss, 
+                netprofit = profit - loss,
                 Accuracy = accuracy,
-                Investment = sumEndPrice,
-                InvestmentNow = correctPredictionsSum + wrongPredictionsSum + MissleniousSum,
+                Investment = correctPredictionsSum + wrongPredictionsSum + MissleniousSum,
                 CorrectPredict = correctPredictionsSum,
                 WrongPredict = wrongPredictionsSum,
                 DrafonFlyDojiCandels,

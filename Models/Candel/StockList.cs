@@ -17,6 +17,7 @@
                 ("LT-EQ", "NSE", "Larsen & Toubro", 9, "11483"),
                 ("SBIN-EQ", "NSE", "State Bank of India", 10, "3045"),
                 ("COALINDIA-EQ", "NSE", "Coal India", 11, "20374"),
+                ("TITAN-EQ", "NSE", "Titan Company", 12 , "3506"),
 
                 //("AXISBANK", "NSE", "Axis Bank", 11),
                 //("BAJFINANCE", "NSE", "Bajaj Finance", 12),
