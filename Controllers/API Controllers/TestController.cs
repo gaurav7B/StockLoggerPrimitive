@@ -28,6 +28,14 @@ namespace StockLogger.Controllers.API_Controllers
         //    return Ok(CandelData);  // Correct usage of Ok()
         //}
 
+        // Define the PriceData class
+        public class PriceData
+        {
+            public int Count { get; set; }
+            public Candel DetectedCandel { get; set; }
+            public Candel FutureCandel { get; set; }
+        }
+
         // POST https://localhost:44364/api/Test/DragonFly
         [HttpPost("DragonFly")]
         public async Task<IActionResult> DragonFly(List<Candel> CandelData)
@@ -97,7 +105,7 @@ namespace StockLogger.Controllers.API_Controllers
 
             decimal loss = 0;
             decimal profit = 0;
-            List<int> ints = new List<int>();
+            List<PriceData> PriceIncreasedAfterCount = new List<PriceData>();
 
 
             foreach (Candel DetectedCandels in DrafonFlyDojiCandels)
@@ -167,10 +175,12 @@ namespace StockLogger.Controllers.API_Controllers
                                     // Calculate how many candles later it was detected
                                     int candlesAfterDetected = matchingCandelIndex - detectedCandelIndex;
 
-                                    ints.Add(candlesAfterDetected);
-
-                                    // Optional: You can log or use the count of candles after detection
-                                    Console.WriteLine($"Candle was detected {candlesAfterDetected} candles after DetectedCandels.");
+                                    PriceIncreasedAfterCount.Add(new PriceData
+                                    {
+                                        Count = candlesAfterDetected,
+                                        DetectedCandel = DetectedCandels,
+                                        FutureCandel = matchingCandel
+                                    });
                                 }
                             }
                             else
