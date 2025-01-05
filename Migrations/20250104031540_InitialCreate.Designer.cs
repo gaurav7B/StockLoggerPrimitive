@@ -12,7 +12,7 @@ using StockLogger.Data;
 namespace StockLogger.Migrations
 {
     [DbContext(typeof(StockLoggerDbContext))]
-    [Migration("20250102091058_InitialCreate")]
+    [Migration("20250104031540_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

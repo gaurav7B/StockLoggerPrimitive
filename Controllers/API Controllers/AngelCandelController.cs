@@ -101,14 +101,19 @@ namespace StockLogger.Controllers.API_Controllers
             // Create start date with time 3:30 PM
             var startDateWithTime330 = startDateOnly.AddHours(15).AddMinutes(30);
 
+            DateTime specificDate = new DateTime(2025, 1, 3, 15, 0, 0); // January 3, 2025, at 3:00 PM
+
+
             var data = new
             {
                 exchange = "NSE",
                 symboltoken = stockRequest.SymbolToken,
                 interval = "ONE_MINUTE",
                 fromdate = startDateWithTime900.ToString("yyyy-MM-dd HH:mm"),
-                todate = startDateWithTime330.ToString("yyyy-MM-dd HH:mm")
-            };
+                //todate = startDateWithTime330.ToString("yyyy-MM-dd HH:mm")
+                todate = specificDate.ToString("yyyy-MM-dd HH:mm")
+
+        };
 
             var jsonData = JsonConvert.SerializeObject(data);
             var client = new HttpClient();

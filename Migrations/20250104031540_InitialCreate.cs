@@ -113,14 +113,14 @@ namespace StockLogger.Migrations
                     EndPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     OpenTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CloseTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Volume = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Ticker = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TickerId = table.Column<long>(type: "bigint", nullable: false),
                     Exchange = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsBullish = table.Column<bool>(type: "bit", nullable: true),
                     IsBearish = table.Column<bool>(type: "bit", nullable: true),
                     PriceChange = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    PriceChangePercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    PriceChangePercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Volume = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
                 {

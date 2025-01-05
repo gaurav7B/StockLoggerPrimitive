@@ -6,6 +6,7 @@
         {
             return new List<(string, string, string, long, string)>
             {
+                ("NIFTY_50","NSE","NIFTYY_50",0,"99926000"),
                 ("INFY-EQ", "NSE", "Infosys", 1, "1594"),
                 ("RELIANCE-EQ", "NSE", "Reliance Industries", 2, "2885"),
                 ("TCS-EQ", "NSE", "Tata Consultancy Services", 3, "11536"),
