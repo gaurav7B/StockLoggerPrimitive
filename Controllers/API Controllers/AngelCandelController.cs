@@ -96,18 +96,18 @@ namespace StockLogger.Controllers.API_Controllers
             var matchingStock = _stocks.FirstOrDefault(s => s.symboltoken == stockRequest.SymbolToken);
 
             // Create start date with time 9:15 AM
-            var startDateWithTime900 = startDateOnly.AddHours(9).AddMinutes(00);
+            var startDateWithTime900 = startDateOnly.AddHours(9).AddMinutes(15);
 
             // Create start date with time 3:30 PM
-            var startDateWithTime330 = EndDateOnly.AddHours(10).AddMinutes(30);
+            var startDateWithTime330 = EndDateOnly.AddHours(15).AddMinutes(30);
 
             var data = new
             {
                 exchange = "NSE",
                 symboltoken = stockRequest.SymbolToken,
                 interval = "ONE_MINUTE",
-                fromdate = startDateWithTime900.ToString("yyyy-MM-dd HH:mm"),
-                todate = startDateWithTime330.ToString("yyyy-MM-dd HH:mm")
+                fromdate = stockRequest.StartDate.ToString("yyyy-MM-dd HH:mm"),
+                todate = stockRequest.EndDate.ToString("yyyy-MM-dd HH:mm")
             };
 
             var jsonData = JsonConvert.SerializeObject(data);

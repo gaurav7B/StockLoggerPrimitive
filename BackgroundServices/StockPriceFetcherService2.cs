@@ -15,7 +15,6 @@ namespace StockLogger.BackgroundServices
     {
         private readonly HttpClient _httpClient;
         private readonly List<(string ticker, string exchange, string name, long id, string symboltoken)> _stocks;
-        string authorizationToken;
 
 
         public StockPriceFetcherService2(HttpClient httpClient)
@@ -53,170 +52,144 @@ namespace StockLogger.BackgroundServices
             return otp.ComputeTotp(); // Generates the TOTP value
         }
 
+        private async Task<string> FetchAuthTokenAsync(CancellationToken stoppingToken)
+        {
+            try
+            {
+                HttpResponseMessage response = await _httpClient.GetAsync("https://localhost:44364/api/Token", stoppingToken);
+                string responseData = await response.Content.ReadAsStringAsync(stoppingToken);
 
+                dynamic data = JsonConvert.DeserializeObject(responseData);
+                return data?.authToken;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
 
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            string authorizationToken = null;
+
             // Fetch public IP using ipify API
             string publicIp = await GetPublicIPAsync();
 
-            // Setup login credentials and generate TOTP
-            var loginData = new
-            {
-                clientcode = "AAAF282130", // Your actual client code
-                password = "6366",          // Your actual pin
-                totp = GenerateTOTP("3IGPCM52A2WTQCH7FW2RYOCYIY") // Generate TOTP from secret key
-            };
+            // Fetch token before the service starts
+            authorizationToken = await FetchAuthTokenAsync(stoppingToken);
 
-            var loginJsonData = JsonConvert.SerializeObject(loginData);
-            var loginClient = new HttpClient();
-            var loginRequestMessage = new HttpRequestMessage(HttpMethod.Post, "https://apiconnect.angelone.in/rest/auth/angelbroking/user/v1/loginByPassword")
-            {
-                Content = new StringContent(loginJsonData, Encoding.UTF8, "application/json")
-            };
-
-            // Set headers for login request
-            loginRequestMessage.Headers.Add("Accept", "application/json");
-            loginRequestMessage.Headers.Add("X-UserType", "USER");
-            loginRequestMessage.Headers.Add("X-SourceID", "WEB");
-            loginRequestMessage.Headers.Add("X-ClientLocalIP", "192.168.56.177");  // Your local IP from ipconfig
-            loginRequestMessage.Headers.Add("X-ClientPublicIP", publicIp);
-            loginRequestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX"); // Replace with your MAC address
-            loginRequestMessage.Headers.Add("X-PrivateKey", "DcsJlRJp");          // Your actual API Key
-
-            try
-            {
-                // Send login request and fetch login token
-                HttpResponseMessage loginResponse = await loginClient.SendAsync(loginRequestMessage);
-                loginResponse.EnsureSuccessStatusCode();  // Throws an exception if not successful
-                string loginResponseContent = await loginResponse.Content.ReadAsStringAsync();
-                dynamic loginResponseJson = JsonConvert.DeserializeObject(loginResponseContent);
-
-                // Check login status
-                if (loginResponseJson.status == true)
-                {
-                    authorizationToken = loginResponseJson.data.jwtToken;  // Corrected key  // Assuming the token is present here
-                    Console.WriteLine("Login Successful: " + JsonConvert.SerializeObject(loginResponseJson, Formatting.Indented));
-
-                    // Now fetch the historical data
-                    //await GetHistoricalData(publicIp, authorizationToken);
-                }
-                else
-                {
-                    Console.WriteLine("Login Failed: " + loginResponseJson.message);
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Error: " + e.Message);
-            }
-
-                while (!stoppingToken.IsCancellationRequested)
+            while (!stoppingToken.IsCancellationRequested)
                 {
                     var stopwatch = Stopwatch.StartNew();
 
+                if(authorizationToken != null)
+                {
                     var tasks = _stocks.Select(stock => Task.Run(async () =>
                     {
-                        string Ticker = stock.ticker;
-                        long TickeId = stock.id;
-                        string Exchange = stock.exchange;
+
+                            string Ticker = stock.ticker;
+                            long TickeId = stock.id;
+                            string Exchange = stock.exchange;
 
 
-                        string fromdate = DateTime.Today.AddHours(9).ToString("yyyy-MM-dd HH:mm");
-                        string todate = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
+                            string fromdate = DateTime.Today.AddHours(9).ToString("yyyy-MM-dd HH:mm");
+                            string todate = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
 
-                        var data = new
-                        {
-                            exchange = "NSE",
-                            symboltoken = stock.symboltoken,
-                            interval = "ONE_MINUTE",
-                            fromdate = fromdate,
-                            todate = todate
-                        };
-
-                        var jsonData = JsonConvert.SerializeObject(data);
-                        var client = new HttpClient();
-
-                        var requestMessage = new HttpRequestMessage(HttpMethod.Post, "https://apiconnect.angelone.in/rest/secure/angelbroking/historical/v1/getCandleData")
-                        {
-                            Content = new StringContent(jsonData, Encoding.UTF8, "application/json")
-                        };
-
-                        // Set the headers
-                        requestMessage.Headers.Add("Accept", "application/json");
-                        requestMessage.Headers.Add("X-SourceID", "WEB");
-                        requestMessage.Headers.Add("X-ClientLocalIP", "192.168.56.177");  // Your local IP from ipconfig
-                        requestMessage.Headers.Add("X-ClientPublicIP", publicIp);
-                        requestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX"); // Replace with your actual MAC address
-                        requestMessage.Headers.Add("X-UserType", "USER");
-                        requestMessage.Headers.Add("Authorization", "Bearer " + authorizationToken);
-                        requestMessage.Headers.Add("X-PrivateKey", "DcsJlRJp"); // Your actual API Key
-
-                        try
-                        {
-                            // Send request to get historical data
-                            HttpResponseMessage response = await client.SendAsync(requestMessage);
-                            response.EnsureSuccessStatusCode();  
-
-                            // Read and display the response
-                            string responseContent = await response.Content.ReadAsStringAsync();
-                            dynamic responseJson = JsonConvert.DeserializeObject(responseContent);
-
-                            List<Candel> RC = new List<Candel>();
-                            var RawCandels = responseJson.data;
-
-                            if(RawCandels != null)
+                            var data = new
                             {
-                                foreach (var c in RawCandels)
+                                exchange = "NSE",
+                                symboltoken = stock.symboltoken,
+                                interval = "ONE_MINUTE",
+                                fromdate = fromdate,
+                                todate = todate
+                            };
+
+                            var jsonData = JsonConvert.SerializeObject(data);
+                            var client = new HttpClient();
+
+                            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "https://apiconnect.angelone.in/rest/secure/angelbroking/historical/v1/getCandleData")
+                            {
+                                Content = new StringContent(jsonData, Encoding.UTF8, "application/json")
+                            };
+
+                            // Set the headers
+                            requestMessage.Headers.Add("Accept", "application/json");
+                            requestMessage.Headers.Add("X-SourceID", "WEB");
+                            requestMessage.Headers.Add("X-ClientLocalIP", "192.168.56.177");  // Your local IP from ipconfig
+                            requestMessage.Headers.Add("X-ClientPublicIP", publicIp);
+                            requestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX"); // Replace with your actual MAC address
+                            requestMessage.Headers.Add("X-UserType", "USER");
+                            requestMessage.Headers.Add("Authorization", "Bearer " + authorizationToken);
+                            requestMessage.Headers.Add("X-PrivateKey", "DcsJlRJp"); // Your actual API Key
+
+                            try
+                            {
+                                // Send request to get historical data
+                                HttpResponseMessage response = await client.SendAsync(requestMessage);
+                                response.EnsureSuccessStatusCode();
+
+                                // Read and display the response
+                                string responseContent = await response.Content.ReadAsStringAsync();
+                                dynamic responseJson = JsonConvert.DeserializeObject(responseContent);
+
+                                List<Candel> RC = new List<Candel>();
+                                var RawCandels = responseJson.data;
+
+                                if (RawCandels != null)
                                 {
-                                    Candel rawCandel = new Candel
+                                    foreach (var c in RawCandels)
                                     {
-                                        OpenTime = DateTime.Parse(c[0].ToString()),
-                                        CloseTime = DateTime.Parse(c[0].ToString()).AddMinutes(1),
+                                        Candel rawCandel = new Candel
+                                        {
+                                            OpenTime = DateTime.Parse(c[0].ToString()),
+                                            CloseTime = DateTime.Parse(c[0].ToString()).AddMinutes(1),
 
-                                        StartPrice = Convert.ToDecimal(c[1]),
-                                        HighestPrice = Convert.ToDecimal(c[2]),
-                                        LowestPrice = Convert.ToDecimal(c[3]),
-                                        EndPrice = Convert.ToDecimal(c[4]),
+                                            StartPrice = Convert.ToDecimal(c[1]),
+                                            HighestPrice = Convert.ToDecimal(c[2]),
+                                            LowestPrice = Convert.ToDecimal(c[3]),
+                                            EndPrice = Convert.ToDecimal(c[4]),
 
-                                        Ticker = Ticker,
-                                        TickerId = TickeId,
-                                        Exchange = Exchange,
+                                            Ticker = Ticker,
+                                            TickerId = TickeId,
+                                            Exchange = Exchange,
 
-                                        Volume = Convert.ToDecimal(c[5]),
-                                    };
+                                            Volume = Convert.ToDecimal(c[5]),
+                                        };
 
-                                    rawCandel.SetBullBearStatus();
-                                    rawCandel.SetPriceChange();
+                                        rawCandel.SetBullBearStatus();
+                                        rawCandel.SetPriceChange();
 
-                                    RC.Add(rawCandel);
+                                        RC.Add(rawCandel);
 
-                                    HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/Candel",
-                                          new StringContent(JsonConvert.SerializeObject(rawCandel), Encoding.UTF8, "application/json"),
-                                          stoppingToken);
+                                        HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/Candel",
+                                              new StringContent(JsonConvert.SerializeObject(rawCandel), Encoding.UTF8, "application/json"),
+                                              stoppingToken);
+
+                                    }
 
                                 }
 
+                                if (responseJson.status == true)
+                                {
+                                    Console.WriteLine("Historical Data: " + JsonConvert.SerializeObject(responseJson.data, Formatting.Indented));
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Failed to fetch data: " + responseJson.message);
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine("Error fetching historical data: " + e.Message);
                             }
 
-                            if (responseJson.status == true)
-                            {
-                                Console.WriteLine("Historical Data: " + JsonConvert.SerializeObject(responseJson.data, Formatting.Indented));
-                            }
-                            else
-                            {
-                                Console.WriteLine("Failed to fetch data: " + responseJson.message);
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine("Error fetching historical data: " + e.Message);
-                        }
                     }, stoppingToken));
 
                     // Wait for all tasks to complete.
                     await Task.WhenAll(tasks);
+                }
+
                     stopwatch.Stop();
 
                     // Trigger garbage collection periodically

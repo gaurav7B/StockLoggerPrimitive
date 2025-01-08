@@ -12,7 +12,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
         public async void DragonFlyDojiAnalyzerLogic(List<Candel> candelList , HttpClient _httpClient, int Range)
         {
             // Ensure there are at least 2 candles in the list
-            if (candelList.Count < 1)
+            if (candelList.Count < 2)
             {
                 Console.WriteLine("The list must contain at least 2 candles.");
                 return;
@@ -32,31 +32,31 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
             // The body of the candle should be small and at the top of the range
             bool smallBodyAtTop = Math.Abs(dojicandel.StartPrice - dojicandel.EndPrice) < (dojicandel.HighestPrice - dojicandel.LowestPrice) * 0.3m;
 
-            // Preceding candle's trend should be bullish (for confirming upward momentum)
-            bool precedingBullishTrend = candelList.Where(x => x.CloseTime < dojicandel.OpenTime)
-                                                   .OrderByDescending(x => x.CloseTime)
-                                                   .Take(3)
-                                                   .All(x => x.EndPrice > x.StartPrice); // At least the last 3 candles should be bullish
+            //// Preceding candle's trend should be bullish (for confirming upward momentum)
+            //bool precedingBullishTrend = candelList.Where(x => x.CloseTime < dojicandel.OpenTime)
+            //                                       .OrderByDescending(x => x.CloseTime)
+            //                                       .Take(3)
+            //                                       .All(x => x.EndPrice > x.StartPrice); // At least the last 3 candles should be bullish
 
-            //// Check for higher volume
-            //bool higherVolume = recentCandel.Volume > CandelData.Average(x => x.Volume);
+            ////// Check for higher volume
+            ////bool higherVolume = recentCandel.Volume > CandelData.Average(x => x.Volume);
 
-            bool higherVolume = dojicandel.Volume > candelList.TakeLast(10).Max(x => x.Volume) * 0.75m; // Volume above 75% of the max in last 10 candles
+            //bool higherVolume = dojicandel.Volume > candelList.TakeLast(10).Max(x => x.Volume) * 0.75m; // Volume above 75% of the max in last 10 candles
 
 
-            // The next candle should also be bullish for confirmation
-            bool nextCandleBullish = candelList.Where(x => x.OpenTime > dojicandel.CloseTime)
-                                               .OrderBy(x => x.OpenTime)
-                                               .FirstOrDefault()?.EndPrice > dojicandel.EndPrice;
-
-            //Candel verificationCandel = candelList.Where(x => x.OpenTime > recentCandel.CloseTime)
+            //// The next candle should also be bullish for confirmation
+            //bool nextCandleBullish = candelList.Where(x => x.OpenTime > dojicandel.CloseTime)
             //                                   .OrderBy(x => x.OpenTime)
-            //                                   .FirstOrDefault();
+            //                                   .FirstOrDefault()?.EndPrice > dojicandel.EndPrice;
+
+            ////Candel verificationCandel = candelList.Where(x => x.OpenTime > recentCandel.CloseTime)
+            ////                                   .OrderBy(x => x.OpenTime)
+            ////                                   .FirstOrDefault();
 
             // If all conditions match, then it's a Dragonfly Doji with high probability of upward movement
             if (isDoji && longLowerShadow && smallBodyAtTop
-                && precedingBullishTrend && higherVolume
-                && nextCandleBullish
+                //&& precedingBullishTrend && higherVolume
+                //&& nextCandleBullish
                 )
             {
                 if (Range == 1)
@@ -135,11 +135,30 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
         }
 
 
-        public async Task Analyze1MinCandelAsync(string ticker, HttpClient _httpClient, CancellationToken stoppingToken)
+        public async Task Analyze1MinCandelAsync(string symboltoken, HttpClient _httpClient, CancellationToken stoppingToken , string authToken)
         {
+            var symbolTokenValue = symboltoken; // Replace with the correct value from stock
+            var token = authToken; // Replace with the actual token
+            var startDate = DateTime.Now.AddMinutes(-3); // Example start date
+            var endDate = DateTime.Now; // Example end date
+
+            var requestBody = new
+            {
+                SymbolToken = symbolTokenValue,
+                AuthorizationToken = token,
+                StartDate = startDate.ToString("o"), // ISO string format
+                EndDate = endDate.ToString("o") // ISO string format
+            };
+
+            var client = new HttpClient();
+            var jsonRequestBody = JsonConvert.SerializeObject(requestBody);
+            var content = new StringContent(jsonRequestBody, Encoding.UTF8, "application/json");
+
+
+
             try
             {
-                HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:44364/api/Candel/GetbyTicker?ticker={ticker}", stoppingToken);
+                var response = await client.PostAsync("https://localhost:44364/api/AngelCandel/getCandleData", content);
                 response.EnsureSuccessStatusCode();
 
                 string responseData = await response.Content.ReadAsStringAsync(stoppingToken);
@@ -153,7 +172,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error analyzing ticker {ticker}: {ex.Message}");
+                Console.WriteLine($"Error analyzing ticker {symboltoken}: {ex.Message}");
             }
         }
 

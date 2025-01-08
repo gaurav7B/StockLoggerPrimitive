@@ -127,6 +127,10 @@
                     <i class="fas fa-home icon"></i>
                     <h2>HOME</h2>
                 </div>
+                <div class="sidebarMenuediv" onclick="redirectToService()">
+                    <i class="fas fa-chart-bar icon"></i>
+                    <h2>SERVICE</h2>
+                </div>
                 <div class="sidebarMenuediv" onclick="redirectTo3WS()">
                     <i class="fas fa-chart-bar icon"></i>
                     <h2>3WS REPORT</h2>
@@ -183,6 +187,11 @@
 
         function redirectToHistoricDataTester() {
             window.location.href = '/HistoricDataTesterMVC/Index'
+        }
+
+        function redirectToService()
+        {
+            window.location.href = '/ServiceMVC/Index'
         }
 
         function redirectToLogicTester()

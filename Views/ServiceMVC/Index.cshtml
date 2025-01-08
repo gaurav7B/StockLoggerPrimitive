@@ -1,0 +1,130 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .center-form {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 300px;
+        }
+
+
+        .login-button-container {
+            margin: 100px auto;
+            text-align: center;
+        }
+
+        .login-button {
+            font-size: 20px;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+            .login-button:hover {
+                background-color: #0056b3;
+            }
+    </style>
+</head>
+<body>
+    <div class="center-form">
+        <div>
+            <main role="main" class="pb-3">
+                <div class="login-button-container">
+                    <form id="loginForm" onsubmit="return false;">
+                        <button type="button" class="login-button" id="loginButton">LOGIN</button>
+                    </form>
+                </div>
+                <div class="login-button-container">
+                    <form id="loginoutForm" onsubmit="return false;">
+                        <button type="button" class="login-button" id="logoutButton">LOGOUT</button>
+                    </form>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginButton').addEventListener('click', async function () {
+            console.log('Login button clicked');
+
+            try {
+                // Define the API URL
+                const apiUrl = 'https://localhost:44364/api/Token';
+
+                // Send the POST request
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                // Check if the response is okay
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                // Parse the response JSON
+                const data = await response.json();
+                console.log('Token created:', data);
+
+                // Perform further actions with the token, e.g., store it
+            } catch (error) {
+                console.error('Error creating token:', error);
+            }
+        });
+
+        document.getElementById('logoutButton').addEventListener('click', async function () {
+            console.log('Logout button clicked');
+
+            try {
+                // Define the API URL
+                const apiUrl = 'https://localhost:44364/api/Token';
+
+                // Send the DELETE request
+                const response = await fetch(apiUrl, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                // Check if the response is okay
+                if (response.status === 204) {
+                    console.log('Token table truncated successfully.');
+                } else {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Error truncating Token table:', error);
+            }
+        });
+
+
+    </script>
+</body>
+</html>

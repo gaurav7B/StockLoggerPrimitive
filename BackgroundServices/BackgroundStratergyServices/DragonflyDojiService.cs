@@ -1,4 +1,5 @@
-﻿using StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers;
+﻿using Newtonsoft.Json;
+using StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers;
 using StockLogger.Models.Candel;
 using System.Diagnostics;
 using System.Net.Http;
@@ -23,33 +24,57 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
         }
 
 
+        private async Task<string> FetchAuthTokenAsync(CancellationToken stoppingToken)
+        {
+            try
+            {
+                HttpResponseMessage response = await _httpClient.GetAsync("https://localhost:44364/api/Token", stoppingToken);
+                string responseData = await response.Content.ReadAsStringAsync(stoppingToken);
+
+                dynamic data = JsonConvert.DeserializeObject(responseData);
+                return data?.authToken;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            string authToken = null;
 
             List<double> iterationTimes = new();
 
             while (!stoppingToken.IsCancellationRequested)
             {
+
+                // Fetch token before the service starts
+                authToken = await FetchAuthTokenAsync(stoppingToken);
+
                 var stopwatch = Stopwatch.StartNew();
 
-                var tasks = _stocks.Select(stock => Task.Run(async () =>
+                if(authToken != null)
                 {
-                    try
+                    var tasks = _stocks.Select(stock => Task.Run(async () =>
                     {
-                        await _analyzer.Analyze1MinCandelAsync(stock.ticker, _httpClient, stoppingToken);
-                        //await _analyzer.Analyze5MinCandelAsync(stock.ticker, _httpClient, stoppingToken);
-                        //await _analyzer.Analyze10MinCandelAsync(stock.ticker, _httpClient, stoppingToken);
-                        //await _analyzer.Analyze15MinCandelAsync(stock.ticker, _httpClient, stoppingToken);
-                    }
-                    catch (Exception ex)
-                    {
-                    }
-                }, stoppingToken));
+                        try
+                        {
+                                await _analyzer.Analyze1MinCandelAsync(stock.symboltoken, _httpClient, stoppingToken , authToken);
+                                //await _analyzer.Analyze5MinCandelAsync(stock.ticker, _httpClient, stoppingToken);
+                                //await _analyzer.Analyze10MinCandelAsync(stock.ticker, _httpClient, stoppingToken);
+                                //await _analyzer.Analyze15MinCandelAsync(stock.ticker, _httpClient, stoppingToken);
+                        }
+                        catch (Exception ex)
+                        {
+                        }
+                    }, stoppingToken));
 
-
-
-                // Wait for all tasks to complete.
-                await Task.WhenAll(tasks);
+                    // Wait for all tasks to complete.
+                    await Task.WhenAll(tasks);
+                }
 
                 stopwatch.Stop();
                 iterationTimes.Add(stopwatch.Elapsed.TotalMilliseconds);
@@ -61,5 +86,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
             }
 
         }
+   
+    
     }
 }

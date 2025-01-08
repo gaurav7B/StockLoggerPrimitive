@@ -139,15 +139,18 @@ namespace StockLogger.Controllers.API_Controllers
                 return BadRequest("Ticker and Exchange are required.");
             }
 
-            // Fetch the most recent 3 distinct candels based on CloseTime for the given ticker and exchange
-            //var result = await _context.Candel
-            //    .Where(c => c.Ticker == ticker)
-            //    .ToListAsync();
+            var currentTime = DateTime.UtcNow; // Use DateTime.Now if you are working in local time.
 
             var result = await _context.Candel
-                        .Where(c => c.Ticker == ticker)
-                        .OrderByDescending(c => c.CloseTime)
-                        .ToListAsync();
+                .Where(c => c.Ticker == ticker)
+                .OrderByDescending(c => c.CloseTime)
+                .ToListAsync();
+
+            // Remove the first element if its CloseTime is greater than the current time.
+            if (result.Count > 0 && result[0].CloseTime > currentTime)
+            {
+                result.RemoveAt(0);
+            }
 
 
             // Check if data exists

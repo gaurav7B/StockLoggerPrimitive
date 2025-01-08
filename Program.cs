@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using StockLogger.BackgroundServices;
 using StockLogger.BackgroundServices.BackgroundStratergyServices;
+using StockLogger.BackgroundServices.BackgroundStratergyServices.HelperMethods;
 using StockLogger.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,7 +16,6 @@ builder.Services.AddDbContext<StockLoggerDbContext>(options =>
 
 
 builder.Services.AddHostedService<StockPriceFetcherService2>();
-
 
 ////builder.Services.AddHostedService<StockPriceFetcherService>();
 
