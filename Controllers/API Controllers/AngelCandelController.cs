@@ -165,7 +165,11 @@ namespace StockLogger.Controllers.API_Controllers
                     newCandel.SetBullBearStatus();
                     newCandel.SetPriceChange();
 
-                    ModifiedCandelDataList.Add(newCandel);
+                    if(newCandel.CloseTime < DateTime.Now)
+                    {
+                        ModifiedCandelDataList.Add(newCandel);
+                    }
+                    
                 }
 
                 return Ok(ModifiedCandelDataList);  // Return the fetched historical candle data
