@@ -301,6 +301,23 @@ namespace StockLogger.Migrations
                     b.ToTable("StockTickerExchanges");
                 });
 
+            modelBuilder.Entity("StockLogger.Models.Candel.Token", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("AuthToken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Token");
+                });
+
             modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Breakaway__Bullish_.BreakawayCandels", b =>
                 {
                     b.Property<long>("Id")

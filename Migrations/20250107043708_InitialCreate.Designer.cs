@@ -12,7 +12,7 @@ using StockLogger.Data;
 namespace StockLogger.Migrations
 {
     [DbContext(typeof(StockLoggerDbContext))]
-    [Migration("20250102091058_InitialCreate")]
+    [Migration("20250107043708_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -302,6 +302,23 @@ namespace StockLogger.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("StockTickerExchanges");
+                });
+
+            modelBuilder.Entity("StockLogger.Models.Candel.Token", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("AuthToken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Token");
                 });
 
             modelBuilder.Entity("StockLogger.Models.Stratergic_Models.Breakaway__Bullish_.BreakawayCandels", b =>

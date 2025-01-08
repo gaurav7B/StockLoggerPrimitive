@@ -165,33 +165,38 @@ namespace StockLogger.BackgroundServices
 
                             List<Candel> RC = new List<Candel>();
                             var RawCandels = responseJson.data;
-                            foreach (var c in RawCandels)
+
+                            if(RawCandels != null)
                             {
-                                Candel rawCandel = new Candel
+                                foreach (var c in RawCandels)
                                 {
-                                    OpenTime = DateTime.Parse(c[0].ToString()),
-                                    CloseTime = DateTime.Parse(c[0].ToString()).AddMinutes(1), 
+                                    Candel rawCandel = new Candel
+                                    {
+                                        OpenTime = DateTime.Parse(c[0].ToString()),
+                                        CloseTime = DateTime.Parse(c[0].ToString()).AddMinutes(1),
 
-                                    StartPrice = Convert.ToDecimal(c[1]),
-                                    HighestPrice = Convert.ToDecimal(c[2]),
-                                    LowestPrice = Convert.ToDecimal(c[3]),
-                                    EndPrice = Convert.ToDecimal(c[4]),
+                                        StartPrice = Convert.ToDecimal(c[1]),
+                                        HighestPrice = Convert.ToDecimal(c[2]),
+                                        LowestPrice = Convert.ToDecimal(c[3]),
+                                        EndPrice = Convert.ToDecimal(c[4]),
 
-                                    Ticker = Ticker, 
-                                    TickerId = TickeId,
-                                    Exchange = Exchange,
+                                        Ticker = Ticker,
+                                        TickerId = TickeId,
+                                        Exchange = Exchange,
 
-                                    Volume = Convert.ToDecimal(c[5]), 
-                                };
+                                        Volume = Convert.ToDecimal(c[5]),
+                                    };
 
-                                rawCandel.SetBullBearStatus(); 
-                                rawCandel.SetPriceChange();  
+                                    rawCandel.SetBullBearStatus();
+                                    rawCandel.SetPriceChange();
 
-                                RC.Add(rawCandel); 
+                                    RC.Add(rawCandel);
 
-                                HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/Candel",
-                                      new StringContent(JsonConvert.SerializeObject(rawCandel), Encoding.UTF8, "application/json"),
-                                      stoppingToken);
+                                    HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/Candel",
+                                          new StringContent(JsonConvert.SerializeObject(rawCandel), Encoding.UTF8, "application/json"),
+                                          stoppingToken);
+
+                                }
 
                             }
 

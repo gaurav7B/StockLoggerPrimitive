@@ -37,9 +37,9 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
                     try
                     {
                         await _analyzer.Analyze1MinCandelAsync(stock.ticker, _httpClient, stoppingToken);
-                        await _analyzer.Analyze5MinCandelAsync(stock.ticker, _httpClient, stoppingToken);
-                        await _analyzer.Analyze10MinCandelAsync(stock.ticker, _httpClient, stoppingToken);
-                        await _analyzer.Analyze15MinCandelAsync(stock.ticker, _httpClient, stoppingToken);
+                        //await _analyzer.Analyze5MinCandelAsync(stock.ticker, _httpClient, stoppingToken);
+                        //await _analyzer.Analyze10MinCandelAsync(stock.ticker, _httpClient, stoppingToken);
+                        //await _analyzer.Analyze15MinCandelAsync(stock.ticker, _httpClient, stoppingToken);
                     }
                     catch (Exception ex)
                     {

@@ -99,7 +99,7 @@ namespace StockLogger.Controllers.API_Controllers
             var startDateWithTime900 = startDateOnly.AddHours(9).AddMinutes(00);
 
             // Create start date with time 3:30 PM
-            var startDateWithTime330 = startDateOnly.AddHours(15).AddMinutes(30);
+            var startDateWithTime330 = EndDateOnly.AddHours(10).AddMinutes(30);
 
             var data = new
             {
@@ -138,7 +138,13 @@ namespace StockLogger.Controllers.API_Controllers
                 var rawCandelData = candleData.data;
 
                 List<Candel> ModifiedCandelDataList = new List<Candel>();
-                foreach(var rawCandel in rawCandelData)
+
+                if(rawCandelData == null)
+                {
+                    return null;
+                }
+
+                foreach (var rawCandel in rawCandelData)
                 {
                     Candel newCandel = new Candel
                     {

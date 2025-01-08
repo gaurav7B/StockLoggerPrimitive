@@ -1,0 +1,59 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Date Picker Form</title>
+    <style>
+        .center-form {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 300px;
+        }
+    </style>
+</head>
+<body>
+    <div class="center-form">
+        <form id="dateForm">
+            <div>
+                <label for="fromDate">From Date:</label>
+                <input type="date" id="fromDate" name="fromDate" required>
+            </div>
+            <div>
+                <label for="toDate">To Date:</label>
+                <input type="date" id="toDate" name="toDate" required>
+            </div>
+            <button type="button" id="testButton">TEST</button>
+        </form>
+    </div>
+
+    <script>
+        // Restrict the date pickers to prevent selecting tomorrow or later.
+        document.addEventListener('DOMContentLoaded', function () {
+            const today = new Date();
+            const maxDate = new Date();
+            maxDate.setDate(today.getDate());
+
+            const maxDateString = maxDate.toISOString().split('T')[0];
+            document.getElementById('fromDate').setAttribute('max', maxDateString);
+            document.getElementById('toDate').setAttribute('max', maxDateString);
+        });
+
+        // Prevent form submission on button click
+        document.getElementById('testButton').addEventListener('click', function () {
+            alert('TEST button clicked. Page will not refresh.');
+        });
+    </script>
+</body>
+</html>

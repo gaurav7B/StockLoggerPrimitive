@@ -18,35 +18,57 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
                 return;
             }
 
-            // Get the most recent candle
-            Candel recentCandel = candelList.OrderByDescending(c => c.CloseTime).FirstOrDefault();
 
-            // Check if it is a Doji
-            bool isDoji = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.1m;
+            Candel verificationCandel = candelList.OrderByDescending(c => c.CloseTime).FirstOrDefault();
+            Candel dojicandel = candelList.OrderByDescending(c => c.CloseTime).Skip(1).FirstOrDefault();
 
-            // Check for a long lower shadow (the shadow should be at least twice the size of the body)
-            bool longLowerShadow = (recentCandel.StartPrice - recentCandel.LowestPrice) > 2 * (recentCandel.EndPrice - recentCandel.StartPrice);
 
-            // The body of the candle should be at the top of the range
-            bool smallBodyAtTop = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.3m;
+            // Check if it is a Doji with a small body
+            bool isDoji = Math.Abs(dojicandel.StartPrice - dojicandel.EndPrice) < (dojicandel.HighestPrice - dojicandel.LowestPrice) * 0.1m;
 
-            // Check if the last candle is followed by a bullish candle (suggesting potential for a bullish trend)
-            bool bullishFollowUp = candelList.Count > 1 && candelList[1].IsBullish == true;
+            // Check for a long lower shadow (shadow size relative to the body)
+            bool longLowerShadow = (dojicandel.StartPrice - dojicandel.LowestPrice) > 3 * (dojicandel.EndPrice - dojicandel.StartPrice);
 
-            //Combine all conditions to detect the Dragonfly Doji Bullish pattern
-            if (isDoji && longLowerShadow && smallBodyAtTop && bullishFollowUp)
-            //if (isDoji && longLowerShadow && smallBodyAtTop)
+            // The body of the candle should be small and at the top of the range
+            bool smallBodyAtTop = Math.Abs(dojicandel.StartPrice - dojicandel.EndPrice) < (dojicandel.HighestPrice - dojicandel.LowestPrice) * 0.3m;
+
+            // Preceding candle's trend should be bullish (for confirming upward momentum)
+            bool precedingBullishTrend = candelList.Where(x => x.CloseTime < dojicandel.OpenTime)
+                                                   .OrderByDescending(x => x.CloseTime)
+                                                   .Take(3)
+                                                   .All(x => x.EndPrice > x.StartPrice); // At least the last 3 candles should be bullish
+
+            //// Check for higher volume
+            //bool higherVolume = recentCandel.Volume > CandelData.Average(x => x.Volume);
+
+            bool higherVolume = dojicandel.Volume > candelList.TakeLast(10).Max(x => x.Volume) * 0.75m; // Volume above 75% of the max in last 10 candles
+
+
+            // The next candle should also be bullish for confirmation
+            bool nextCandleBullish = candelList.Where(x => x.OpenTime > dojicandel.CloseTime)
+                                               .OrderBy(x => x.OpenTime)
+                                               .FirstOrDefault()?.EndPrice > dojicandel.EndPrice;
+
+            //Candel verificationCandel = candelList.Where(x => x.OpenTime > recentCandel.CloseTime)
+            //                                   .OrderBy(x => x.OpenTime)
+            //                                   .FirstOrDefault();
+
+            // If all conditions match, then it's a Dragonfly Doji with high probability of upward movement
+            if (isDoji && longLowerShadow && smallBodyAtTop
+                && precedingBullishTrend && higherVolume
+                && nextCandleBullish
+                )
             {
                 if (Range == 1)
                 {
                     DragonflyDojiDb Payload = new DragonflyDojiDb
                     {
-                        Ticker = recentCandel.Ticker,
-                        TickerId = recentCandel.TickerId,
-                        Exchange = recentCandel.Exchange,
+                        Ticker = verificationCandel.Ticker,
+                        TickerId = verificationCandel.TickerId,
+                        Exchange = verificationCandel.Exchange,
                         IsDragonflyDojiDetected = true,
                         DetectionRange = 1,
-                        DetectionTime = recentCandel.CloseTime,
+                        DetectionTime = verificationCandel.CloseTime,
                         DragonflyDojiCandels = null
                     };
 
@@ -57,15 +79,15 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
                 {
                     DragonflyDojiDb Payload = new DragonflyDojiDb
                     {
-                        Ticker = recentCandel.Ticker,
-                        TickerId = recentCandel.TickerId,
-                        Exchange = recentCandel.Exchange,
+                        Ticker = verificationCandel.Ticker,
+                        TickerId = verificationCandel.TickerId,
+                        Exchange = verificationCandel.Exchange,
                         IsDragonflyDojiDetected = true,
                         DetectionRange = 5,
-                        DetectionTime = recentCandel.CloseTime,
+                        DetectionTime = verificationCandel.CloseTime,
                         DragonflyDojiCandels = null
                     };
-                    if ((recentCandel.CloseTime.Minute - recentCandel.OpenTime.Minute) > 4)
+                    if ((verificationCandel.CloseTime.Minute - verificationCandel.OpenTime.Minute) > 4)
                     {
                         HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/DragonflyDoji",
                                                               new StringContent(JsonConvert.SerializeObject(Payload), Encoding.UTF8, "application/json"));
@@ -75,16 +97,16 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
                 {
                     DragonflyDojiDb Payload = new DragonflyDojiDb
                     {
-                        Ticker = recentCandel.Ticker,
-                        TickerId = recentCandel.TickerId,
-                        Exchange = recentCandel.Exchange,
+                        Ticker = verificationCandel.Ticker,
+                        TickerId = verificationCandel.TickerId,
+                        Exchange = verificationCandel.Exchange,
                         IsDragonflyDojiDetected = true,
                         DetectionRange = 10,
-                        DetectionTime = recentCandel.CloseTime,
+                        DetectionTime = verificationCandel.CloseTime,
                         DragonflyDojiCandels = null
                     };
 
-                    if ((recentCandel.CloseTime.Minute - recentCandel.OpenTime.Minute) > 9)
+                    if ((verificationCandel.CloseTime.Minute - verificationCandel.OpenTime.Minute) > 9)
                     {
                         HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/DragonflyDoji",
                                                               new StringContent(JsonConvert.SerializeObject(Payload), Encoding.UTF8, "application/json"));
@@ -94,16 +116,16 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
                 {
                     DragonflyDojiDb Payload = new DragonflyDojiDb
                     {
-                        Ticker = recentCandel.Ticker,
-                        TickerId = recentCandel.TickerId,
-                        Exchange = recentCandel.Exchange,
+                        Ticker = verificationCandel.Ticker,
+                        TickerId = verificationCandel.TickerId,
+                        Exchange = verificationCandel.Exchange,
                         IsDragonflyDojiDetected = true,
                         DetectionRange = 15,
-                        DetectionTime = recentCandel.CloseTime,
+                        DetectionTime = verificationCandel.CloseTime,
                         DragonflyDojiCandels = null
                     };
 
-                    if ((recentCandel.CloseTime.Minute - recentCandel.OpenTime.Minute) > 14)
+                    if ((verificationCandel.CloseTime.Minute - verificationCandel.OpenTime.Minute) > 14)
                     {
                         HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/DragonflyDoji",
                                                               new StringContent(JsonConvert.SerializeObject(Payload), Encoding.UTF8, "application/json"));
@@ -117,7 +139,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
         {
             try
             {
-                HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:44364/api/StockPricePerSec/GetCandel?ticker={ticker}", stoppingToken);
+                HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:44364/api/Candel/GetbyTicker?ticker={ticker}", stoppingToken);
                 response.EnsureSuccessStatusCode();
 
                 string responseData = await response.Content.ReadAsStringAsync(stoppingToken);

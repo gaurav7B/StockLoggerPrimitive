@@ -113,14 +113,14 @@ namespace StockLogger.Migrations
                     EndPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     OpenTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CloseTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Volume = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Ticker = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TickerId = table.Column<long>(type: "bigint", nullable: false),
                     Exchange = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsBullish = table.Column<bool>(type: "bit", nullable: true),
                     IsBearish = table.Column<bool>(type: "bit", nullable: true),
                     PriceChange = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    PriceChangePercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    PriceChangePercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Volume = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -396,6 +396,19 @@ namespace StockLogger.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ThreeWhiteSoilderDbs", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Token",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    AuthToken = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Token", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -1089,6 +1102,9 @@ namespace StockLogger.Migrations
 
             migrationBuilder.DropTable(
                 name: "ThreeWhiteSoilderCandelss");
+
+            migrationBuilder.DropTable(
+                name: "Token");
 
             migrationBuilder.DropTable(
                 name: "TowerBottomCandels");

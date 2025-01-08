@@ -130,31 +130,33 @@ namespace StockLogger.Controllers.API_Controllers
         }
 
 
-        [HttpGet("recentThree")]
-        public async Task<ActionResult<IEnumerable<Candel>>> GetRecentCandels(string ticker, string exchange)
+        [HttpGet("GetbyTicker")]
+        public async Task<ActionResult<IEnumerable<Candel>>> GetRecentCandels(string ticker)
         {
             // Validate input
-            if (string.IsNullOrEmpty(ticker) || string.IsNullOrEmpty(exchange))
+            if (string.IsNullOrEmpty(ticker))
             {
                 return BadRequest("Ticker and Exchange are required.");
             }
 
             // Fetch the most recent 3 distinct candels based on CloseTime for the given ticker and exchange
-            var recentCandels = await _context.Candel
-                .Where(c => c.Ticker == ticker && c.Exchange == exchange)
-                .GroupBy(c => c.OpenTime)
-                .OrderByDescending(g => g.Key) // Ordering by CloseTime
-                .Take(4) // Taking the most recent 3
-                .Select(g => g.FirstOrDefault()) // Select the first (latest) candle in each CloseTime group
-                .ToListAsync();
+            //var result = await _context.Candel
+            //    .Where(c => c.Ticker == ticker)
+            //    .ToListAsync();
+
+            var result = await _context.Candel
+                        .Where(c => c.Ticker == ticker)
+                        .OrderByDescending(c => c.CloseTime)
+                        .ToListAsync();
+
 
             // Check if data exists
-            if (!recentCandels.Any())
+            if (!result.Any())
             {
                 return NotFound("No candels found for the specified Ticker and Exchange.");
             }
 
-            return Ok(recentCandels);
+            return Ok(result);
         }
 
 

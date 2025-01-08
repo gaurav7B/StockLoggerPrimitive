@@ -14,7 +14,7 @@ builder.Services.AddDbContext<StockLoggerDbContext>(options =>
     sqlServerOptions => sqlServerOptions.EnableRetryOnFailure()));
 
 
-//builder.Services.AddHostedService<StockPriceFetcherService2>();
+builder.Services.AddHostedService<StockPriceFetcherService2>();
 
 
 ////builder.Services.AddHostedService<StockPriceFetcherService>();
@@ -33,8 +33,8 @@ builder.Services.AddDbContext<StockLoggerDbContext>(options =>
 //builder.Services.AddHttpClient<BullishHaramiService>();
 //builder.Services.AddHostedService<BullishHaramiService>();
 
-//builder.Services.AddHttpClient<DragonflyDojiService>();
-//builder.Services.AddHostedService<DragonflyDojiService>();
+builder.Services.AddHttpClient<DragonflyDojiService>();
+builder.Services.AddHostedService<DragonflyDojiService>();
 
 //builder.Services.AddHttpClient<HammerService>();
 //builder.Services.AddHostedService<HammerService>();
