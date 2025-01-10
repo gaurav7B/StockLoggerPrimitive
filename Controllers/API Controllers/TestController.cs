@@ -345,6 +345,7 @@ namespace StockLogger.Controllers.API_Controllers
                 //    dragonFlyDojiCandles.Add(verificationCandel);
                 //}
 
+
                 // Fetch the last and previous candles
                 Candel latestCandel = c;
                 Candel previousCandel = CandelData
@@ -528,18 +529,14 @@ namespace StockLogger.Controllers.API_Controllers
             //    ////                                       .All(x => x.EndPrice > x.StartPrice); // At least the last 3 candles should be bullish
 
 
-            //    //bool precedingBullishTrend = false;
-
-            //    //if ((v1.IsBullish == true)
-            //    //    //&& (v2.IsBullish == true) 
-            //    //    &&
-            //    //    (verificationCandel.IsBullish == true))
-            //    //{
-            //    //    precedingBullishTrend = true;
-            //    //}
-
-
-
+            //    bool precedingBullishTrend = false;
+            //    if(verificationCandel != null)
+            //    {
+            //        if (verificationCandel.IsBullish == true)
+            //        {
+            //            precedingBullishTrend = true;
+            //        }
+            //    }
 
 
             //    //// Check for higher volume
@@ -547,6 +544,17 @@ namespace StockLogger.Controllers.API_Controllers
 
             //    //bool higherVolume = recentCandel.Volume > CandelData.TakeLast(10).Max(x => x.Volume) * 0.75m; // Volume above 75% of the max in last 10 candles
             //    bool higherVolume2 = recentCandel.Volume > CandelData.Average(x => x.Volume);
+
+
+            //    // Find the index of the recentCandel
+            //    int recentCandelIndex = CandelData.IndexOf(recentCandel);
+
+            //    // Get the 10 candles immediately before the recentCandel
+            //    var last10CandelsBefore = CandelData.Skip(recentCandelIndex - 10).Take(10);
+
+            //    // Determine if the volume of recentCandel is higher than 75% of the max volume from the previous 10 candles
+            //    bool higherVolume = recentCandel.Volume > last10CandelsBefore.Max(x => x.Volume) * 0.75m;
+
 
             //    ////The next candle should also be bullish for confirmation
 
@@ -562,7 +570,7 @@ namespace StockLogger.Controllers.API_Controllers
 
             //    bool previousCandelBearish = false;
 
-            //    if(previousCandel != null)
+            //    if (previousCandel != null)
             //    {
             //        if (previousCandel.IsBearish == true)
             //        {
@@ -574,7 +582,7 @@ namespace StockLogger.Controllers.API_Controllers
             //    if (isDoji
             //        && longLowerShadow
             //        && smallBodyAtTop
-            //        //&& precedingBullishTrend
+            //        && precedingBullishTrend
             //        //&& higherVolume
             //        && higherVolume2
             //        && nextCandleBullish
@@ -583,7 +591,7 @@ namespace StockLogger.Controllers.API_Controllers
             //    {
             //        dragonFlyDojiCandles.Add(verificationCandel);
             //    }
-        //}
+            //}
 
             return dragonFlyDojiCandles;
         }
