@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using OtpNet;
 using StockLogger.Data;
@@ -20,63 +21,79 @@ namespace StockLogger.Controllers.API_Controllers
         {
             _context = context;
 
-            // Fetch stocks from StockList
-            _stocks = StockList.GetStocks();
+            // Fetch stocks from StockList and transform them into the required tuple format
+            _stocks = StockList2.GetStocks()
+                .Select(stock => (stock.Ticker, stock.Exchange, stock.Name, stock.Id, stock.SymbolToken))
+                .ToList();
         }
 
-        //// POST https://localhost:44364/api/Test/DragonFly
-        //[HttpPost("DragonFly")]
-        //public async Task<IActionResult> DragonFly(dynamic CandelData)
-        //{
-        //    return Ok(CandelData);  // Correct usage of Ok()
-        //}
-
-        // Define the PriceData class
-        public class PriceData
+        [HttpGet]
+        public IActionResult GetStocks()
         {
-            public int Count { get; set; }
-            public Candel DetectedCandel { get; set; }
-            public Candel FutureCandel { get; set; }
+            var stocks = StockList.GetStocks();
+            return Ok(stocks);
         }
 
-        public class CandelPair
+        public class TestRequestModel
         {
-            public Candel First { get; set; }
-            public Candel Second { get; set; }
-
-            public CandelPair(Candel first, Candel second)
-            {
-                First = first;
-                Second = second;
-            }
+            public string Symboltoken { get; set; }
+            public DateTime StartDate { get; set; }
+            public DateTime EndDate { get; set; }
         }
 
-        //POST https://localhost:44364/api/Test/TestMasterAPI
-        [HttpPost("TestMasterAPI")]
-        public async Task<IActionResult> TestMasterAPI()
+        public class BulkTestRequestModel
         {
-            string authtoken = await GetAuthorizationTokenAsync();
+            public DateTime StartDate { get; set; }
+            public DateTime EndDate { get; set; }
+        }
 
-            List<List<Candel>> MasterList = new List<List<Candel>>();
+        //POST https://localhost:44364/api/Test/BulkTestMasterAPI
+        [HttpPost("BulkTestMasterAPI")]
+        public async Task<IActionResult> BulkTestMasterAPI([FromBody] BulkTestRequestModel request)
+        {
+            var Tokenresponse = await _context.Token.FirstOrDefaultAsync();
 
-            List<Candel> DrafonFlyDojiCandels = new List<Candel>();
+            string authtoken = Tokenresponse.AuthToken;
+
+            //string authtoken = await GetAuthorizationTokenAsync();
+
+            List<List<List<Candel>>> MainCorrectPredictionList = new List<List<List<Candel>>>();
+            List<List<List<Candel>>> MainWrongPredictionList = new List<List<List<Candel>>>();
+
+            List<List<Candel>> MainMasterList = new List<List<Candel>>();
+
+
+            decimal MainProfit = 0;
+            decimal MainLoss = 0;
+
 
             foreach (var stock in _stocks)
             {
+                List<Candel> MasterList = new List<Candel>();
+
+                List<Candel> DrafonFlyDojiCandels = new List<Candel>();
+
+                List<List<Candel>> AnalyzerList = new List<List<Candel>>();
+
+                List<List<Candel>> CorrectPredictionList = new List<List<Candel>>();
+                List<List<Candel>> WrongPredictionList = new List<List<Candel>>();
+
                 List<Candel> CandelData = new List<Candel>();
 
-                var symbolTokenValue = stock.symboltoken; // Replace with the correct value from stock
-                var token = authtoken; // Replace with the actual token
-                var startDate = DateTime.UtcNow.AddDays(-20); // Example start date
-                var endDate = DateTime.UtcNow; // Example end date
+                // Variables for profit and loss tracking
+                decimal TotalProfit = 0;
+                decimal NetLoss = 0;
+
+                var token = authtoken;
 
                 var requestBody = new
                 {
-                    SymbolToken = symbolTokenValue,
+                    SymbolToken = stock.symboltoken,
                     AuthorizationToken = token,
-                    StartDate = startDate.ToString("o"), // ISO string format
-                    EndDate = endDate.ToString("o") // ISO string format
+                    StartDate = request.StartDate.ToString("o"), // ISO string format
+                    EndDate = request.EndDate.ToString("o") // ISO string format
                 };
+
 
                 var client = new HttpClient();
                 var jsonRequestBody = JsonConvert.SerializeObject(requestBody);
@@ -84,41 +101,414 @@ namespace StockLogger.Controllers.API_Controllers
 
                 try
                 {
-                    var response = await client.PostAsync("https://localhost:44364/api/AngelCandel/getCandleData", content);
+                    var response = await client.PostAsync("https://localhost:44364/api/AngelCandel/getCandleDataForTest", content);
 
                     if (response.IsSuccessStatusCode)
                     {
+
                         var responseData = await response.Content.ReadAsStringAsync();
                         CandelData = JsonConvert.DeserializeObject<List<Candel>>(responseData);
 
-                        MasterList.Add(CandelData);
+                        Candel EndCandel = CandelData.LastOrDefault();
+
+
+                        List<Candel> dragonFlyDojiCandles = IdentifyDragonflyDojiCandles(CandelData);
+
+                        MasterList = CandelData;
+                        MainMasterList.Add(MasterList);
+                        DrafonFlyDojiCandels = dragonFlyDojiCandles;
+
+                        if (DrafonFlyDojiCandels.Count > 0)
+                        {
+                            // Iterating through each Dragonfly Doji Candle
+                            foreach (Candel dojiCandle in dragonFlyDojiCandles)
+                            {
+                                // Get the index of the Dragonfly Doji candle in the full list
+                                int dojiIndex = CandelData.IndexOf(dojiCandle);
+
+                                // List to store the next 5 candles
+                                List<Candel> nextFiveCandles = new List<Candel>();
+
+                                nextFiveCandles.Add(dojiCandle);
+
+                                // Check if there are at least 5 more candles after the identified Dragonfly Doji candle
+                                for (int i = dojiIndex + 1; i < dojiIndex + 6 && i < CandelData.Count; i++)
+                                {
+                                    nextFiveCandles.Add(CandelData[i]);
+                                }
+
+                                // Add the list of next 5 candles to the AnalyzerList
+                                AnalyzerList.Add(nextFiveCandles);
+                            }
+
+                            foreach (List<Candel> detectedCandelList in AnalyzerList)
+                            {
+                                Candel firstCandel = detectedCandelList[0];
+                                Candel lastCandel = detectedCandelList[5];
+
+                                bool isCorrectPrediction = detectedCandelList.Any(c => c.EndPrice > firstCandel.EndPrice);
+
+                                if (isCorrectPrediction)
+                                {
+                                    Candel candelThatSatisfiesCondition = detectedCandelList.FirstOrDefault(c => c.EndPrice > firstCandel.EndPrice);
+                                    //Candel candelThatSatisfiesHighestPriceCondition = detectedCandelList.FirstOrDefault(c => c.HighestPrice > firstCandel.EndPrice);
+                                    //Candel candelThatSatisfiesHighestPriceCondition = detectedCandelList.FirstOrDefault(c => c.HighestPrice > firstCandel.EndPrice * (decimal)1.5);
+                                    Candel candelThatSatisfiesHighestPriceCondition = detectedCandelList.FirstOrDefault(c => c.HighestPrice > (firstCandel.EndPrice + (decimal)0.5));
+
+
+
+                                    if (candelThatSatisfiesCondition == null && candelThatSatisfiesHighestPriceCondition != null)
+                                    {
+                                        CorrectPredictionList.Add(detectedCandelList);
+                                        MainCorrectPredictionList.Add(CorrectPredictionList);
+
+                                        TotalProfit = TotalProfit + (candelThatSatisfiesHighestPriceCondition.HighestPrice - firstCandel.EndPrice);
+                                        MainProfit = MainProfit + (candelThatSatisfiesHighestPriceCondition.HighestPrice - firstCandel.EndPrice);
+                                    }
+                                    else if(candelThatSatisfiesCondition != null && candelThatSatisfiesHighestPriceCondition == null)
+                                    {
+
+                                        CorrectPredictionList.Add(detectedCandelList);
+                                        MainCorrectPredictionList.Add(CorrectPredictionList);
+
+                                        TotalProfit = TotalProfit + (candelThatSatisfiesCondition.EndPrice - firstCandel.EndPrice);
+                                        MainProfit = MainProfit + (candelThatSatisfiesCondition.EndPrice - firstCandel.EndPrice);
+                                    }
+                                    else if (candelThatSatisfiesCondition != null && candelThatSatisfiesHighestPriceCondition != null)
+                                    {
+                                        CorrectPredictionList.Add(detectedCandelList);
+                                        MainCorrectPredictionList.Add(CorrectPredictionList);
+
+                                        TotalProfit = TotalProfit + (candelThatSatisfiesHighestPriceCondition.HighestPrice - firstCandel.EndPrice);
+                                        MainProfit = MainProfit + (candelThatSatisfiesHighestPriceCondition.HighestPrice - firstCandel.EndPrice);
+                                    }
+                                    else
+                                    {
+                                        CorrectPredictionList.Add(detectedCandelList);
+                                        MainCorrectPredictionList.Add(CorrectPredictionList);
+
+                                        TotalProfit = TotalProfit + (candelThatSatisfiesCondition.EndPrice - firstCandel.EndPrice);
+                                        MainProfit = MainProfit + (candelThatSatisfiesCondition.EndPrice - firstCandel.EndPrice);
+                                    }
+                                }
+                                else
+                                {
+                                    //WrongPredictionList.Add(detectedCandelList);
+                                    //MainWrongPredictionList.Add(WrongPredictionList);
+                                    //NetLoss = NetLoss + (firstCandel.EndPrice - lastCandel.EndPrice);
+                                    //MainLoss = MainLoss + (firstCandel.EndPrice - lastCandel.EndPrice);
+
+
+                                    foreach (var detectedCandel in detectedCandelList)
+                                    {
+                                        // Find the candel meeting the criteria
+                                        var matchingCandel = CandelData
+                                            .Where(c => c.EndPrice > detectedCandel.EndPrice && c.OpenTime > detectedCandel.OpenTime)
+                                            .FirstOrDefault();
+
+                                        if (matchingCandel != null)
+                                        {
+                                            CorrectPredictionList.Add(detectedCandelList);
+
+                                            MainCorrectPredictionList.Add(CorrectPredictionList);
+
+                                            TotalProfit = TotalProfit + (matchingCandel.EndPrice - detectedCandel.EndPrice);
+                                            MainProfit = MainProfit + (matchingCandel.EndPrice - detectedCandel.EndPrice);
+                                        }
+                                        else
+                                        {
+                                            WrongPredictionList.Add(detectedCandelList);
+                                            MainWrongPredictionList.Add(WrongPredictionList);
+                                            NetLoss = NetLoss + (firstCandel.EndPrice - EndCandel.EndPrice);
+                                            MainLoss = MainLoss + (firstCandel.EndPrice - EndCandel.EndPrice);
+                                        }
+                                    }
+
+                                }
+                            }
+
+                        }
+
                     }
                     else
                     {
                         Console.WriteLine($"Error: {response.StatusCode}");
                     }
+
+
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"An error occurred: {ex.Message}");
                 }
 
+
+
+
+
             }
 
-            foreach(List<Candel> c in MasterList)
+            return Ok(new
             {
-                List<Candel> dragonFlyDojiCandles = IdentifyDragonflyDojiCandles(c);
-                foreach(Candel candel in dragonFlyDojiCandles)
-                {
-                    DrafonFlyDojiCandels.Add(candel);
+                Net = MainProfit - MainLoss,
+                MainProfit,
+                MainLoss,
+                MainCorrectPredictionList,
+                MainWrongPredictionList,
+                MainMasterList
+            });
 
+        }
+
+
+        // Function to identify Dragonfly Doji candles
+        private List<Candel> IdentifyDragonflyDojiCandles(List<Candel> CandelData)
+        {
+
+            List<Candel> dragonFlyDojiCandles = new List<Candel>();
+
+            foreach(Candel c in CandelData)
+            {
+                // Get the last (most recent) candle
+                Candel latestCandel = c;
+
+                Candel previousCandel = CandelData
+                            .Where(c => c.CloseTime < latestCandel.CloseTime)
+                            .OrderByDescending(c => c.CloseTime) // Ensures we get the closest one before recentCandel
+                            .FirstOrDefault();
+
+
+                // Calculate the body size
+                decimal bodySize = Math.Abs(latestCandel.EndPrice - latestCandel.StartPrice);
+
+                // Calculate the lower shadow size
+                decimal lowerShadowSize = latestCandel.StartPrice - latestCandel.LowestPrice;
+
+                // Calculate the upper shadow size
+                decimal upperShadowSize = latestCandel.HighestPrice - latestCandel.EndPrice;
+
+                // Check if the candle is bullish
+                bool isBullish = latestCandel.IsBullish == true &&
+                                 (latestCandel.EndPrice > (latestCandel.LowestPrice + latestCandel.HighestPrice) / 2);
+
+                // Check if the body is small relative to the range
+                bool smallBody = bodySize < (latestCandel.HighestPrice - latestCandel.LowestPrice) * 0.2m;
+
+                // Check if the lower shadow is significantly longer than the body
+                bool longLowerShadow = lowerShadowSize > (latestCandel.HighestPrice - latestCandel.LowestPrice) * 0.5m;
+
+                // Check if the upper shadow is very small
+                bool smallUpperShadow = upperShadowSize < bodySize * 0.1m;
+
+                bool highVolume = false;
+
+                if (previousCandel != null)
+                {
+                    decimal previousVolume = previousCandel.Volume;
+                    // Optional: Add a volume check for additional confirmation (if volume data is available)
+                    highVolume = latestCandel.Volume > (previousVolume * 1.5m); // Modify this based on available data
+                }
+
+
+                // Final check
+                if (isBullish && smallBody && longLowerShadow && smallUpperShadow && highVolume)
+                {
+                    dragonFlyDojiCandles.Add(latestCandel);
                 }
             }
 
-            DragonFlyDojiResponse LR = CreateDragonFlyDojiResponse(MasterList);
 
-            return Ok();
+
+
+            //List<List<Candel>> MasterCandelList = new List<List<Candel>>();
+
+            //for (int i = 0; i < CandelData.Count - 2; i++)
+            //{
+            //    List<Candel> sublist = new List<Candel>
+            //    {
+            //        CandelData[i],
+            //        CandelData[i + 1],
+            //        CandelData[i + 2]
+            //    };
+
+            //    MasterCandelList.Add(sublist);
+            //}
+
+
+
+            //List<Candel> dragonFlyDojiCandles = new List<Candel>();
+
+            //foreach (List<Candel> candelList in MasterCandelList)
+            //{
+
+            //    // Get the last 3 candles from the list (the most recent 3)
+            //    List<Candel> recentThreeCandles = candelList.OrderByDescending(c => c.CloseTime).Take(3).ToList();
+
+            //    Candel latestCandel = recentThreeCandles.FirstOrDefault();
+
+            //    // Check if all three candles are bullish
+            //    bool allThreeBullish = recentThreeCandles.All(c => c.IsBullish == true);
+
+            //    // Check if the three candles close higher than the previous one
+            //    bool progressiveCloses = recentThreeCandles[0].EndPrice > recentThreeCandles[1].EndPrice
+            //                                                            &&
+            //                             recentThreeCandles[1].EndPrice > recentThreeCandles[2].EndPrice;
+
+            //    // Check if the bodies of the candles are progressively larger
+            //    bool increasingBodySize = (recentThreeCandles[0].EndPrice - recentThreeCandles[0].StartPrice) > (recentThreeCandles[1].EndPrice - recentThreeCandles[1].StartPrice)
+            //                                                                                                  &&
+            //                              (recentThreeCandles[1].EndPrice - recentThreeCandles[1].StartPrice) > (recentThreeCandles[2].EndPrice - recentThreeCandles[2].StartPrice);
+
+            //    // Check for small upper and lower shadows
+            //    bool smallUpperShadow = (recentThreeCandles[0].HighestPrice - recentThreeCandles[0].EndPrice) < (recentThreeCandles[0].EndPrice - recentThreeCandles[0].StartPrice);
+            //    bool smallLowerShadow = (recentThreeCandles[0].StartPrice - recentThreeCandles[0].LowestPrice) < (recentThreeCandles[0].EndPrice - recentThreeCandles[0].StartPrice);
+
+            //    // Check if the body is at least 60% of the total range (strong body)
+            //    decimal range = recentThreeCandles[0].HighestPrice - recentThreeCandles[0].LowestPrice;
+            //    bool strongBodyRatio = range != 0 && (recentThreeCandles[0].EndPrice - recentThreeCandles[0].StartPrice) / range > 0.6m;
+
+            //    bool increasingVolume = recentThreeCandles[0].Volume > recentThreeCandles[1].Volume &&
+            //            recentThreeCandles[1].Volume > recentThreeCandles[2].Volume;
+
+            //    // Get the Candel where CloseTime is greater than latestCandel's CloseTime
+            //    Candel verificationCandel = CandelData
+            //        .Where(c => c.CloseTime > latestCandel.CloseTime)
+            //        .OrderBy(c => c.CloseTime) // Ensures we get the closest one
+            //        .FirstOrDefault();
+
+            //    bool precedingCandelBullish = false;
+
+            //    if(verificationCandel != null)
+            //    {
+            //        if (verificationCandel.IsBullish == true)
+            //        {
+            //            precedingCandelBullish = true;
+            //        }
+            //    }
+
+
+            //    if (
+            //        allThreeBullish
+            //        && progressiveCloses
+            //        && increasingBodySize
+            //        && smallUpperShadow
+            //        && smallLowerShadow
+            //        && strongBodyRatio
+            //        && increasingVolume
+            //        && precedingCandelBullish
+            //        )
+            //    {
+            //        dragonFlyDojiCandles.Add(verificationCandel);
+            //    }
+
+
+
+            //List<Candel> dragonFlyDojiCandles = new List<Candel>();
+
+            //foreach (Candel c in CandelData)
+            //{
+            //    Candel recentCandel = c;
+
+            //    Candel verificationCandel = CandelData
+            //                       .Where(c => c.CloseTime > recentCandel.CloseTime)
+            //                       .OrderBy(c => c.CloseTime) // Ensures we get the closest one
+            //                       .FirstOrDefault();
+
+            //    Candel previousCandel = CandelData
+            //                .Where(c => c.CloseTime < recentCandel.CloseTime)
+            //                .OrderByDescending(c => c.CloseTime) // Ensures we get the closest one before recentCandel
+            //                .FirstOrDefault();
+
+            //    //List<Candel> futureCandels = CandelData
+            //    //              .Where(c => c.CloseTime > recentCandel.CloseTime)
+            //    //              .OrderBy(c => c.CloseTime)
+            //    //              .Take(3)
+            //    //              .ToList();
+
+
+            //    //Candel v1 = futureCandels[0];
+            //    //Candel v2 = futureCandels[1];
+            //    //Candel verificationCandel = futureCandels[1];
+
+            //    // Check if it is a Doji with a small body
+            //    bool isDoji = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.1m;
+
+            //    // Check for a long lower shadow (shadow size relative to the body)
+            //    bool longLowerShadow = (recentCandel.StartPrice - recentCandel.LowestPrice) > 3 * (recentCandel.EndPrice - recentCandel.StartPrice);
+
+            //    // The body of the candle should be small and at the top of the range
+            //    bool smallBodyAtTop = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.3m;
+
+            //    //// Preceding candle's trend should be bullish (for confirming upward momentum)
+            //    ////bool precedingBullishTrend = CandelData.Where(x => x.CloseTime < recentCandel.OpenTime)
+            //    ////                                       .OrderByDescending(x => x.CloseTime)
+            //    ////                                       .Take(3)
+            //    ////                                       .All(x => x.EndPrice > x.StartPrice); // At least the last 3 candles should be bullish
+
+
+            //    //bool precedingBullishTrend = false;
+
+            //    //if ((v1.IsBullish == true)
+            //    //    //&& (v2.IsBullish == true) 
+            //    //    &&
+            //    //    (verificationCandel.IsBullish == true))
+            //    //{
+            //    //    precedingBullishTrend = true;
+            //    //}
+
+
+
+
+
+            //    //// Check for higher volume
+            //    //bool higherVolume = recentCandel.Volume > CandelData.Average(x => x.Volume);
+
+            //    //bool higherVolume = recentCandel.Volume > CandelData.TakeLast(10).Max(x => x.Volume) * 0.75m; // Volume above 75% of the max in last 10 candles
+            //    bool higherVolume2 = recentCandel.Volume > CandelData.Average(x => x.Volume);
+
+            //    ////The next candle should also be bullish for confirmation
+
+            //    bool nextCandleBullish = false;
+
+            //    if (verificationCandel != null)
+            //    {
+            //        if (verificationCandel.IsBullish == true)
+            //        {
+            //            nextCandleBullish = true;
+            //        }
+            //    }
+
+            //    bool previousCandelBearish = false;
+
+            //    if(previousCandel != null)
+            //    {
+            //        if (previousCandel.IsBearish == true)
+            //        {
+            //            previousCandelBearish = true;
+            //        }
+            //    }
+
+            //    // If all conditions match, then it's a Dragonfly Doji with high probability of upward movement
+            //    if (isDoji
+            //        && longLowerShadow
+            //        && smallBodyAtTop
+            //        //&& precedingBullishTrend
+            //        //&& higherVolume
+            //        && higherVolume2
+            //        && nextCandleBullish
+            //        && previousCandelBearish
+            //        )
+            //    {
+            //        dragonFlyDojiCandles.Add(verificationCandel);
+            //    }
+        //}
+
+            return dragonFlyDojiCandles;
         }
+
+
+
+
 
 
         // Helper method to fetch the JWT token
@@ -210,597 +600,8 @@ namespace StockLogger.Controllers.API_Controllers
 
 
 
-        // Function to identify Dragonfly Doji candles
-        private List<Candel> IdentifyDragonflyDojiCandles(List<Candel> CandelData)
-        {
-            List<Candel> dragonFlyDojiCandles = new List<Candel>();
-
-            foreach (var c in CandelData)
-            {
-                Candel recentCandel = c;
-
-                // Check if it is a Doji with a small body
-                bool isDoji = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.1m;
-
-                // Check for a long lower shadow (shadow size relative to the body)
-                bool longLowerShadow = (recentCandel.StartPrice - recentCandel.LowestPrice) > 3 * (recentCandel.EndPrice - recentCandel.StartPrice);
-
-                // The body of the candle should be small and at the top of the range
-                bool smallBodyAtTop = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.3m;
-
-                // Preceding candle's trend should be bullish (for confirming upward momentum)
-                bool precedingBullishTrend = CandelData.Where(x => x.CloseTime < recentCandel.OpenTime)
-                                                       .OrderByDescending(x => x.CloseTime)
-                                                       .Take(3)
-                                                       .All(x => x.EndPrice > x.StartPrice); // At least the last 3 candles should be bullish
-
-                // Check for higher volume
-                bool higherVolume = recentCandel.Volume > CandelData.Average(x => x.Volume);
-
-                // The next candle should also be bullish for confirmation
-                bool nextCandleBullish = CandelData.Where(x => x.OpenTime > recentCandel.CloseTime)
-                                                   .OrderBy(x => x.OpenTime)
-                                                   .FirstOrDefault()?.EndPrice > recentCandel.EndPrice;
-
-                Candel verificationCandel = CandelData.Where(x => x.OpenTime > recentCandel.CloseTime)
-                                                   .OrderBy(x => x.OpenTime)
-                                                   .FirstOrDefault();
-
-                // If all conditions match, then it's a Dragonfly Doji with high probability of upward movement
-                if (isDoji && longLowerShadow && smallBodyAtTop && precedingBullishTrend && higherVolume && nextCandleBullish)
-                {
-                    dragonFlyDojiCandles.Add(verificationCandel);
-                }
-            }
-
-            return dragonFlyDojiCandles;
-        }
-
-
-
-        // POST https://localhost:44364/api/Test/DragonFly
-        [HttpPost("DragonFly")]
-        public async Task<IActionResult> DragonFly(List<Candel> CandelData)
-        {
-            List<Candel> DrafonFlyDojiCandels = new List<Candel>();
-            List<Candel> CorrectPredictedCandels = new List<Candel>();
-            List<Candel> WrongPredictedCandels = new List<Candel>();
-
-            List<Candel> LossList = new List<Candel>();
-
-            List<Candel> MisleniousList = new List<Candel>();
-
-            List<CandelPair> Logger = new List<CandelPair>();
-
-
-
-            foreach (var c in CandelData)
-            {
-                Candel recentCandel = c;
-
-                //// Check if it is a Doji with a very small body compared to the entire range
-                //bool isDoji = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.1m;
-
-                //// Check for a long lower shadow (shadow size relative to the body)
-                //bool longLowerShadow = (recentCandel.StartPrice - recentCandel.LowestPrice) > 3 * (recentCandel.EndPrice - recentCandel.StartPrice);
-
-                //// The body should be small and placed near the top of the range for Dragonfly Doji
-                //bool smallBodyAtTop = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.2m
-                //                      && recentCandel.StartPrice < recentCandel.HighestPrice * 0.6m;
-
-                // Check if it is a Doji with a small body
-                bool isDoji = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.1m;
-
-                // Check for a long lower shadow (shadow size relative to the body)
-                bool longLowerShadow = (recentCandel.StartPrice - recentCandel.LowestPrice) > 3 * (recentCandel.EndPrice - recentCandel.StartPrice);
-
-                // The body of the candle should be small and at the top of the range
-                bool smallBodyAtTop = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.3m;
-
-                // Preceding candles should confirm a more substantial bullish trend (use a larger window of candles)
-                bool precedingBullishTrend = CandelData.Where(x => x.CloseTime < recentCandel.OpenTime)
-                                                       .OrderByDescending(x => x.CloseTime)
-                                                       .Take(5)
-                                                       .All(x => x.EndPrice > x.StartPrice); // At least the last 5 candles should be bullish
-
-                //// Check for significant volume compared to the highest volume in the last 10 candles
-                //bool higherVolume = recentCandel.Volume > CandelData.TakeLast(10).Max(x => x.Volume) * 0.75m; // Volume above 75% of the max in last 10 candles
-
-                // Check for higher volume
-                bool higherVolume = recentCandel.Volume > CandelData.Average(x => x.Volume);
-
-                // The next candle should be strongly bullish for confirmation
-                bool nextCandleBullish = CandelData.Where(x => x.OpenTime > recentCandel.CloseTime)
-                                                   .OrderBy(x => x.OpenTime)
-                                                   .FirstOrDefault()?.EndPrice > recentCandel.EndPrice
-                                        && CandelData.Where(x => x.OpenTime > recentCandel.CloseTime)
-                                                     .OrderBy(x => x.OpenTime)
-                                                     .FirstOrDefault()?.EndPrice > recentCandel.StartPrice;
-
-                // Ensure the recent candle follows a significant downtrend before confirming reversal
-                bool isAfterDowntrend = CandelData.Where(x => x.CloseTime < recentCandel.OpenTime)
-                                                  .OrderByDescending(x => x.CloseTime)
-                                                  .Take(5)
-                                                  .All(x => x.EndPrice < x.StartPrice); // Last 5 candles should be bearish
-
-                Candel verificationCandel = CandelData.Where(x => x.OpenTime > recentCandel.CloseTime)
-                                                      .OrderBy(x => x.OpenTime)
-                                                      .FirstOrDefault();
-
-                // If all conditions match, then it's a Dragonfly Doji with high probability of upward movement
-                if (isDoji && longLowerShadow && smallBodyAtTop && precedingBullishTrend && higherVolume && nextCandleBullish && isAfterDowntrend)
-                {
-                    DrafonFlyDojiCandels.Add(verificationCandel);
-                }
-            }
-
-            //foreach (var c in CandelData)
-            //{
-            //    Candel recentCandel = c;
-
-            //    // Check if it is a Doji with a small body
-            //    bool isDoji = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.1m;
-
-            //    // Check for a long lower shadow (shadow size relative to the body)
-            //    bool longLowerShadow = (recentCandel.StartPrice - recentCandel.LowestPrice) > 3 * (recentCandel.EndPrice - recentCandel.StartPrice);
-
-            //    // The body of the candle should be small and at the top of the range
-            //    bool smallBodyAtTop = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.3m;
-
-            //    // Preceding candle's trend should be bullish (for confirming upward momentum)
-            //    bool precedingBullishTrend = CandelData.Where(x => x.CloseTime < recentCandel.OpenTime)
-            //                                           .OrderByDescending(x => x.CloseTime)
-            //                                           .Take(3)
-            //                                           .All(x => x.EndPrice > x.StartPrice); // At least the last 3 candles should be bullish
-
-            //    // Check for higher volume
-            //    bool higherVolume = recentCandel.Volume > CandelData.Average(x => x.Volume);
-
-            //    // The next candle should also be bullish for confirmation
-            //    bool nextCandleBullish = CandelData.Where(x => x.OpenTime > recentCandel.CloseTime)
-            //                                       .OrderBy(x => x.OpenTime)
-            //                                       .FirstOrDefault()?.EndPrice > recentCandel.EndPrice;
-
-            //    Candel verificationCandel = CandelData.Where(x => x.OpenTime > recentCandel.CloseTime)
-            //                                       .OrderBy(x => x.OpenTime)
-            //                                       .FirstOrDefault();
-
-            //    // If all conditions match, then it's a Dragonfly Doji with high probability of upward movement
-            //    if (isDoji && longLowerShadow && smallBodyAtTop && precedingBullishTrend && higherVolume && nextCandleBullish)
-            //    {
-            //        DrafonFlyDojiCandels.Add(verificationCandel);
-            //    }
-            //}
-
-            //foreach (var c in CandelData)
-            //{
-            //    Candel recentCandel = c;
-
-            //    //// Check if it is a Doji with a very small body compared to the entire range
-            //    //bool isDoji = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.1m;
-
-            //    //// Check for a long lower shadow (shadow size relative to the body)
-            //    //bool longLowerShadow = (recentCandel.StartPrice - recentCandel.LowestPrice) > 3 * (recentCandel.EndPrice - recentCandel.StartPrice);
-
-            //    //// The body should be small and placed near the top of the range for Dragonfly Doji
-            //    //bool smallBodyAtTop = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.2m
-            //    //                      && recentCandel.StartPrice < recentCandel.HighestPrice * 0.6m;
-
-            //    // Check if it is a Doji with a small body
-            //    bool isDoji = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.1m;
-
-            //    // Check for a long lower shadow (shadow size relative to the body)
-            //    bool longLowerShadow = (recentCandel.StartPrice - recentCandel.LowestPrice) > 3 * (recentCandel.EndPrice - recentCandel.StartPrice);
-
-            //    // The body of the candle should be small and at the top of the range
-            //    bool smallBodyAtTop = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.3m;
-
-            //    // Preceding candles should confirm a more substantial bullish trend (use a larger window of candles)
-            //    bool precedingBullishTrend = CandelData.Where(x => x.CloseTime < recentCandel.OpenTime)
-            //                                           .OrderByDescending(x => x.CloseTime)
-            //                                           .Take(5)
-            //                                           .All(x => x.EndPrice > x.StartPrice); // At least the last 5 candles should be bullish
-
-            //    //// Check for significant volume compared to the highest volume in the last 10 candles
-            //    //bool higherVolume = recentCandel.Volume > CandelData.TakeLast(10).Max(x => x.Volume) * 0.75m; // Volume above 75% of the max in last 10 candles
-
-            //    // Check for higher volume
-            //    bool higherVolume = recentCandel.Volume > CandelData.Average(x => x.Volume);
-
-            //    // The next candle should be strongly bullish for confirmation
-            //    bool nextCandleBullish = CandelData.Where(x => x.OpenTime > recentCandel.CloseTime)
-            //                                       .OrderBy(x => x.OpenTime)
-            //                                       .FirstOrDefault()?.EndPrice > recentCandel.EndPrice
-            //                            && CandelData.Where(x => x.OpenTime > recentCandel.CloseTime)
-            //                                         .OrderBy(x => x.OpenTime)
-            //                                         .FirstOrDefault()?.EndPrice > recentCandel.StartPrice;
-
-            //    // Ensure the recent candle follows a significant downtrend before confirming reversal
-            //    bool isAfterDowntrend = CandelData.Where(x => x.CloseTime < recentCandel.OpenTime)
-            //                                      .OrderByDescending(x => x.CloseTime)
-            //                                      .Take(5)
-            //                                      .All(x => x.EndPrice < x.StartPrice); // Last 5 candles should be bearish
-
-            //    Candel verificationCandel = CandelData.Where(x => x.OpenTime > recentCandel.CloseTime)
-            //                                          .OrderBy(x => x.OpenTime)
-            //                                          .FirstOrDefault();
-
-            //    // If all conditions match, then it's a Dragonfly Doji with high probability of upward movement
-            //    if (isDoji && longLowerShadow && smallBodyAtTop && precedingBullishTrend && higherVolume && nextCandleBullish && isAfterDowntrend)
-            //    {
-            //        DrafonFlyDojiCandels.Add(verificationCandel);
-            //    }
-            //}
-
-
-            decimal loss = 0;
-            decimal profit = 0;
-            List<PriceData> PriceIncreasedAfterCount = new List<PriceData>();
-
-
-            foreach (Candel DetectedCandels in DrafonFlyDojiCandels)
-            {
-
-                // Find all objects where CloseTime > DetectedCandels.CloseTime
-                List<Candel> filteredCandels = CandelData
-                                              .Where(c => c.CloseTime > DetectedCandels.CloseTime)
-                                              .OrderBy(c => c.CloseTime)
-                                              .ToList();
-
-                Candel nextCandel = filteredCandels[0];
-                Candel nextCandel2 = filteredCandels[1];
-                Candel nextCandel3 = filteredCandels[2];
-
-
-                List<Candel> FurtherCandel = new List<Candel>();
-
-                if (nextCandel == null || nextCandel2 == null || nextCandel3 == null)
-                {
-                    MisleniousList.Add(DetectedCandels);
-                }
-
-
-                if (nextCandel.EndPrice > DetectedCandels.EndPrice)
-                {
-                    CorrectPredictedCandels.Add(DetectedCandels);
-
-                    Logger.Add(new CandelPair(DetectedCandels, nextCandel));
-
-                    decimal calculatedProfit = (nextCandel.EndPrice - DetectedCandels.EndPrice);
-                    profit = profit + calculatedProfit;
-                }
-                else if (nextCandel2.EndPrice > DetectedCandels.EndPrice)
-                {
-                    CorrectPredictedCandels.Add(DetectedCandels);
-
-                    Logger.Add(new CandelPair(DetectedCandels, nextCandel2));
-
-                    decimal calculatedProfit = (nextCandel2.EndPrice - DetectedCandels.EndPrice);
-                    profit = profit + calculatedProfit;
-                }
-                else if (nextCandel3.EndPrice > DetectedCandels.EndPrice)
-                {
-                    CorrectPredictedCandels.Add(DetectedCandels);
-
-                    Logger.Add(new CandelPair(DetectedCandels, nextCandel3));
-
-                    decimal calculatedProfit = (nextCandel3.EndPrice - DetectedCandels.EndPrice);
-                    profit = profit + calculatedProfit;
-                }
-                else if ((nextCandel.EndPrice < DetectedCandels.EndPrice) || (nextCandel2.EndPrice < DetectedCandels.EndPrice) || (nextCandel3.EndPrice < DetectedCandels.EndPrice))
-                {
-
-                    if (nextCandel.EndPrice < DetectedCandels.EndPrice)
-                    {
-
-                        if (nextCandel2.EndPrice < DetectedCandels.EndPrice)
-                        {
-                            if (nextCandel3.EndPrice < DetectedCandels.EndPrice)
-                            {
-                                WrongPredictedCandels.Add(DetectedCandels);
-                                LossList.Add(nextCandel3);
-
-                                Logger.Add(new CandelPair(DetectedCandels, nextCandel3));
-
-                                decimal calculatedloss = (DetectedCandels.EndPrice - nextCandel3.EndPrice);
-                                loss = loss + calculatedloss;
-                            }
-                            else
-                            {
-                                WrongPredictedCandels.Add(DetectedCandels);
-                                LossList.Add(nextCandel2);
-
-                                Logger.Add(new CandelPair(DetectedCandels, nextCandel2));
-
-                                decimal calculatedloss = (DetectedCandels.EndPrice - nextCandel2.EndPrice);
-                                loss = loss + calculatedloss;
-                            }
-                        }
-                        else
-                        {
-                            WrongPredictedCandels.Add(DetectedCandels);
-                            LossList.Add(nextCandel);
-
-                            Logger.Add(new CandelPair(DetectedCandels, nextCandel));
-
-                            decimal calculatedloss = (DetectedCandels.EndPrice - nextCandel.EndPrice);
-                            loss = loss + calculatedloss;
-                        }
-
-                    }
-                }
-                else
-                {
-                    MisleniousList.Add(DetectedCandels);
-                }
-
-            }
-
-            // Find the objects in PriceIncreasedAfterCount where DetectedCandel matches any Candel from WrongPredictedCandels
-            var matchingPriceData = PriceIncreasedAfterCount
-                .Where(priceData => WrongPredictedCandels
-                                    .Any(wrongCandel => priceData.DetectedCandel.Equals(wrongCandel)))
-                .ToList();
-
-            // Find the objects in PriceIncreasedAfterCount where DetectedCandel does NOT match any Candel from WrongPredictedCandels
-            var nonMatchingPriceData = PriceIncreasedAfterCount
-                .Where(priceData => !WrongPredictedCandels
-                                    .Any(wrongCandel => priceData.DetectedCandel.Equals(wrongCandel)))
-                .ToList();
-
-
-
-
-
-
-            // Get the object(s) in DrafonFlyDojiCandels that are not present in the other two lists
-            var missingObjects = DrafonFlyDojiCandels
-                .Where(candle => !CorrectPredictedCandels.Contains(candle) && !WrongPredictedCandels.Contains(candle))
-                .ToList();
-
-            foreach (var c in missingObjects)
-            {
-                MisleniousList.Add(c);
-            }
-
-            decimal sumEndPrice = DrafonFlyDojiCandels.Sum(candel => candel.EndPrice);
-            decimal correctPredictionsSum = CorrectPredictedCandels.Sum(candel => candel.EndPrice);
-            decimal wrongPredictionsSum = WrongPredictedCandels.Sum(candel => candel.EndPrice);
-            decimal MissleniousSum = WrongPredictedCandels.Sum(candel => candel.EndPrice);
-
-            // Calculate accuracy using the helper method
-            double accuracy = CalculateAccuracy(DrafonFlyDojiCandels.Count, CorrectPredictedCandels.Count);
-
-
-            // Return an anonymous object containing the lists
-            return Ok(new
-            {
-                profit,
-                loss,
-
-                Accuracy = accuracy,
-
-                netprofit = profit - loss,
-
-                Logger,
-
-                CorrectPredictedCandels,
-                DrafonFlyDojiCandels,
-                WrongPredictedCandels,
-
-                MisleniousList,
-
-            });
-        }
-
-        public class DragonFlyDojiResponse
-        {
-            public List<List<Candel>> MasterCorrectPrediction { get; set; }
-            public List<List<Candel>> MasterWrongPrediction { get; set; }
-            public List<List<CandelPair>> CorrectPredictionLogger { get; set; }
-            public List<List<CandelPair>> WrongpredictionLogger { get; set; }
-        }
-
-        // Function to identify Dragonfly Doji candles
-        private DragonFlyDojiResponse CreateDragonFlyDojiResponse(List<List<Candel>> MasterList)
-        {
-            List<LogicResponse> logicResponse = new List<LogicResponse>();
-
-            List<List<Candel>> DojiList = new List<List<Candel>>();
-
-            List<List<Candel>> MasterCorrectPrediction = new List<List<Candel>>();
-            List<List<Candel>> MasterWrongprediction = new List<List<Candel>>();
-            List<List<CandelPair>> MasterCorrectPredictionLogger = new List<List<CandelPair>>();
-            List<List<CandelPair>> MasterWrongPredictionLogger = new List<List<CandelPair>>();
-
-
-            foreach (List<Candel> CandelData in MasterList)
-            {
-                List<Candel> dragonFlyDojiCandles = new List<Candel>();
-
-                List<Candel> CorrectPrediction = new List<Candel>();
-                List<Candel> Wrongprediction = new List<Candel>();
-                List<CandelPair> CorrectPredictionLogger = new List<CandelPair>();
-                List<CandelPair> WrongPredictionLogger = new List<CandelPair>();
-
-                foreach (var c in CandelData)
-                {
-                    //Candel recentCandel = c;
-
-
-                    //// Check if it is a Doji with a small body
-                    //bool isDoji = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.1m;
-
-                    //// Check for a long lower shadow (shadow size relative to the body)
-                    //bool longLowerShadow = (recentCandel.StartPrice - recentCandel.LowestPrice) > 3 * (recentCandel.EndPrice - recentCandel.StartPrice);
-
-                    //// The body of the candle should be small and at the top of the range
-                    //bool smallBodyAtTop = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.3m;
-
-                    //// Preceding candle's trend should be bullish (for confirming upward momentum)
-                    //bool precedingBullishTrend = CandelData.Where(x => x.CloseTime < recentCandel.OpenTime)
-                    //                                       .OrderByDescending(x => x.CloseTime)
-                    //                                       .Take(3)
-                    //                                       .All(x => x.EndPrice > x.StartPrice); // At least the last 3 candles should be bullish
-
-                    //// Check for higher volume
-                    //bool higherVolume = recentCandel.Volume > CandelData.Average(x => x.Volume);
-
-                    //// The next candle should also be bullish for confirmation
-                    //bool nextCandleBullish = CandelData.Where(x => x.OpenTime > recentCandel.CloseTime)
-                    //                                   .OrderBy(x => x.OpenTime)
-                    //                                   .FirstOrDefault()?.EndPrice > recentCandel.EndPrice;
-
-                    //Candel verificationCandel = CandelData.Where(x => x.OpenTime > recentCandel.CloseTime)
-                    //                                   .OrderBy(x => x.OpenTime)
-                    //                                   .FirstOrDefault();
-
-                    //// If all conditions match, then it's a Dragonfly Doji with high probability of upward movement
-                    //if (isDoji && longLowerShadow && smallBodyAtTop && precedingBullishTrend && higherVolume && nextCandleBullish)
-                    //{
-
-                    Candel recentCandel = c;
-
-                    // Check if it is a Doji with a small body
-                    bool isDoji = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.1m;
-
-                    // Check for a long lower shadow (shadow size relative to the body)
-                    bool longLowerShadow = (recentCandel.StartPrice - recentCandel.LowestPrice) > 3 * (recentCandel.EndPrice - recentCandel.StartPrice);
-
-                    // The body of the candle should be small and at the top of the range
-                    bool smallBodyAtTop = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.3m;
-
-                    // Preceding candle's trend should be bullish (for confirming upward momentum)
-                    bool precedingBullishTrend = CandelData.Where(x => x.CloseTime < recentCandel.OpenTime)
-                                                           .OrderByDescending(x => x.CloseTime)
-                                                           .Take(3)
-                                                           .All(x => x.EndPrice > x.StartPrice); // At least the last 3 candles should be bullish
-
-                    // Check for higher volume
-                    bool higherVolume = recentCandel.Volume > CandelData.Average(x => x.Volume);
-
-                    //bool higherVolume = recentCandel.Volume > CandelData.TakeLast(10).Max(x => x.Volume) * 0.75m; // Volume above 75% of the max in last 10 candles
-
-
-                    // The next candle should also be bullish for confirmation
-                    bool nextCandleBullish = CandelData.Where(x => x.OpenTime > recentCandel.CloseTime)
-                                                       .OrderBy(x => x.OpenTime)
-                                                       .FirstOrDefault()?.EndPrice > recentCandel.EndPrice;
-
-                    Candel verificationCandel = CandelData.Where(x => x.OpenTime > recentCandel.CloseTime)
-                                                       .OrderBy(x => x.OpenTime)
-                                                       .FirstOrDefault();
-
-                    // If all conditions match, then it's a Dragonfly Doji with high probability of upward movement
-                    if (isDoji && longLowerShadow && smallBodyAtTop && precedingBullishTrend && higherVolume && nextCandleBullish)
-                    {
-
-                        dragonFlyDojiCandles.Add(verificationCandel);
-
-                        List<Candel> filteredCandels = CandelData
-                              .Where(c => c.CloseTime > verificationCandel.CloseTime)
-                              .OrderBy(c => c.CloseTime)
-                              .ToList();
-
-                        Candel nextCandel = filteredCandels[0];
-                        Candel nextCandel2 = filteredCandels[1];
-                        Candel nextCandel3 = filteredCandels[2];
-
-
-                        if (nextCandel != null && nextCandel2 != null && nextCandel3 != null)
-                        {
-                            if(nextCandel.EndPrice > verificationCandel.EndPrice)
-                            {
-                                CorrectPrediction.Add(nextCandel);
-                                CorrectPredictionLogger.Add(new CandelPair(verificationCandel, nextCandel));
-                            }
-                            else if(nextCandel2.EndPrice > verificationCandel.EndPrice)
-                            {
-                                CorrectPrediction.Add(nextCandel2);
-                                CorrectPredictionLogger.Add(new CandelPair(verificationCandel, nextCandel2));
-                            }
-                            else if(nextCandel3.EndPrice > verificationCandel.EndPrice)
-                            {
-                                CorrectPrediction.Add(nextCandel3);
-                                CorrectPredictionLogger.Add(new CandelPair(verificationCandel, nextCandel3));
-                            }
-                            else
-                            {
-                                if(nextCandel.EndPrice < verificationCandel.EndPrice)
-                                {
-                                    if(nextCandel2.EndPrice < verificationCandel.EndPrice)
-                                    {
-                                        if(nextCandel3.EndPrice < verificationCandel.EndPrice)
-                                        {
-                                            Wrongprediction.Add(verificationCandel);
-                                            WrongPredictionLogger.Add(new CandelPair(verificationCandel, nextCandel3));
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                    }
-                }
-
-                DojiList.Add(dragonFlyDojiCandles);
-                MasterCorrectPrediction.Add(CorrectPrediction);
-                MasterWrongprediction.Add(Wrongprediction);
-                MasterCorrectPredictionLogger.Add(CorrectPredictionLogger);
-                MasterWrongPredictionLogger.Add(WrongPredictionLogger);
-
-
-            }
-
-
-
-            return new DragonFlyDojiResponse
-            {
-                MasterCorrectPrediction = MasterCorrectPrediction,
-                MasterWrongPrediction = MasterWrongprediction,
-                CorrectPredictionLogger = MasterCorrectPredictionLogger,
-                WrongpredictionLogger = MasterWrongPredictionLogger
-
-            };
-        }
-
-
-        public class LogicResponse
-        {
-            public decimal profit { get; set; }
-            public decimal loss { get; set; }
-            public decimal accuracy { get; set; }
-            public decimal netprofit { get; set; }
-
-            public CandelPair Logger { get; set; }
-            public List<Candel> CorrectPredictedCandels { get; set; }
-            public List<Candel> DrafonFlyDojiCandels { get; set; }
-            public List<Candel> WrongPredictedCandels { get; set; }
-
-            public List<Candel> MisleniousList { get; set; }
-
-        }
-
-        // Helper method to calculate accuracy
-        private double CalculateAccuracy(int totalPredictions, int correctPredictions)
-        {
-            if (totalPredictions == 0)
-                return 0;
-
-            double accuracy = ((double)correctPredictions / totalPredictions) * 100;
-            return Math.Round(accuracy, 2); // Round the result to 2 decimal places
-        }
-
-
-
-
-
-
-
-
-
-
-
 
     }
+
+
 }

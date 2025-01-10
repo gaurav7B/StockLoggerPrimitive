@@ -22,6 +22,14 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
             Candel verificationCandel = candelList.OrderByDescending(c => c.CloseTime).FirstOrDefault();
             Candel dojicandel = candelList.OrderByDescending(c => c.CloseTime).Skip(1).FirstOrDefault();
 
+            //List<Candel> futureCandels = candelList
+            //                             .Where(c => c.CloseTime > dojicandel.CloseTime)
+            //                             .OrderBy(c => c.CloseTime)
+            //                             .Take(3)
+            //                             .ToList();
+
+            //Candel verificationCandel = futureCandels[2];
+
 
             // Check if it is a Doji with a small body
             bool isDoji = Math.Abs(dojicandel.StartPrice - dojicandel.EndPrice) < (dojicandel.HighestPrice - dojicandel.LowestPrice) * 0.1m;
@@ -44,10 +52,8 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
             //bool higherVolume = dojicandel.Volume > candelList.TakeLast(10).Max(x => x.Volume) * 0.75m; // Volume above 75% of the max in last 10 candles
 
 
-            //// The next candle should also be bullish for confirmation
-            //bool nextCandleBullish = candelList.Where(x => x.OpenTime > dojicandel.CloseTime)
-            //                                   .OrderBy(x => x.OpenTime)
-            //                                   .FirstOrDefault()?.EndPrice > dojicandel.EndPrice;
+            // The next candle should also be bullish for confirmation
+            bool nextCandleBullish = verificationCandel?.IsBullish == true;
 
             ////Candel verificationCandel = candelList.Where(x => x.OpenTime > recentCandel.CloseTime)
             ////                                   .OrderBy(x => x.OpenTime)
@@ -139,7 +145,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
         {
             var symbolTokenValue = symboltoken; // Replace with the correct value from stock
             var token = authToken; // Replace with the actual token
-            var startDate = DateTime.Now.AddMinutes(-3); // Example start date
+            var startDate = DateTime.Now.AddMinutes(-5); // Example start date
             var endDate = DateTime.Now; // Example end date
 
             var requestBody = new

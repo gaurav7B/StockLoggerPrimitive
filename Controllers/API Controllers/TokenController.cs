@@ -234,4 +234,6 @@ namespace StockLogger.Controllers.API_Controllers
             return _context.Token.Any(e => e.Id == id);
         }
     }
+
+
 }

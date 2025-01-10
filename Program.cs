@@ -15,8 +15,8 @@ builder.Services.AddDbContext<StockLoggerDbContext>(options =>
     sqlServerOptions => sqlServerOptions.EnableRetryOnFailure()));
 
 
-builder.Services.AddHttpClient<DragonflyDojiService>();
-builder.Services.AddHostedService<DragonflyDojiService>();
+//builder.Services.AddHttpClient<DragonflyDojiService>();
+//builder.Services.AddHostedService<DragonflyDojiService>();
 
 //builder.Services.AddHostedService<StockPriceFetcherService2>(); //---------Makes the Candels
 
