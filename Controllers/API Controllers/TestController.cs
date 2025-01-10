@@ -146,12 +146,12 @@ namespace StockLogger.Controllers.API_Controllers
                                 Candel firstCandel = detectedCandelList[0];
                                 Candel lastCandel = detectedCandelList[5];//5
 
-                                bool isCorrectPrediction = detectedCandelList.Any(c => c.EndPrice > firstCandel.EndPrice);
+                                bool isCorrectPrediction = detectedCandelList.Skip(1).Any(c => c.EndPrice > firstCandel.EndPrice + (decimal)1);
 
-                                    Candel candelThatSatisfiesCondition = detectedCandelList.FirstOrDefault(c => c.EndPrice > firstCandel.EndPrice);
-                                    //Candel candelThatSatisfiesHighestPriceCondition = detectedCandelList.FirstOrDefault(c => c.HighestPrice > firstCandel.EndPrice);
-                                    //Candel candelThatSatisfiesHighestPriceCondition = detectedCandelList.FirstOrDefault(c => c.HighestPrice > firstCandel.EndPrice * (decimal)1.5);
-                                    Candel candelThatSatisfiesHighestPriceCondition = detectedCandelList.FirstOrDefault(c => c.HighestPrice > (firstCandel.EndPrice + (decimal)0.5));
+                                Candel candelThatSatisfiesCondition = detectedCandelList.Skip(1).FirstOrDefault(c => c.EndPrice > firstCandel.EndPrice + (decimal)1);
+                                //Candel candelThatSatisfiesHighestPriceCondition = detectedCandelList.FirstOrDefault(c => c.HighestPrice > firstCandel.EndPrice);
+                                //Candel candelThatSatisfiesHighestPriceCondition = detectedCandelList.FirstOrDefault(c => c.HighestPrice > firstCandel.EndPrice * (decimal)1.5);
+                                Candel candelThatSatisfiesHighestPriceCondition = detectedCandelList.Skip(1).FirstOrDefault(c => c.HighestPrice > (firstCandel.EndPrice + (decimal)1));
 
 
                                 if (isCorrectPrediction)
@@ -185,7 +185,7 @@ namespace StockLogger.Controllers.API_Controllers
                                             .Where(c => c.EndPrice > detectedCandel.EndPrice && c.OpenTime > detectedCandel.OpenTime)
                                             .FirstOrDefault();
 
-                                        //Candel matchingCandel = detectedCandelList.FirstOrDefault(c => c.HighestPrice > (firstCandel.EndPrice + (decimal)0.5));
+                                        Candel matchingCandel2 = CandelData.FirstOrDefault(c => c.HighestPrice > (firstCandel.EndPrice + (decimal)1) && c.OpenTime > detectedCandel.OpenTime);
 
 
                                         if (matchingCandel != null)
@@ -194,13 +194,31 @@ namespace StockLogger.Controllers.API_Controllers
 
                                             MainCorrectPredictionList.Add(CorrectPredictionList);
 
-                                            TotalProfit = TotalProfit + (matchingCandel.HighestPrice - detectedCandel.EndPrice);
-                                            MainProfit = MainProfit + (matchingCandel.HighestPrice - detectedCandel.EndPrice);
+                                            TotalProfit = TotalProfit + (matchingCandel.EndPrice - detectedCandel.EndPrice);
+                                            MainProfit = MainProfit + (matchingCandel.EndPrice - detectedCandel.EndPrice);
+                                        }else if(matchingCandel2 != null)
+                                        {
+                                            CorrectPredictionList.Add(detectedCandelList);
+
+                                            MainCorrectPredictionList.Add(CorrectPredictionList);
+
+                                            TotalProfit = TotalProfit + (matchingCandel2.HighestPrice - detectedCandel.EndPrice);
+                                            MainProfit = MainProfit + (matchingCandel2.HighestPrice - detectedCandel.EndPrice);
                                         }
                                         else
                                         {
+                                            Candel matchingCandel3 = CandelData.FirstOrDefault(c => c.HighestPrice > (firstCandel.EndPrice) && c.OpenTime > detectedCandel.OpenTime);
 
-                                            if (EndCandel.EndPrice > firstCandel.EndPrice)
+                                            if (matchingCandel3 != null)
+                                            {
+                                                CorrectPredictionList.Add(detectedCandelList);
+
+                                                MainCorrectPredictionList.Add(CorrectPredictionList);
+
+                                                TotalProfit = TotalProfit + (matchingCandel3.HighestPrice - detectedCandel.EndPrice);
+                                                MainProfit = MainProfit + (matchingCandel3.HighestPrice - detectedCandel.EndPrice);
+                                            }
+                                            else if (EndCandel.EndPrice > firstCandel.EndPrice)
                                             {
                                                 CorrectPredictionList.Add(detectedCandelList);
 
@@ -306,11 +324,25 @@ namespace StockLogger.Controllers.API_Controllers
                 //    highVolume = latestCandel.Volume > (previousVolume * 1.5m); // Modify this based on available data
                 //}
 
+                //Candel verificationCandel = CandelData
+                //                   .Where(c => c.CloseTime > latestCandel.CloseTime)
+                //                   .OrderBy(c => c.CloseTime) // Ensures we get the closest one
+                //                   .FirstOrDefault();
+
+                //bool nextcandelbullish = false;
+
+                //if (verificationCandel != null)
+                //{
+                //    if (verificationCandel.IsBullish == true)
+                //    {
+                //        nextcandelbullish = true;
+                //    }
+                //}
 
                 //// Final check
-                //if (isBullish && smallBody && longLowerShadow && smallUpperShadow && highVolume)
+                //if (isBullish && smallBody && longLowerShadow && smallUpperShadow && highVolume && nextcandelbullish)
                 //{
-                //    dragonFlyDojiCandles.Add(latestCandel);
+                //    dragonFlyDojiCandles.Add(verificationCandel);
                 //}
 
                 // Fetch the last and previous candles
@@ -350,16 +382,16 @@ namespace StockLogger.Controllers.API_Controllers
 
                 bool nextcandelbullish = false;
 
-                if(verificationCandel != null)
+                if (verificationCandel != null)
                 {
-                    if(verificationCandel.IsBullish == true)
+                    if (verificationCandel.IsBullish == true)
                     {
                         nextcandelbullish = true;
                     }
                 }
 
                 // Combine conditions
-                if (isBullish && smallBody && longLowerShadow && smallUpperShadow && highVolume && significantPriceChange 
+                if (isBullish && smallBody && longLowerShadow && smallUpperShadow && highVolume && significantPriceChange
                     && nextcandelbullish
                     )
                 {
