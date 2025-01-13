@@ -513,12 +513,12 @@ namespace StockLogger.Controllers.API_Controllers
                     && nextcandelbullish
                     )
                 {
-                    //if (verificationCandel.OpenTime.TimeOfDay < new TimeSpan(11, 0, 0))
-                    //{
+                    if (verificationCandel.OpenTime.TimeOfDay < new TimeSpan(11, 0, 0))
+                    {
                         dragonFlyDojiCandles.Add(verificationCandel);
-                    //}
+                    }
 
-            }
+                }
 
             }
 
