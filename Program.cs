@@ -36,8 +36,8 @@ builder.Services.AddDbContext<StockLoggerDbContext>(options =>
 //builder.Services.AddHttpClient<BullishHaramiService>();
 //builder.Services.AddHostedService<BullishHaramiService>();
 
-//builder.Services.AddHttpClient<HammerService>();
-//builder.Services.AddHostedService<HammerService>();
+builder.Services.AddHttpClient<HammerService>();
+builder.Services.AddHostedService<HammerService>();
 
 //builder.Services.AddHttpClient<PiercingLineService>();
 //builder.Services.AddHostedService<PiercingLineService>();

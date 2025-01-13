@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using StockLogger.Models.Candel;
 using StockLogger.Models.Stratergic_Models.Hammer;
+using System.Diagnostics.SymbolStore;
 using System.Text;
 
 namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
@@ -17,42 +18,73 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
             }
 
             // Get the last (most recent) candle
-            Candel latestCandel = candelList.OrderByDescending(c => c.CloseTime).First();
+            Candel verificationCandel = candelList.OrderByDescending(c => c.CloseTime).First();
+            Candel hammerCandel = candelList
+                                    .OrderByDescending(c => c.CloseTime)
+                                    .Skip(1) // Skip the first candle
+                                    .First(); // Take the second one
+            Candel previousCandel = candelList
+                                    .OrderByDescending(c => c.CloseTime)
+                                    .Skip(2) // Skip two candles
+                                    .First(); // Take the second one
+            Candel latestCandel = hammerCandel;
 
-            // Calculate the body size
+            // Calculate key metrics
             decimal bodySize = Math.Abs(latestCandel.EndPrice - latestCandel.StartPrice);
-
-            // Calculate the lower shadow size
+            decimal range = latestCandel.HighestPrice - latestCandel.LowestPrice;
             decimal lowerShadowSize = latestCandel.StartPrice - latestCandel.LowestPrice;
-
-            // Calculate the upper shadow size
             decimal upperShadowSize = latestCandel.HighestPrice - latestCandel.EndPrice;
 
-            // Check if the candle is bullish
-            bool isBullish = latestCandel.IsBullish == true;
+            // Define thresholds
+            bool isBullish = latestCandel.IsBullish == true &&
+                             latestCandel.EndPrice > (latestCandel.LowestPrice + range / 2);
+            bool smallBody = bodySize < (range * 0.15m); // Tweaked threshold
+            bool longLowerShadow = lowerShadowSize > (range * 0.6m); // Increased relative size
+            bool smallUpperShadow = upperShadowSize < bodySize * 0.1m;
 
-            // Check if the body is small (small relative to the overall candle range)
-            bool smallBody = bodySize < (latestCandel.HighestPrice - latestCandel.LowestPrice) * 0.3m;
+            // High volume check
+            bool highVolume = false;
+            if (previousCandel != null)
+            {
+                highVolume = latestCandel.Volume > (previousCandel.Volume * 1.7m); // Increased factor
+            }
 
-            // Check if the lower shadow is at least twice as long as the body
-            bool longLowerShadow = lowerShadowSize > 2 * bodySize;
+            // Price change confirmation
+            bool significantPriceChange = latestCandel.PriceChangePercentage > 0.005m; // Ensure meaningful move
 
-            // Check if the upper shadow is very small or nonexistent
-            bool smallUpperShadow = upperShadowSize <= bodySize * 0.1m;
+            bool nextcandelbullish = false;
+
+            if (verificationCandel != null)
+            {
+                if (verificationCandel.IsBullish == true)
+                {
+                    nextcandelbullish = true;
+                }
+            }
 
             // If all conditions are met, the pattern is a bullish hammer
-            if (isBullish && smallBody && longLowerShadow && smallUpperShadow)
+            if (
+                    isBullish
+                    && smallBody
+                    && longLowerShadow
+                    && smallUpperShadow
+                    && highVolume
+                    && significantPriceChange
+                    && nextcandelbullish
+                )
             {
                 if (Range == 1)
                 {
                     HammerDb Payload = new HammerDb
                     {
-                        Ticker = latestCandel.Ticker,
-                        TickerId = latestCandel.TickerId,
-                        Exchange = latestCandel.Exchange,
+                        Ticker = verificationCandel.Ticker,
+                        TickerId = verificationCandel.TickerId,
+                        Exchange = verificationCandel.Exchange,
                         IsHammerDetected = true,
                         DetectionRange = 1,
-                        DetectionTime = latestCandel.CloseTime,
+                        DetectionTime = verificationCandel.CloseTime,
+                        DetectedPrice = verificationCandel.EndPrice,
+                        ExpectedPrice = verificationCandel.EndPrice * 1.001429m,
                         HammerCandels = null
                     };
 
@@ -63,12 +95,14 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
                 {
                     HammerDb Payload = new HammerDb
                     {
-                        Ticker = latestCandel.Ticker,
-                        TickerId = latestCandel.TickerId,
-                        Exchange = latestCandel.Exchange,
+                        Ticker = verificationCandel.Ticker,
+                        TickerId = verificationCandel.TickerId,
+                        Exchange = verificationCandel.Exchange,
                         IsHammerDetected = true,
                         DetectionRange = 5,
-                        DetectionTime = latestCandel.CloseTime,
+                        DetectionTime = verificationCandel.CloseTime,
+                        DetectedPrice = verificationCandel.EndPrice,
+                        ExpectedPrice = verificationCandel.EndPrice * 1.001429m,
                         HammerCandels = null
                     };
 
@@ -82,12 +116,14 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
                 {
                     HammerDb Payload = new HammerDb
                     {
-                        Ticker = latestCandel.Ticker,
-                        TickerId = latestCandel.TickerId,
-                        Exchange = latestCandel.Exchange,
+                        Ticker = verificationCandel.Ticker,
+                        TickerId = verificationCandel.TickerId,
+                        Exchange = verificationCandel.Exchange,
                         IsHammerDetected = true,
                         DetectionRange = 10,
-                        DetectionTime = latestCandel.CloseTime,
+                        DetectionTime = verificationCandel.CloseTime,
+                        DetectedPrice = verificationCandel.EndPrice,
+                        ExpectedPrice = verificationCandel.EndPrice * 1.001429m,
                         HammerCandels = null
                     };
 
@@ -101,12 +137,14 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
                 {
                     HammerDb Payload = new HammerDb
                     {
-                        Ticker = latestCandel.Ticker,
-                        TickerId = latestCandel.TickerId,
-                        Exchange = latestCandel.Exchange,
+                        Ticker = verificationCandel.Ticker,
+                        TickerId = verificationCandel.TickerId,
+                        Exchange = verificationCandel.Exchange,
                         IsHammerDetected = true,
                         DetectionRange = 15,
-                        DetectionTime = latestCandel.CloseTime,
+                        DetectionTime = verificationCandel.CloseTime,
+                        DetectedPrice = verificationCandel.EndPrice,
+                        ExpectedPrice = verificationCandel.EndPrice * 1.001429m,
                         HammerCandels = null
                     };
 
@@ -126,11 +164,29 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
 
 
 
-        public async Task Analyze1MinCandelAsync(string ticker, HttpClient _httpClient, CancellationToken stoppingToken)
+        public async Task Analyze1MinCandelAsync(string symboltoken, HttpClient _httpClient, CancellationToken stoppingToken, string authToken)
         {
+
+            var symbolTokenValue = symboltoken; // Replace with the correct value from stock
+            var token = authToken; // Replace with the actual token
+            var startDate = DateTime.Now.AddMinutes(-5); // Example start date
+            var endDate = DateTime.Now; // Example end date
+
+            var requestBody = new
+            {
+                SymbolToken = symbolTokenValue,
+                AuthorizationToken = token,
+                StartDate = startDate.ToString("o"), // ISO string format
+                EndDate = endDate.ToString("o") // ISO string format
+            };
+
+            var client = new HttpClient();
+            var jsonRequestBody = JsonConvert.SerializeObject(requestBody);
+            var content = new StringContent(jsonRequestBody, Encoding.UTF8, "application/json");
+
             try
             {
-                HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:44364/api/StockPricePerSec/GetCandel?ticker={ticker}", stoppingToken);
+                var response = await client.PostAsync("https://localhost:44364/api/AngelCandel/getCandleData", content);
                 response.EnsureSuccessStatusCode();
 
                 string responseData = await response.Content.ReadAsStringAsync(stoppingToken);
@@ -144,7 +200,7 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error analyzing ticker {ticker}: {ex.Message}");
+                Console.WriteLine($"Error analyzing ticker {symboltoken}: {ex.Message}");
             }
         }
 

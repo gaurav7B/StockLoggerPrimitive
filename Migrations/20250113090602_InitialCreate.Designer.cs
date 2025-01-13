@@ -12,7 +12,7 @@ using StockLogger.Data;
 namespace StockLogger.Migrations
 {
     [DbContext(typeof(StockLoggerDbContext))]
-    [Migration("20250108071547_InitialCreate")]
+    [Migration("20250113090602_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -964,6 +964,9 @@ namespace StockLogger.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
+                    b.Property<decimal>("DetectedPrice")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<int>("DetectionRange")
                         .HasColumnType("int");
 
@@ -973,6 +976,9 @@ namespace StockLogger.Migrations
                     b.Property<string>("Exchange")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("ExpectedPrice")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<bool>("IsHammerDetected")
                         .HasColumnType("bit");

@@ -16,6 +16,8 @@ namespace StockLogger.Models.Stratergic_Models.Hammer
 
         public int DetectionRange { get; set; }
         public DateTime DetectionTime { get; set; }
+        public decimal DetectedPrice { get; set; }
+        public decimal ExpectedPrice { get; set; }
 
         // Navigation property to hold the list of Candel objects
         public List<HammerCandels>? HammerCandels { get; set; }

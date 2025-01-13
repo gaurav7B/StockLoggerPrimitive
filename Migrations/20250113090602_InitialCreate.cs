@@ -234,7 +234,9 @@ namespace StockLogger.Migrations
                     Exchange = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsHammerDetected = table.Column<bool>(type: "bit", nullable: false),
                     DetectionRange = table.Column<int>(type: "int", nullable: false),
-                    DetectionTime = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    DetectionTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DetectedPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    ExpectedPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
                 {
