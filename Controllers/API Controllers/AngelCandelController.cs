@@ -135,7 +135,14 @@ namespace StockLogger.Controllers.API_Controllers
             {
                 // Send request to get historical data
                 HttpResponseMessage response = await client.SendAsync(requestMessage);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    HttpResponseMessage tokenResponse = await client.PostAsync("https://localhost:44364/api/Token", null); //Creats new JWT token in database
+                }
+
                 response.EnsureSuccessStatusCode();
+
                 string responseContent = await response.Content.ReadAsStringAsync();
                 dynamic candleData = JsonConvert.DeserializeObject(responseContent);
                 var rawCandelData = candleData.data;
