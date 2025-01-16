@@ -159,7 +159,7 @@ namespace StockLogger.Controllers.API_Controllers
                                 var expectedPrice = firstCandel.EndPrice * 1.0025m; // 2.5 R profit on 1000 R
 
 
-                                var stopLoss = firstCandel.EndPrice - (firstCandel.EndPrice * 0.01m);
+                                var stopLoss = firstCandel.EndPrice - (firstCandel.EndPrice * 0.09m);
 
 
                                 Candel CandelWithHighestPrice = CandelData?
@@ -182,36 +182,36 @@ namespace StockLogger.Controllers.API_Controllers
                                                       .FirstOrDefault();
 
 
-                                //if (stoplossCandel != null)
-                                //{
-                                //    if(profitCandel != null)
-                                //    {
-                                //        if (profitCandel.OpenTime > stoplossCandel.OpenTime)
-                                //        {
-                                //            WrongPredictionList.Add(detectedCandelList);
-                                //            MainWrongPredictionList.Add(WrongPredictionList);
-                                //            NetLoss = NetLoss + (firstCandel.EndPrice - stopLoss);
-                                //            MainLoss = MainLoss + (firstCandel.EndPrice - stopLoss);
-                                //        }
-                                //        else if (profitCandel.OpenTime < stoplossCandel.OpenTime)
-                                //        {
-                                //            CorrectPredictionList.Add(detectedCandelList);
-                                //            MainCorrectPredictionList.Add(CorrectPredictionList);
+                                if (stoplossCandel != null)
+                                {
+                                    if (profitCandel != null)
+                                    {
+                                        if (profitCandel.OpenTime > stoplossCandel.OpenTime)
+                                        {
+                                            WrongPredictionList.Add(detectedCandelList);
+                                            MainWrongPredictionList.Add(WrongPredictionList);
+                                            NetLoss = NetLoss + (firstCandel.EndPrice - stopLoss);
+                                            MainLoss = MainLoss + (firstCandel.EndPrice - stopLoss);
+                                        }
+                                        else if (profitCandel.OpenTime < stoplossCandel.OpenTime)
+                                        {
+                                            CorrectPredictionList.Add(detectedCandelList);
+                                            MainCorrectPredictionList.Add(CorrectPredictionList);
 
-                                //            TotalProfit = TotalProfit + (expectedPrice - firstCandel.EndPrice);
-                                //            MainProfit = MainProfit + (expectedPrice - firstCandel.EndPrice);
-                                //        }
-                                //    }
-                                //    else if (profitCandel == null)
-                                //    {
-                                //        WrongPredictionList.Add(detectedCandelList);
-                                //        MainWrongPredictionList.Add(WrongPredictionList);
-                                //        NetLoss = NetLoss + (firstCandel.EndPrice - stopLoss);
-                                //        MainLoss = MainLoss + (firstCandel.EndPrice - stopLoss);
-                                //    }
-                                //}
-                                //else
-                                //{
+                                            TotalProfit = TotalProfit + (expectedPrice - firstCandel.EndPrice);
+                                            MainProfit = MainProfit + (expectedPrice - firstCandel.EndPrice);
+                                        }
+                                    }
+                                    else if (profitCandel == null)
+                                    {
+                                        WrongPredictionList.Add(detectedCandelList);
+                                        MainWrongPredictionList.Add(WrongPredictionList);
+                                        NetLoss = NetLoss + (firstCandel.EndPrice - stopLoss);
+                                        MainLoss = MainLoss + (firstCandel.EndPrice - stopLoss);
+                                    }
+                                }
+                                else
+                                {
                                     if (expectedPrice < CandelWithHighestPrice.HighestPrice)
                                     {
                                         CorrectPredictionList.Add(detectedCandelList);
@@ -248,13 +248,13 @@ namespace StockLogger.Controllers.API_Controllers
                                     MainLoss = MainLoss + (firstCandel.EndPrice - EndCandel.EndPrice);
 
                                 }
-                            //}
+                                }
 
 
 
 
 
-                        }
+                            }
 
                         }
 
