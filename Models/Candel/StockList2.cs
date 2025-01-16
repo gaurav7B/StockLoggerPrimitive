@@ -75,75 +75,80 @@ namespace StockLogger.Models.Candel
                 new Stock { Ticker = "VEDL-EQ", Exchange = "NSE", Name = "Vedanta", Id = 48, SymbolToken = "3063" },
                 new Stock { Ticker = "BAJAJ-AUTO-EQ", Exchange = "NSE", Name = "Bajaj Auto", Id = 49, SymbolToken = "16669" },
                 new Stock { Ticker = "NESTLEIND-EQ", Exchange = "NSE", Name = "Nestlé India", Id = 50, SymbolToken = "17963" },
-
-
-
-
-
-
                 new Stock { Ticker = "ADANIGAS-EQ", Exchange = "NSE", Name = "ADANI GAS", Id = 51, SymbolToken = "6066" },
                 new Stock { Ticker = "ADANIGREEN-EQ", Exchange = "NSE", Name = "ADANI GREEN", Id = 52, SymbolToken = "3563" },
                 new Stock { Ticker = "ADANIPOWER-EQ", Exchange = "NSE", Name = "ADANI POWER", Id = 53, SymbolToken = "17388" },
                 new Stock { Ticker = "ADANITRANS-EQ", Exchange = "NSE", Name = "ADANI TRANS", Id = 54, SymbolToken = "10217" },
-                new Stock { Ticker = "DLF-EQ", Exchange = "NSE", Name = "DLF", Id = 55, SymbolToken = "14732" },
-                new Stock { Ticker = "PNB-EQ", Exchange = "NSE", Name = "PUNJAB NATIONAL BANK", Id = 56, SymbolToken = "10666" },
-                new Stock { Ticker = "IOC-EQ", Exchange = "NSE", Name = "INDIAN OIL CORPORATION LTD", Id = 57, SymbolToken = "1624" },
-                new Stock { Ticker = "HAL-EQ", Exchange = "NSE", Name = "HINDUSTAN AERONAUTICS LTD", Id = 58, SymbolToken = "2303" },
-                
-
-
-                new Stock { Ticker = "MARUTI-EQ", Exchange = "NSE", Name = "Maruti Suzuki India", Id = 17, SymbolToken = "10999" },
-                new Stock { Ticker = "BPCL-EQ", Exchange = "NSE", Name = "Bharat Petroleum Corporation", Id = 33, SymbolToken = "526" },
-                new Stock { Ticker = "SHREECEM-EQ", Exchange = "NSE", Name = "Shree Cement", Id = 43, SymbolToken = "3103" },
-                new Stock { Ticker = "UPL-EQ", Exchange = "NSE", Name = "UPL Limited", Id = 46, SymbolToken = "11287" },
 
 
 
-                new Stock { Ticker = "ABB-EQ", Exchange = "NSE", Name = "ABB India Ltd.", Id = 59, SymbolToken = "13" },
-                new Stock { Ticker = "AMBUJACEM-EQ", Exchange = "NSE", Name = "Ambuja Cements Ltd.", Id = 60, SymbolToken = "1270" },
-                new Stock { Ticker = "ZYDUSWELL-EQ", Exchange = "NSE", Name = "Zydus Lifesciences Ltd.", Id = 61, SymbolToken = "17635" },
-                new Stock { Ticker = "BEL-EQ", Exchange = "NSE", Name = "Bharat Electronics Ltd.", Id = 62, SymbolToken = "383" },
-                new Stock { Ticker = "BIOCON-EQ", Exchange = "NSE", Name = "Biocon Ltd.", Id = 63, SymbolToken = "11373" },
-                new Stock { Ticker = "BOSCHLTD-EQ", Exchange = "NSE", Name = "Bosch Ltd.", Id = 64, SymbolToken = "2181" },
-                new Stock { Ticker = "COLPAL-EQ", Exchange = "NSE", Name = "Colgate-Palmolive (India) Ltd.", Id = 65, SymbolToken = "15141" },
-                new Stock { Ticker = "CONCOR-EQ", Exchange = "NSE", Name = "Container Corporation of India Ltd.", Id = 66, SymbolToken = "4749" },
-                new Stock { Ticker = "GAIL-EQ", Exchange = "NSE", Name = "GAIL (India) Ltd. ", Id = 67, SymbolToken = "4717" },
-                new Stock { Ticker = "HDFC-EQ", Exchange = "NSE", Name = "HDFC Ltd.", Id = 68, SymbolToken = "1330" },
-                new Stock { Ticker = "HINDALCO-EQ", Exchange = "NSE", Name = "Hindalco Industries Ltd.", Id = 69, SymbolToken = "1363" },
-                new Stock { Ticker = "HINDPETRO-EQ", Exchange = "NSE", Name = "Hindustan Petroleum Corporation Ltd.", Id = 70, SymbolToken = "1406" },
-                new Stock { Ticker = "ICICIGI-EQ", Exchange = "NSE", Name = "ICICI Lombard General Insurance Co.", Id = 71, SymbolToken = "21770" },
-                new Stock { Ticker = "ICICIPRULI-EQ", Exchange = "NSE", Name = "ICICI Prudential Life Insurance Co.", Id = 72, SymbolToken = "18652" },
-                new Stock { Ticker = "INDHOTEL-EQ", Exchange = "NSE", Name = "Indian Hotels Company Ltd.", Id = 73, SymbolToken = "1512" },
-                new Stock { Ticker = "NAUKRI-EQ", Exchange = "NSE", Name = "NAUKRI", Id = 74, SymbolToken = "13751" },
-                new Stock { Ticker = "INDIGO-EQ", Exchange = "NSE", Name = "InterGlobe Aviation Ltd.", Id = 75, SymbolToken = "11195" },
-                new Stock { Ticker = "JINDALSTEL-EQ", Exchange = "NSE", Name = "Jindal Steel & Power Ltd.", Id = 76, SymbolToken = "6733" },
-                new Stock { Ticker = "LICHSGFIN-EQ", Exchange = "NSE", Name = "LIC Housing Finance Ltd.", Id = 77, SymbolToken = "1997" },
-                new Stock { Ticker = "LUPIN-EQ", Exchange = "NSE", Name = "Lupin Ltd.", Id = 78, SymbolToken = "10440" },
-                new Stock { Ticker = "MARICO-EQ", Exchange = "NSE", Name = "Marico Ltd.", Id = 79, SymbolToken = "4067" },
-                new Stock { Ticker = "MOTHERSUMI-EQ", Exchange = "NSE", Name = "Motherson Sumi Wiring India Ltd.", Id = 80, SymbolToken = "4204" },
-                new Stock { Ticker = "MRF-EQ", Exchange = "NSE", Name = "MRF Ltd.", Id = 81, SymbolToken = "2277" },
-                new Stock { Ticker = "PAGEIND-EQ", Exchange = "NSE", Name = "Page Industries Ltd.", Id = 82, SymbolToken = "14413" },
-                new Stock { Ticker = "SBICARD-EQ", Exchange = "NSE", Name = "SBI Cards and Payment Services Ltd.", Id = 83, SymbolToken = "17971" },
-                new Stock { Ticker = "SIEMENS-EQ", Exchange = "NSE", Name = "Siemens Ltd.", Id = 84, SymbolToken = "3150" },
-                new Stock { Ticker = "SRF-EQ", Exchange = "NSE", Name = "SRF Ltd.", Id = 85, SymbolToken = "3273" },
-                new Stock { Ticker = "SAIL-EQ", Exchange = "NSE", Name = "Steel Authority of India Ltd.", Id = 86, SymbolToken = "2963" },
-                new Stock { Ticker = "TATACONSUM-EQ", Exchange = "NSE", Name = "Tata Consumer Products Ltd.", Id = 87, SymbolToken = "3432" },
-                new Stock { Ticker = "TATAPOWER-EQ", Exchange = "NSE", Name = "Tata Power Company Ltd.", Id = 88, SymbolToken = "3426" },
-                new Stock { Ticker = "TATASTEEL-EQ", Exchange = "NSE", Name = "Tata Steel Ltd.", Id = 89, SymbolToken = "3499" },
-                new Stock { Ticker = "TORNTPHARM-EQ", Exchange = "NSE", Name = "Torrent Pharmaceuticals Ltd.", Id = 90, SymbolToken = "3518" },
-                new Stock { Ticker = "UBL-EQ", Exchange = "NSE", Name = "United Breweries Ltd.", Id = 91, SymbolToken = "16713" },
-                new Stock { Ticker = "MCDOWELL-N-EQ", Exchange = "NSE", Name = "United Spirits Ltd.", Id = 92, SymbolToken = "10447" },
 
 
 
-                new Stock { Ticker = "APLAPOLLO-EQ", Exchange = "NSE", Name = "APLAPOLLO", Id = 93, SymbolToken = "25780" },
-                new Stock { Ticker = "AUBANK-EQ", Exchange = "NSE", Name = "AUBANK-EQ", Id = 94, SymbolToken = "21238" },
-                new Stock { Ticker = "ABCAPITAL-EQ", Exchange = "NSE", Name = "ABCAPITAL-EQ", Id = 95, SymbolToken = "21614" },
-                new Stock { Ticker = "ABFRL-EQ", Exchange = "NSE", Name = "ABFRL-EQ", Id = 96, SymbolToken = "30108" },
-                new Stock { Ticker = "ALKEM-EQ", Exchange = "NSE", Name = "ALKEM-EQ", Id = 97, SymbolToken = "11703" },
-                new Stock { Ticker = "APOLLOTYRE-EQ", Exchange = "NSE", Name = "APOLLOTYRE-EQ", Id = 98, SymbolToken = "163" },
-                new Stock { Ticker = "ASHOKLEY-EQ", Exchange = "NSE", Name = "ASHOKLEY-EQ", Id = 99, SymbolToken = "212" },
-                new Stock { Ticker = "ASTRAL-EQ", Exchange = "NSE", Name = "ASTRAL-EQ", Id = 100, SymbolToken = "14418" },
+
+
+
+                //new Stock { Ticker = "DLF-EQ", Exchange = "NSE", Name = "DLF", Id = 55, SymbolToken = "14732" },
+                //new Stock { Ticker = "PNB-EQ", Exchange = "NSE", Name = "PUNJAB NATIONAL BANK", Id = 56, SymbolToken = "10666" },
+                //new Stock { Ticker = "IOC-EQ", Exchange = "NSE", Name = "INDIAN OIL CORPORATION LTD", Id = 57, SymbolToken = "1624" },
+                //new Stock { Ticker = "HAL-EQ", Exchange = "NSE", Name = "HINDUSTAN AERONAUTICS LTD", Id = 58, SymbolToken = "2303" },
+
+
+
+                //new Stock { Ticker = "MARUTI-EQ", Exchange = "NSE", Name = "Maruti Suzuki India", Id = 17, SymbolToken = "10999" },
+                //new Stock { Ticker = "BPCL-EQ", Exchange = "NSE", Name = "Bharat Petroleum Corporation", Id = 33, SymbolToken = "526" },
+                //new Stock { Ticker = "SHREECEM-EQ", Exchange = "NSE", Name = "Shree Cement", Id = 43, SymbolToken = "3103" },
+                //new Stock { Ticker = "UPL-EQ", Exchange = "NSE", Name = "UPL Limited", Id = 46, SymbolToken = "11287" },
+
+
+
+                //new Stock { Ticker = "ABB-EQ", Exchange = "NSE", Name = "ABB India Ltd.", Id = 59, SymbolToken = "13" },
+                //new Stock { Ticker = "AMBUJACEM-EQ", Exchange = "NSE", Name = "Ambuja Cements Ltd.", Id = 60, SymbolToken = "1270" },
+                //new Stock { Ticker = "ZYDUSWELL-EQ", Exchange = "NSE", Name = "Zydus Lifesciences Ltd.", Id = 61, SymbolToken = "17635" },
+                //new Stock { Ticker = "BEL-EQ", Exchange = "NSE", Name = "Bharat Electronics Ltd.", Id = 62, SymbolToken = "383" },
+                //new Stock { Ticker = "BIOCON-EQ", Exchange = "NSE", Name = "Biocon Ltd.", Id = 63, SymbolToken = "11373" },
+                //new Stock { Ticker = "BOSCHLTD-EQ", Exchange = "NSE", Name = "Bosch Ltd.", Id = 64, SymbolToken = "2181" },
+                //new Stock { Ticker = "COLPAL-EQ", Exchange = "NSE", Name = "Colgate-Palmolive (India) Ltd.", Id = 65, SymbolToken = "15141" },
+                //new Stock { Ticker = "CONCOR-EQ", Exchange = "NSE", Name = "Container Corporation of India Ltd.", Id = 66, SymbolToken = "4749" },
+                //new Stock { Ticker = "GAIL-EQ", Exchange = "NSE", Name = "GAIL (India) Ltd. ", Id = 67, SymbolToken = "4717" },
+                //new Stock { Ticker = "HDFC-EQ", Exchange = "NSE", Name = "HDFC Ltd.", Id = 68, SymbolToken = "1330" },
+                //new Stock { Ticker = "HINDALCO-EQ", Exchange = "NSE", Name = "Hindalco Industries Ltd.", Id = 69, SymbolToken = "1363" },
+                //new Stock { Ticker = "HINDPETRO-EQ", Exchange = "NSE", Name = "Hindustan Petroleum Corporation Ltd.", Id = 70, SymbolToken = "1406" },
+                //new Stock { Ticker = "ICICIGI-EQ", Exchange = "NSE", Name = "ICICI Lombard General Insurance Co.", Id = 71, SymbolToken = "21770" },
+                //new Stock { Ticker = "ICICIPRULI-EQ", Exchange = "NSE", Name = "ICICI Prudential Life Insurance Co.", Id = 72, SymbolToken = "18652" },
+                //new Stock { Ticker = "INDHOTEL-EQ", Exchange = "NSE", Name = "Indian Hotels Company Ltd.", Id = 73, SymbolToken = "1512" },
+                //new Stock { Ticker = "NAUKRI-EQ", Exchange = "NSE", Name = "NAUKRI", Id = 74, SymbolToken = "13751" },
+                //new Stock { Ticker = "INDIGO-EQ", Exchange = "NSE", Name = "InterGlobe Aviation Ltd.", Id = 75, SymbolToken = "11195" },
+                //new Stock { Ticker = "JINDALSTEL-EQ", Exchange = "NSE", Name = "Jindal Steel & Power Ltd.", Id = 76, SymbolToken = "6733" },
+                //new Stock { Ticker = "LICHSGFIN-EQ", Exchange = "NSE", Name = "LIC Housing Finance Ltd.", Id = 77, SymbolToken = "1997" },
+                //new Stock { Ticker = "LUPIN-EQ", Exchange = "NSE", Name = "Lupin Ltd.", Id = 78, SymbolToken = "10440" },
+                //new Stock { Ticker = "MARICO-EQ", Exchange = "NSE", Name = "Marico Ltd.", Id = 79, SymbolToken = "4067" },
+                //new Stock { Ticker = "MOTHERSUMI-EQ", Exchange = "NSE", Name = "Motherson Sumi Wiring India Ltd.", Id = 80, SymbolToken = "4204" },
+                //new Stock { Ticker = "MRF-EQ", Exchange = "NSE", Name = "MRF Ltd.", Id = 81, SymbolToken = "2277" },
+                //new Stock { Ticker = "PAGEIND-EQ", Exchange = "NSE", Name = "Page Industries Ltd.", Id = 82, SymbolToken = "14413" },
+                //new Stock { Ticker = "SBICARD-EQ", Exchange = "NSE", Name = "SBI Cards and Payment Services Ltd.", Id = 83, SymbolToken = "17971" },
+                //new Stock { Ticker = "SIEMENS-EQ", Exchange = "NSE", Name = "Siemens Ltd.", Id = 84, SymbolToken = "3150" },
+                //new Stock { Ticker = "SRF-EQ", Exchange = "NSE", Name = "SRF Ltd.", Id = 85, SymbolToken = "3273" },
+                //new Stock { Ticker = "SAIL-EQ", Exchange = "NSE", Name = "Steel Authority of India Ltd.", Id = 86, SymbolToken = "2963" },
+                //new Stock { Ticker = "TATACONSUM-EQ", Exchange = "NSE", Name = "Tata Consumer Products Ltd.", Id = 87, SymbolToken = "3432" },
+                //new Stock { Ticker = "TATAPOWER-EQ", Exchange = "NSE", Name = "Tata Power Company Ltd.", Id = 88, SymbolToken = "3426" },
+                //new Stock { Ticker = "TATASTEEL-EQ", Exchange = "NSE", Name = "Tata Steel Ltd.", Id = 89, SymbolToken = "3499" },
+                //new Stock { Ticker = "TORNTPHARM-EQ", Exchange = "NSE", Name = "Torrent Pharmaceuticals Ltd.", Id = 90, SymbolToken = "3518" },
+                //new Stock { Ticker = "UBL-EQ", Exchange = "NSE", Name = "United Breweries Ltd.", Id = 91, SymbolToken = "16713" },
+                //new Stock { Ticker = "MCDOWELL-N-EQ", Exchange = "NSE", Name = "United Spirits Ltd.", Id = 92, SymbolToken = "10447" },
+
+
+
+                //new Stock { Ticker = "APLAPOLLO-EQ", Exchange = "NSE", Name = "APLAPOLLO", Id = 93, SymbolToken = "25780" },
+                //new Stock { Ticker = "AUBANK-EQ", Exchange = "NSE", Name = "AUBANK-EQ", Id = 94, SymbolToken = "21238" },
+                //new Stock { Ticker = "ABCAPITAL-EQ", Exchange = "NSE", Name = "ABCAPITAL-EQ", Id = 95, SymbolToken = "21614" },
+                //new Stock { Ticker = "ABFRL-EQ", Exchange = "NSE", Name = "ABFRL-EQ", Id = 96, SymbolToken = "30108" },
+                //new Stock { Ticker = "ALKEM-EQ", Exchange = "NSE", Name = "ALKEM-EQ", Id = 97, SymbolToken = "11703" },
+                //new Stock { Ticker = "APOLLOTYRE-EQ", Exchange = "NSE", Name = "APOLLOTYRE-EQ", Id = 98, SymbolToken = "163" },
+                //new Stock { Ticker = "ASHOKLEY-EQ", Exchange = "NSE", Name = "ASHOKLEY-EQ", Id = 99, SymbolToken = "212" },
+                //new Stock { Ticker = "ASTRAL-EQ", Exchange = "NSE", Name = "ASTRAL-EQ", Id = 100, SymbolToken = "14418" },
+
+
                 //new Stock { Ticker = "AUROPHARMA-EQ", Exchange = "NSE", Name = "AUROPHARMA-EQ", Id = 101, SymbolToken = "275" },
                 //new Stock { Ticker = "BSE-EQ", Exchange = "BSE", Name = "19585 BSE-EQ", Id = 102, SymbolToken = "19585" },
                 //new Stock { Ticker = "BAJAJHLDNG-EQ", Exchange = "NSE", Name = "BAJAJHLDNG-EQ", Id = 103, SymbolToken = "305" },
@@ -195,10 +200,10 @@ namespace StockLogger.Models.Candel
                 //new Stock { Ticker = "NLCINDIA-EQ", Exchange = "NSE", Name = "NLCINDIA-EQ", Id = 149, SymbolToken = "8585" },
                 //new Stock { Ticker = "NMDC-EQ", Exchange = "NSE", Name = "NMDC-EQ", Id = 150, SymbolToken = "15332" },
                 //new Stock { Ticker = "OBEROIRLTY-EQ", Exchange = "NSE", Name = "OBEROIRLTY-EQ", Id = 151, SymbolToken = "20242" },
-                
-                
-                
-                
+
+
+
+
                 //new Stock { Ticker = "OIL-EQ", Exchange = "NSE", Name = "OIL-EQ", Id = 152, SymbolToken = "17438" },
                 //new Stock { Ticker = "OFSS-EQ", Exchange = "NSE", Name = "OFSS-EQ", Id = 153, SymbolToken = "10738" },
                 //new Stock { Ticker = "PIIND-EQ", Exchange = "NSE", Name = "PIIND-EQ", Id = 154, SymbolToken = "24184" },
