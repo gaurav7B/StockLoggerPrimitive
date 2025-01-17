@@ -26,6 +26,9 @@
 ("KOTAKBANK-EQ", "NSE", "Kotak Mahindra Bank", 8, "1922"),
 ("LT-EQ", "NSE", "Larsen & Toubro", 9, "11483"),
 ("SBIN-EQ", "NSE", "State Bank of India", 10, "3045"),
+
+
+
 ("HCLTECH-EQ", "NSE", "HCL Technologies", 14, "7229"),
 ("ASIANPAINT-EQ", "NSE", "Asian Paints", 15, "236"),
 ("DMART-EQ", "NSE", "Avenue Supermarts", 16, "19913"),
