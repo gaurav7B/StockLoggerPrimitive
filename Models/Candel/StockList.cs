@@ -58,6 +58,10 @@
 ("ADANIPOWER-EQ", "NSE", "ADANI POWER", 53, "17388"),
 ("ADANITRANS-EQ", "NSE", "ADANI TRANS", 54, "10217"),
 
+
+
+
+
 ("DLF-EQ", "NSE", "DLF", 55, "14732"),
 ("PNB-EQ", "NSE", "PUNJAB NATIONAL BANK", 56, "10666"),
 ("IOC-EQ", "NSE", "INDIAN OIL CORPORATION LTD", 57, "1624"),
@@ -91,7 +95,7 @@
 ("MARICO-EQ", "NSE", "Marico Ltd.", 79, "4067"),
 ("MOTHERSUMI-EQ", "NSE", "Motherson Sumi Wiring India Ltd.", 80, "4204"),
 ("MRF-EQ", "NSE", "MRF Ltd.", 81, "2277"),
-("PAGEIND-EQ", "NSE", "Page Industries Ltd.", 82, "14413"),
+("PAGEIND-EQ", "NSE", "Page Industries Ltd.", 82, "14413"), //45000
 ("SBICARD-EQ", "NSE", "SBI Cards and Payment Services Ltd.", 83, "17971"),
 ("SIEMENS-EQ", "NSE", "Siemens Ltd.", 84, "3150"),
 ("SRF-EQ", "NSE", "SRF Ltd.", 85, "3273"),
@@ -178,6 +182,8 @@
 ("PRESTIGE-EQ", "NSE", "PRESTIGE-EQ", 160, "20302"),
 ("RECLTD-EQ", "NSE", "RECLTD-EQ", 161, "15355"),
 ("RVNL-EQ", "NSE", "RVNL-EQ", 162, "9552"),
+
+
 
 
             };

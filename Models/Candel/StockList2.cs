@@ -125,7 +125,7 @@ namespace StockLogger.Models.Candel
                 new Stock { Ticker = "MARICO-EQ", Exchange = "NSE", Name = "Marico Ltd.", Id = 79, SymbolToken = "4067" },
                 new Stock { Ticker = "MOTHERSUMI-EQ", Exchange = "NSE", Name = "Motherson Sumi Wiring India Ltd.", Id = 80, SymbolToken = "4204" },
                 new Stock { Ticker = "MRF-EQ", Exchange = "NSE", Name = "MRF Ltd.", Id = 81, SymbolToken = "2277" },
-                new Stock { Ticker = "PAGEIND-EQ", Exchange = "NSE", Name = "Page Industries Ltd.", Id = 82, SymbolToken = "14413" },
+                new Stock { Ticker = "PAGEIND-EQ", Exchange = "NSE", Name = "Page Industries Ltd.", Id = 82, SymbolToken = "14413" }, // 45000 R stock
                 new Stock { Ticker = "SBICARD-EQ", Exchange = "NSE", Name = "SBI Cards and Payment Services Ltd.", Id = 83, SymbolToken = "17971" },
                 new Stock { Ticker = "SIEMENS-EQ", Exchange = "NSE", Name = "Siemens Ltd.", Id = 84, SymbolToken = "3150" },
                 new Stock { Ticker = "SRF-EQ", Exchange = "NSE", Name = "SRF Ltd.", Id = 85, SymbolToken = "3273" },
@@ -215,8 +215,10 @@ namespace StockLogger.Models.Candel
                 new Stock { Ticker = "PRESTIGE-EQ", Exchange = "NSE", Name = "PRESTIGE-EQ", Id = 160, SymbolToken = "20302" },
                 new Stock { Ticker = "RECLTD-EQ", Exchange = "NSE", Name = "RECLTD-EQ", Id = 161, SymbolToken = "15355" },
                 new Stock { Ticker = "RVNL-EQ", Exchange = "NSE", Name = "RVNL-EQ", Id = 162, SymbolToken = "9552" },
-                //new Stock { Ticker = "", Exchange = "NSE", Name = "", Id = 163, SymbolToken = "" },
-                //new Stock { Ticker = "", Exchange = "NSE", Name = "", Id = 164, SymbolToken = "" },
+
+
+                ////new Stock { Ticker = "", Exchange = "NSE", Name = "", Id = 163, SymbolToken = "" },
+                ////new Stock { Ticker = "", Exchange = "NSE", Name = "", Id = 164, SymbolToken = "" },
 
 
 
@@ -263,6 +265,14 @@ namespace StockLogger.Models.Candel
 //Yes Bank Ltd.   Financial Services  YESBANK EQ  INE528G01035
 //Zomato Ltd. Consumer Services   ZOMATO  EQ  INE758T01015
 //Zydus Lifesciences Ltd. Healthcare  ZYDUSLIFE   EQ  INE010B01027
+
+
+
+
+
+
+
+
 
 
 
