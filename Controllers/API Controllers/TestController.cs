@@ -67,6 +67,19 @@ namespace StockLogger.Controllers.API_Controllers
             decimal MainProfit = 0;
             decimal MainLoss = 0;
 
+            // Check if the StartDate is a Saturday or Sunday
+            if (request.StartDate.DayOfWeek == DayOfWeek.Saturday || request.StartDate.DayOfWeek == DayOfWeek.Sunday)
+            {
+                return Ok(new
+                {
+                    Net = MainProfit - MainLoss,
+                    MainProfit,
+                    MainLoss,
+                    MainCorrectPredictionList,
+                    MainWrongPredictionList,
+                    MainMasterList
+                });
+            }
 
             foreach (var stock in _stocks)
             {
@@ -146,14 +159,89 @@ namespace StockLogger.Controllers.API_Controllers
 
                         if (CandelData != null)
                         {
-                            dragonFlyDojiCandles = IdentifyDragonflyDojiCandles(CandelData , CandelDataPreviousDay);
+                            // Dont use INVERTED HAMMER logic without stoploss
+
+
+                            //dragonFlyDojiCandles = IdentifyDragonflyDojiCandles(CandelData , CandelDataPreviousDay);
+
+                            //dragonFlyDojiCandles = IdentifyBullishEngulfingCandles(CandelData, CandelDataPreviousDay);
+                            //dragonFlyDojiCandles = IdentifyInvertedHammerCandles(CandelData, CandelDataPreviousDay);
+
+
+                            foreach (Candel testCandel in CandelData)
+                            {
+                                if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
+                                {
+                                    break; // Skip the rest of this iteration and proceed to the next object
+                                }
+
+
+                                var diff = 5;
+
+                                /// BULLISH ENGULFING
+                                Candel BFfirst = testCandel;
+                                Candel BFSecond = CandelData
+                                    .Where(c => c.OpenTime > BFfirst.OpenTime)
+                                    .OrderBy(c => c.OpenTime)
+                                    .FirstOrDefault();
+
+                                if (BFfirst != null && BFSecond != null)
+                                {
+
+                                    // Check if the previous candle is bearish
+                                    bool isPreviousBearish = BFfirst.EndPrice < BFfirst.StartPrice;
+
+                                    // Check if the current candle is bullish
+                                    bool isCurrentBullish = BFSecond.EndPrice > BFSecond.StartPrice;
+
+                                    // Check if the current candle's body engulfs the previous candle's body
+                                    bool isEngulfingBody =
+                                        BFSecond.StartPrice < BFfirst.EndPrice && // Current start below previous end
+                                        BFSecond.EndPrice > BFfirst.StartPrice;  // Current end above previous start
+
+                                    bool BFisFit = false;
+
+                                    Candel BFPreviousDayHighestPriceCandel = null;
+
+                                    if (testCandel != null)
+                                    {
+                                        BFPreviousDayHighestPriceCandel = CandelDataPreviousDay
+                                            .Where(c => c.OpenTime.TimeOfDay > testCandel.OpenTime.TimeOfDay) // Compare only the time
+                                            .OrderByDescending(c => c.HighestPrice)                            // Order by HighestPrice descending
+                                            .FirstOrDefault();                                                 // Take the first (highest)
+                                    }
+
+                                    if (BFPreviousDayHighestPriceCandel != null && testCandel != null && testCandel.EndPrice < BFPreviousDayHighestPriceCandel.HighestPrice)
+                                    {
+                                        var percentageDifference = ((BFPreviousDayHighestPriceCandel.HighestPrice - testCandel.EndPrice) / testCandel.EndPrice) * 100;
+
+                                        if (percentageDifference > diff)
+                                        {
+                                            BFisFit = true; // IHisFit is true
+                                        }
+                                    }
+
+                                    if (
+                                     isPreviousBearish
+                                     && isCurrentBullish
+                                     && isEngulfingBody
+                                     && BFisFit
+                                     )
+                                    {
+                                        dragonFlyDojiCandles.Add(BFSecond);
+                                    }
+                                }
+
+
+                            }
+
                         }
 
                         MasterList = CandelData;
                         MainMasterList.Add(MasterList);
                         DrafonFlyDojiCandels = dragonFlyDojiCandles;
 
-                        if (DrafonFlyDojiCandels.Count > 0)
+                        if (dragonFlyDojiCandles.Count > 0)
                         {
                             // Iterating through each Dragonfly Doji Candle
                             foreach (Candel dojiCandle in dragonFlyDojiCandles)
@@ -181,10 +269,10 @@ namespace StockLogger.Controllers.API_Controllers
                                 Candel firstCandel = detectedCandelList[0];
                                 Candel lastCandel = detectedCandelList[5];//5
 
-                                var expectedPrice = firstCandel.EndPrice * 1.001429m; // 1.429 R profit on 1000 R // 285 on 2 Lakh
+                                //var expectedPrice = firstCandel.EndPrice * 1.001429m; // 1.429 R profit on 1000 R // 285 on 2 Lakh
                                 //var expectedPrice = firstCandel.EndPrice * 1.005m; //  5 R profit on 1000 R //997 on 2lakh
-                                //var expectedPrice = firstCandel.EndPrice * 1.01m;  //  10 R profit on 1000 R //1995 on 2 lakh
-                                //var expectedPrice = firstCandel.EndPrice * 1.0025m; // 2.5 R profit on 1000 R //450 on 2Lakh
+                                //var expectedPrice = firstCandel.EndPrice * 1.01m;  //  10 R profit on 1000 R //1995 okkkn 2 lakh
+                                var expectedPrice = firstCandel.EndPrice * 1.0025m; // 2.5 R profit on 1000 R //450 on 2Lakh
 
                                 decimal profitMargin = 0;
                                 if (expectedPrice == firstCandel.EndPrice * 1.0025m)
@@ -254,51 +342,51 @@ namespace StockLogger.Controllers.API_Controllers
 
 
 
-                                if (stoplossCandel != null)
-                                {
-                                    if (profitCandel != null && stoplossCandel != null)
-                                    {
-                                        if (profitCandel.OpenTime > stoplossCandel.OpenTime)
-                                        {
-                                            WrongPredictionList.Add(detectedCandelList);
-                                            MainWrongPredictionList.Add(WrongPredictionList);
-                                            NetLoss = NetLoss + lossMargin;
-                                            MainLoss = MainLoss + lossMargin;
-                                        }
-                                        else if (profitCandel.OpenTime < stoplossCandel.OpenTime)
-                                        {
-                                            CorrectPredictionList.Add(detectedCandelList);
-                                            MainCorrectPredictionList.Add(CorrectPredictionList);
+                                //if (stoplossCandel != null)
+                                //{
+                                //    if (profitCandel != null && stoplossCandel != null)
+                                //    {
+                                //        if (profitCandel.OpenTime > stoplossCandel.OpenTime)
+                                //        {
+                                //            WrongPredictionList.Add(detectedCandelList);
+                                //            MainWrongPredictionList.Add(WrongPredictionList);
+                                //            NetLoss = NetLoss + lossMargin;
+                                //            MainLoss = MainLoss + lossMargin;
+                                //        }
+                                //        else if (profitCandel.OpenTime < stoplossCandel.OpenTime)
+                                //        {
+                                //            CorrectPredictionList.Add(detectedCandelList);
+                                //            MainCorrectPredictionList.Add(CorrectPredictionList);
 
-                                            TotalProfit = TotalProfit + profitMargin;
-                                            MainProfit = MainProfit + profitMargin;
-                                        }
-                                    }
-                                }
-                                else if (stoplossCandel == null && profitCandel != null)
-                                {
-                                    CorrectPredictionList.Add(detectedCandelList);
-                                    MainCorrectPredictionList.Add(CorrectPredictionList);
+                                //            TotalProfit = TotalProfit + profitMargin;
+                                //            MainProfit = MainProfit + profitMargin;
+                                //        }
+                                //    }
+                                //}
+                                //else if (stoplossCandel == null && profitCandel != null)
+                                //{
+                                //    CorrectPredictionList.Add(detectedCandelList);
+                                //    MainCorrectPredictionList.Add(CorrectPredictionList);
 
-                                    TotalProfit = TotalProfit + profitMargin;
-                                    MainProfit = MainProfit + profitMargin;
-                                }
-                                else if (profitCandel == null && stoplossCandel != null)
-                                {
-                                    WrongPredictionList.Add(detectedCandelList);
-                                    MainWrongPredictionList.Add(WrongPredictionList);
-                                    NetLoss = NetLoss + lossMargin;
-                                    MainLoss = MainLoss + lossMargin;
-                                }
-                                else if (profitCandel == null && stoplossCandel == null)
-                                {
-                                    WrongPredictionList.Add(detectedCandelList);
-                                    MainWrongPredictionList.Add(WrongPredictionList);
-                                    NetLoss = NetLoss + lossMargin;
-                                    MainLoss = MainLoss + lossMargin;
-                                }
-                                else
-                                {
+                                //    TotalProfit = TotalProfit + profitMargin;
+                                //    MainProfit = MainProfit + profitMargin;
+                                //}
+                                //else if (profitCandel == null && stoplossCandel != null)
+                                //{
+                                //    WrongPredictionList.Add(detectedCandelList);
+                                //    MainWrongPredictionList.Add(WrongPredictionList);
+                                //    NetLoss = NetLoss + lossMargin;
+                                //    MainLoss = MainLoss + lossMargin;
+                                //}
+                                //else if (profitCandel == null && stoplossCandel == null)
+                                //{
+                                //    WrongPredictionList.Add(detectedCandelList);
+                                //    MainWrongPredictionList.Add(WrongPredictionList);
+                                //    NetLoss = NetLoss + lossMargin;
+                                //    MainLoss = MainLoss + lossMargin;
+                                //}
+                                //else
+                                //{
                                     if (expectedPrice < CandelWithHighestPrice.HighestPrice)
                                     {
                                         CorrectPredictionList.Add(detectedCandelList);
@@ -310,50 +398,50 @@ namespace StockLogger.Controllers.API_Controllers
                                     }
                                     else
                                     {
-                                    //if (EndCandel != null && firstCandel != null)
-                                    //{
-                                    //    if (EndCandel.EndPrice > firstCandel.EndPrice)
-                                    //    {
-                                    //        CorrectPredictionList.Add(detectedCandelList);
-                                    //        MainCorrectPredictionList.Add(CorrectPredictionList);
+                                        //if (EndCandel != null && firstCandel != null)
+                                        //{
+                                        //    if (EndCandel.EndPrice > firstCandel.EndPrice)
+                                        //    {
+                                        //        CorrectPredictionList.Add(detectedCandelList);
+                                        //        MainCorrectPredictionList.Add(CorrectPredictionList);
 
-                                    //        TotalProfit = TotalProfit + (EndCandel.EndPrice - firstCandel.EndPrice);
-                                    //        MainProfit = MainProfit + (EndCandel.EndPrice - firstCandel.EndPrice);
-                                    //    }
-                                    //    else
-                                    //    {
-                                    //        WrongPredictionList.Add(detectedCandelList);
-                                    //        MainWrongPredictionList.Add(WrongPredictionList);
-                                    //        NetLoss = NetLoss + (firstCandel.EndPrice - EndCandel.EndPrice);
-                                    //        MainLoss = MainLoss + (firstCandel.EndPrice - EndCandel.EndPrice);
-                                    //    }
-                                    //}
+                                        //        TotalProfit = TotalProfit + (EndCandel.EndPrice - firstCandel.EndPrice);
+                                        //        MainProfit = MainProfit + (EndCandel.EndPrice - firstCandel.EndPrice);
+                                        //    }
+                                        //    else
+                                        //    {
+                                        //        WrongPredictionList.Add(detectedCandelList);
+                                        //        MainWrongPredictionList.Add(WrongPredictionList);
+                                        //        NetLoss = NetLoss + (firstCandel.EndPrice - EndCandel.EndPrice);
+                                        //        MainLoss = MainLoss + (firstCandel.EndPrice - EndCandel.EndPrice);
+                                        //    }
+                                        //}
 
 
-                                    if (stoplossCandel != null)
-                                    {
-                                        WrongPredictionList.Add(detectedCandelList);
-                                        MainWrongPredictionList.Add(WrongPredictionList);
-                                        NetLoss = NetLoss + lossMargin;
-                                        MainLoss = MainLoss + lossMargin;
-                                    }
-                                    else
-                                    {
-                                        WrongPredictionList.Add(detectedCandelList);
+                                        //if (stoplossCandel != null)
+                                        //{
+                                        //    WrongPredictionList.Add(detectedCandelList);
+                                        //    MainWrongPredictionList.Add(WrongPredictionList);
+                                        //    NetLoss = NetLoss + lossMargin;
+                                        //    MainLoss = MainLoss + lossMargin;
+                                        //}
+                                        //else
+                                        //{
+                                            WrongPredictionList.Add(detectedCandelList);
                                     MainWrongPredictionList.Add(WrongPredictionList);
                                     NetLoss = NetLoss + (BoughtStockPrice - EndTotalPrice);
                                     MainLoss = MainLoss + (BoughtStockPrice - EndTotalPrice);
+                                    //}
+
                                 }
 
+                                //}
+
+
+
+
+
                             }
-
-                            }
-
-
-
-
-
-                        }
 
                     }
 
@@ -390,6 +478,178 @@ namespace StockLogger.Controllers.API_Controllers
 
 
         // Function to identify Dragonfly Doji candles
+
+        private List<Candel> IdentifyInvertedHammerCandles(List<Candel> CandelData, List<Candel> CandelDataPreviousDay)
+        {
+            ConcurrentBag<Candel> dragonFlyDojiCandles = new ConcurrentBag<Candel>();
+
+            //// Convert ConcurrentBag to a list, if needed
+            List<Candel> result = dragonFlyDojiCandles.ToList();
+
+            foreach (Candel testCandel in CandelData)
+            {
+
+                if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
+                {
+                    return result; // Skip the rest of this iteration and proceed to the next object
+                }
+
+
+                var diff = 5;
+
+
+
+                /// INVERTED HAMMER
+
+
+                // Define thresholds as a percentage (adjust based on sensitivity)
+                const decimal bodyToWickRatio = 0.3m; // Body should be small relative to the wicks
+                const decimal upperWickLengthRatio = 2m; // Upper wick should be at least twice the body
+                const decimal lowerWickLimit = 0.2m; // Lower wick should be small/negligible
+                decimal bodySize = Math.Abs(testCandel.EndPrice - testCandel.StartPrice);
+                // Calculate body size, wick sizes, and ratios
+                decimal IHbodySize = Math.Abs(testCandel.EndPrice - testCandel.StartPrice);
+                decimal upperWickSize = testCandel.HighestPrice - Math.Max(testCandel.StartPrice, testCandel.EndPrice);
+                decimal lowerWickSize = Math.Min(testCandel.StartPrice, testCandel.EndPrice) - testCandel.LowestPrice;
+
+                decimal totalRange = testCandel.HighestPrice - testCandel.LowestPrice;
+
+                // Ensure totalRange is not zero to avoid divide by zero exception
+                decimal bodyRatio = totalRange != 0 ? bodySize / totalRange : 0;
+
+                // Validate conditions for Inverted Hammer
+                bool smallBody = bodyRatio <= bodyToWickRatio;
+                bool longUpperWick = upperWickSize >= bodySize * upperWickLengthRatio;
+                bool minimalLowerWick = lowerWickSize <= (totalRange * lowerWickLimit);
+
+
+                bool IHisFit = false;
+
+                Candel IHPreviousDayHighestPriceCandel = null;
+
+                if (testCandel != null)
+                {
+                    IHPreviousDayHighestPriceCandel = CandelDataPreviousDay
+                        .Where(c => c.OpenTime.TimeOfDay > testCandel.OpenTime.TimeOfDay) // Compare only the time
+                        .OrderByDescending(c => c.HighestPrice)                            // Order by HighestPrice descending
+                        .FirstOrDefault();                                                 // Take the first (highest)
+                }
+
+                if (IHPreviousDayHighestPriceCandel != null && testCandel != null && testCandel.EndPrice < IHPreviousDayHighestPriceCandel.HighestPrice)
+                {
+                    var percentageDifference = ((IHPreviousDayHighestPriceCandel.HighestPrice - testCandel.EndPrice) / testCandel.EndPrice) * 100;
+
+                    if (percentageDifference > diff)
+                    {
+                        IHisFit = true; // IHisFit is true
+                    }
+                }
+
+
+
+                if (
+                    smallBody
+                    && longUpperWick
+                    && minimalLowerWick
+                    && IHisFit
+                    )
+                {
+                    dragonFlyDojiCandles.Add(testCandel);
+                }
+
+            }
+
+
+
+            return result;
+
+        }
+
+
+        private List<Candel> IdentifyBullishEngulfingCandles(List<Candel> CandelData, List<Candel> CandelDataPreviousDay)
+        {
+            ConcurrentBag<Candel> dragonFlyDojiCandles = new ConcurrentBag<Candel>();
+
+            //// Convert ConcurrentBag to a list, if needed
+            List<Candel> result = dragonFlyDojiCandles.ToList();
+
+
+
+            foreach (Candel testCandel in CandelData)
+            {
+                if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
+                {
+                    continue; // Skip the rest of this iteration and proceed to the next object
+                }
+
+
+                var diff = 5;
+
+                /// BULLISH ENGULFING
+                Candel BFfirst = testCandel;
+                Candel BFSecond = CandelData
+                    .Where(c => c.OpenTime > BFfirst.OpenTime)
+                    .OrderBy(c => c.OpenTime)
+                    .FirstOrDefault();
+
+                if (BFfirst != null && BFSecond != null)
+                {
+
+                    // Check if the previous candle is bearish
+                    bool isPreviousBearish = BFfirst.EndPrice < BFfirst.StartPrice;
+
+                    // Check if the current candle is bullish
+                    bool isCurrentBullish = BFSecond.EndPrice > BFSecond.StartPrice;
+
+                    // Check if the current candle's body engulfs the previous candle's body
+                    bool isEngulfingBody =
+                        BFSecond.StartPrice < BFfirst.EndPrice && // Current start below previous end
+                        BFSecond.EndPrice > BFfirst.StartPrice;  // Current end above previous start
+
+                    bool BFisFit = false;
+
+                    Candel BFPreviousDayHighestPriceCandel = null;
+
+                    if (testCandel != null)
+                    {
+                        BFPreviousDayHighestPriceCandel = CandelDataPreviousDay
+                            .Where(c => c.OpenTime.TimeOfDay > testCandel.OpenTime.TimeOfDay) // Compare only the time
+                            .OrderByDescending(c => c.HighestPrice)                            // Order by HighestPrice descending
+                            .FirstOrDefault();                                                 // Take the first (highest)
+                    }
+
+                    if (BFPreviousDayHighestPriceCandel != null && testCandel != null && testCandel.EndPrice < BFPreviousDayHighestPriceCandel.HighestPrice)
+                    {
+                        var percentageDifference = ((BFPreviousDayHighestPriceCandel.HighestPrice - testCandel.EndPrice) / testCandel.EndPrice) * 100;
+
+                        if (percentageDifference > diff)
+                        {
+                            BFisFit = true; // IHisFit is true
+                        }
+                    }
+
+                    if (
+                     isPreviousBearish
+                     && isCurrentBullish
+                     && isEngulfingBody
+                     && BFisFit
+                     )
+                    {
+                        dragonFlyDojiCandles.Add(testCandel);
+                    }
+                }
+
+
+            }
+
+
+
+
+
+            return result;
+
+        }
+
         private List<Candel> IdentifyDragonflyDojiCandles(List<Candel> CandelData , List<Candel> CandelDataPreviousDay)
         {
 
@@ -1954,133 +2214,143 @@ namespace StockLogger.Controllers.API_Controllers
 
 
 
-            //foreach (Candel testCandel in CandelData)
-            //{
-
-            //    var diff = 5;
-
-            //    /// BULLISH ENGULFING
-            //    Candel BFfirst = testCandel;
-            //    Candel BFSecond = CandelData
-            //        .Where(c => c.OpenTime > BFfirst.OpenTime)
-            //        .OrderBy(c => c.OpenTime)
-            //        .FirstOrDefault();
-
-            //    if (BFfirst != null && BFSecond != null)
-            //    {
-
-            //        // Check if the previous candle is bearish
-            //        bool isPreviousBearish = BFfirst.EndPrice < BFfirst.StartPrice;
-
-            //        // Check if the current candle is bullish
-            //        bool isCurrentBullish = BFSecond.EndPrice > BFSecond.StartPrice;
-
-            //        // Check if the current candle's body engulfs the previous candle's body
-            //        bool isEngulfingBody =
-            //            BFSecond.StartPrice < BFfirst.EndPrice && // Current start below previous end
-            //            BFSecond.EndPrice > BFfirst.StartPrice;  // Current end above previous start
-
-            //        bool BFisFit = false;
-
-            //        Candel BFPreviousDayHighestPriceCandel = null;
-
-            //        if (testCandel != null)
-            //        {
-            //            BFPreviousDayHighestPriceCandel = CandelDataPreviousDay
-            //                .Where(c => c.OpenTime.TimeOfDay > testCandel.OpenTime.TimeOfDay) // Compare only the time
-            //                .OrderByDescending(c => c.HighestPrice)                            // Order by HighestPrice descending
-            //                .FirstOrDefault();                                                 // Take the first (highest)
-            //        }
-
-            //        if (BFPreviousDayHighestPriceCandel != null && testCandel != null && testCandel.EndPrice < BFPreviousDayHighestPriceCandel.HighestPrice)
-            //        {
-            //            var percentageDifference = ((BFPreviousDayHighestPriceCandel.HighestPrice - testCandel.EndPrice) / testCandel.EndPrice) * 100;
-
-            //            if (percentageDifference > diff)
-            //            {
-            //                BFisFit = true; // IHisFit is true
-            //            }
-            //        }
-
-            //        if (
-            //         isPreviousBearish
-            //         && isCurrentBullish
-            //         && isEngulfingBody
-            //         && BFisFit
-            //         )
-            //        {
-            //            dragonFlyDojiCandles.Add(testCandel);
-            //        }
-            //    }
-
-
-            //}
-
-
-
-
-
             foreach (Candel testCandel in CandelData)
             {
+                if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
+                {
+                    continue; // Skip the rest of this iteration and proceed to the next object
+                }
+
 
                 var diff = 5;
 
-
-                /// TWEEZER BOTTOM
-                Candel TBfirst = testCandel;
-                Candel TBSecond = CandelData
-                    .Where(c => c.OpenTime > TBfirst.OpenTime)
+                /// BULLISH ENGULFING
+                Candel BFfirst = testCandel;
+                Candel BFSecond = CandelData
+                    .Where(c => c.OpenTime > BFfirst.OpenTime)
                     .OrderBy(c => c.OpenTime)
                     .FirstOrDefault();
 
-                if (TBfirst != null && TBSecond != null)
+                if (BFfirst != null && BFSecond != null)
                 {
 
-                    // Check if the first candle is bearish and the second is bullish
-                    bool isBearishBullish = TBfirst.EndPrice < TBfirst.StartPrice
-                                            && TBSecond.EndPrice > TBSecond.StartPrice;
+                    // Check if the previous candle is bearish
+                    bool isPreviousBearish = BFfirst.EndPrice < BFfirst.StartPrice;
 
-                    // Check if the lowest prices of the candles are nearly equal
-                    bool hasMatchingLows = Math.Abs(TBfirst.LowestPrice - TBSecond.LowestPrice) <= 0.01m;
+                    // Check if the current candle is bullish
+                    bool isCurrentBullish = BFSecond.EndPrice > BFSecond.StartPrice;
 
-                    bool TBisFit = false;
+                    // Check if the current candle's body engulfs the previous candle's body
+                    bool isEngulfingBody =
+                        BFSecond.StartPrice < BFfirst.EndPrice && // Current start below previous end
+                        BFSecond.EndPrice > BFfirst.StartPrice;  // Current end above previous start
 
-                    Candel TBPreviousDayHighestPriceCandel = null;
+                    bool BFisFit = false;
+
+                    Candel BFPreviousDayHighestPriceCandel = null;
 
                     if (testCandel != null)
                     {
-                        TBPreviousDayHighestPriceCandel = CandelDataPreviousDay
+                        BFPreviousDayHighestPriceCandel = CandelDataPreviousDay
                             .Where(c => c.OpenTime.TimeOfDay > testCandel.OpenTime.TimeOfDay) // Compare only the time
                             .OrderByDescending(c => c.HighestPrice)                            // Order by HighestPrice descending
                             .FirstOrDefault();                                                 // Take the first (highest)
                     }
 
-                    if (TBPreviousDayHighestPriceCandel != null && testCandel != null && testCandel.EndPrice < TBPreviousDayHighestPriceCandel.HighestPrice)
+                    if (BFPreviousDayHighestPriceCandel != null && testCandel != null && testCandel.EndPrice < BFPreviousDayHighestPriceCandel.HighestPrice)
                     {
-                        var percentageDifference = ((TBPreviousDayHighestPriceCandel.HighestPrice - testCandel.EndPrice) / testCandel.EndPrice) * 100;
+                        var percentageDifference = ((BFPreviousDayHighestPriceCandel.HighestPrice - testCandel.EndPrice) / testCandel.EndPrice) * 100;
 
                         if (percentageDifference > diff)
                         {
-                            TBisFit = true; // IHisFit is true
+                            BFisFit = true; // IHisFit is true
                         }
                     }
 
                     if (
-                     isBearishBullish
-                     && hasMatchingLows
-                     && TBisFit
+                     isPreviousBearish
+                     && isCurrentBullish
+                     && isEngulfingBody
+                     && BFisFit
                      )
                     {
                         dragonFlyDojiCandles.Add(testCandel);
                     }
-
                 }
+
 
             }
 
 
-            ////Convert ConcurrentBag to a list, if needed
-            List<Candel> result = dragonFlyDojiCandles.ToList();
+
+
+
+            //foreach (Candel testCandel in CandelData)
+            //{
+
+            //    if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
+            //    {
+            //        continue; // Skip the rest of this iteration and proceed to the next object
+            //    }
+
+            //    var diff = 5;
+
+
+            //    /// TWEEZER BOTTOM
+            //    Candel TBfirst = testCandel;
+            //    Candel TBSecond = CandelData
+            //        .Where(c => c.OpenTime > TBfirst.OpenTime)
+            //        .OrderBy(c => c.OpenTime)
+            //        .FirstOrDefault();
+
+            //    if (TBfirst != null && TBSecond != null)
+            //    {
+
+            //        // Check if the first candle is bearish and the second is bullish
+            //        bool isBearishBullish = TBfirst.EndPrice < TBfirst.StartPrice
+            //                                && TBSecond.EndPrice > TBSecond.StartPrice;
+
+            //        // Check if the lowest prices of the candles are nearly equal
+            //        bool hasMatchingLows = Math.Abs(TBfirst.LowestPrice - TBSecond.LowestPrice) <= 0.01m;
+
+            //        bool TBisFit = false;
+
+            //        Candel TBPreviousDayHighestPriceCandel = null;
+
+            //        if (testCandel != null)
+            //        {
+            //            TBPreviousDayHighestPriceCandel = CandelDataPreviousDay
+            //                .Where(c => c.OpenTime.TimeOfDay > testCandel.OpenTime.TimeOfDay) // Compare only the time
+            //                .OrderByDescending(c => c.HighestPrice)                            // Order by HighestPrice descending
+            //                .FirstOrDefault();                                                 // Take the first (highest)
+            //        }
+
+            //        if (TBPreviousDayHighestPriceCandel != null && testCandel != null && testCandel.EndPrice < TBPreviousDayHighestPriceCandel.HighestPrice)
+            //        {
+            //            var percentageDifference = ((TBPreviousDayHighestPriceCandel.HighestPrice - testCandel.EndPrice) / testCandel.EndPrice) * 100;
+
+            //            if (percentageDifference > diff)
+            //            {
+            //                TBisFit = true; // IHisFit is true
+            //            }
+            //        }
+
+            //        if (
+            //         isBearishBullish
+            //         && hasMatchingLows
+            //         && TBisFit
+            //         )
+            //        {
+            //            dragonFlyDojiCandles.Add(TBSecond);
+            //        }
+
+            //    }
+
+            //}
+
+
+            //////Convert ConcurrentBag to a list, if needed
+            //List<Candel> result = dragonFlyDojiCandles.ToList();
 
 
 
@@ -2155,7 +2425,7 @@ namespace StockLogger.Controllers.API_Controllers
             //Task.WaitAll(tasks.ToArray());
 
             //// Convert ConcurrentBag to a list, if needed
-            //List<Candel> result = dragonFlyDojiCandles.ToList();
+            List<Candel> result = dragonFlyDojiCandles.ToList();
 
 
             return result;
