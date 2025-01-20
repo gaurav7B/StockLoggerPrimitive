@@ -48,11 +48,6 @@ namespace StockLogger.Models.Candel
                 new Stock { Ticker = "KOTAKBANK-EQ", Exchange = "NSE", Name = "Kotak Mahindra Bank", Id = 8, SymbolToken = "1922" },
                 new Stock { Ticker = "LT-EQ", Exchange = "NSE", Name = "Larsen & Toubro", Id = 9, SymbolToken = "11483" },
                 new Stock { Ticker = "SBIN-EQ", Exchange = "NSE", Name = "State Bank of India", Id = 10, SymbolToken = "3045" },
-
-
-
-
-
                 new Stock { Ticker = "HCLTECH-EQ", Exchange = "NSE", Name = "HCL Technologies", Id = 14, SymbolToken = "7229" },
                 new Stock { Ticker = "ASIANPAINT-EQ", Exchange = "NSE", Name = "Asian Paints", Id = 15, SymbolToken = "236" },
                 new Stock { Ticker = "DMART-EQ", Exchange = "NSE", Name = "Avenue Supermarts", Id = 16, SymbolToken = "19913" },
@@ -84,12 +79,6 @@ namespace StockLogger.Models.Candel
                 new Stock { Ticker = "ADANIGREEN-EQ", Exchange = "NSE", Name = "ADANI GREEN", Id = 52, SymbolToken = "3563" },
                 new Stock { Ticker = "ADANIPOWER-EQ", Exchange = "NSE", Name = "ADANI POWER", Id = 53, SymbolToken = "17388" },
                 new Stock { Ticker = "ADANITRANS-EQ", Exchange = "NSE", Name = "ADANI TRANS", Id = 54, SymbolToken = "10217" },
-
-
-
-
-
-
 
 
 

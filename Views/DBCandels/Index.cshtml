@@ -134,11 +134,51 @@
                 <button type="button" id="oneYearBtn">1 Year</button>
                 <button type="button" id="threeMonthsBtn">3 Months</button>
                 <button type="button" id="testButton">TEST</button>
+
+                <button type="button" id="buyButton">BUY</button>
+                <button type="button" id="sellButton">SELL</button>
             </div>
         </div>
     </div>
 
     <script>
+        document.getElementById('buyButton').addEventListener('click', function() {
+         fetch('https://localhost:44364/api/BuySell/buy', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+            // Handle response here, maybe show a success message to the user
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Handle error here, maybe show an error message to the user
+        });
+        });
+
+        document.getElementById('sellButton').addEventListener('click', function() {
+         fetch('https://localhost:44364/api/BuySell/sell', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+            // Handle response here, maybe show a success message to the user
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Handle error here, maybe show an error message to the user
+        });
+        });
+
+
         // Restrict the date pickers to prevent selecting tomorrow or later.
         document.addEventListener('DOMContentLoaded', function () {
             const today = new Date().toISOString().split('T')[0];

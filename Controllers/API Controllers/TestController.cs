@@ -279,19 +279,19 @@ namespace StockLogger.Controllers.API_Controllers
                                 decimal profitMargin = 0;
                                 if (expectedPrice == firstCandel.EndPrice * 1.0025m)
                                 {
-                                    profitMargin = 450;
+                                    profitMargin = 450 - 117;
                                 }
                                 else if (expectedPrice == firstCandel.EndPrice * 1.01m)
                                 {
-                                    profitMargin = 1995;
+                                    profitMargin = 1995 - 117;
                                 }
                                 else if(expectedPrice == firstCandel.EndPrice * 1.005m)
                                 {
-                                    profitMargin = 997;
+                                    profitMargin = 997 - 117;
                                 }
                                 else if (expectedPrice == firstCandel.EndPrice * 1.001429m)
                                 {
-                                    profitMargin = 285;
+                                    profitMargin = 285 - 117;
                                 }
 
 
@@ -303,15 +303,15 @@ namespace StockLogger.Controllers.API_Controllers
                                 decimal lossMargin = 0;
                                 if(stopLoss == firstCandel.EndPrice - (firstCandel.EndPrice * 0.001429m))
                                 {
-                                    lossMargin = 300;
+                                    lossMargin = 300 + 117;
                                 }
                                 else if(stopLoss == firstCandel.EndPrice - (firstCandel.EndPrice * 0.005m))
                                 {
-                                    lossMargin = 997;
+                                    lossMargin = 997 + 117;
                                 }
                                 else if (stopLoss == firstCandel.EndPrice - (firstCandel.EndPrice * 0.03m))
                                 {
-                                    lossMargin = 5985;
+                                    lossMargin = 5985 + 117;
                                 }
 
 
@@ -477,73 +477,6 @@ namespace StockLogger.Controllers.API_Controllers
             });
 
         }
-
-
-
-
-
-        //POST https://localhost:44364/api/Test/InsertCandelsToDB
-        [HttpPost("InsertCandelsToDB")]
-        public async Task<IActionResult> InsertCandelsToDB([FromBody] BulkTestRequestModel request)
-        {
-            List<List<Candel>> MainCandelDataList = new List<List<Candel>>();
-
-            var Tokenresponse = await _context.Token.FirstOrDefaultAsync();
-
-            string authtoken = Tokenresponse.AuthToken;
-
-            if (request.StartDate.DayOfWeek == DayOfWeek.Saturday || request.StartDate.DayOfWeek == DayOfWeek.Sunday)
-            {
-                return Ok(MainCandelDataList);
-            }
-
-            foreach (var stock in _stocks)
-            {
-
-                var token = authtoken;
-
-                var requestBody = new
-                {
-                    SymbolToken = stock.symboltoken,
-                    AuthorizationToken = token,
-                    StartDate = request.StartDate.ToString("o"), // ISO string format
-                    EndDate = request.EndDate.ToString("o") // ISO string format
-                };
-
-                var client = new HttpClient();
-                var jsonRequestBody = JsonConvert.SerializeObject(requestBody);
-                var content = new StringContent(jsonRequestBody, Encoding.UTF8, "application/json");
-
-                try
-                {
-                    var response = await client.PostAsync("https://localhost:44364/api/AngelCandel/getCandleDataForTest", content);
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var responseData = await response.Content.ReadAsStringAsync();
-                        List<Candel> CandelData = JsonConvert.DeserializeObject<List<Candel>>(responseData);
-
-                        MainCandelDataList.Add(CandelData);
-
-                        foreach (var candel in CandelData)
-                        {
-                            _context.Candel.Add(candel);
-                            await _context.SaveChangesAsync();
-                        }
-                    }
-
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"An error occurred: {ex.Message}");
-                }
-
-            }
-            return Ok(MainCandelDataList);
-        }
-
-
-
 
 
 
@@ -2500,6 +2433,75 @@ namespace StockLogger.Controllers.API_Controllers
 
             return result;
         }
+
+
+
+
+        //POST https://localhost:44364/api/Test/InsertCandelsToDB
+        [HttpPost("InsertCandelsToDB")]
+        public async Task<IActionResult> InsertCandelsToDB([FromBody] BulkTestRequestModel request)
+        {
+            List<List<Candel>> MainCandelDataList = new List<List<Candel>>();
+
+            var Tokenresponse = await _context.Token.FirstOrDefaultAsync();
+
+            string authtoken = Tokenresponse.AuthToken;
+
+            if (request.StartDate.DayOfWeek == DayOfWeek.Saturday || request.StartDate.DayOfWeek == DayOfWeek.Sunday)
+            {
+                return Ok(MainCandelDataList);
+            }
+
+            foreach (var stock in _stocks)
+            {
+
+                var token = authtoken;
+
+                var requestBody = new
+                {
+                    SymbolToken = stock.symboltoken,
+                    AuthorizationToken = token,
+                    StartDate = request.StartDate.ToString("o"), // ISO string format
+                    EndDate = request.EndDate.ToString("o") // ISO string format
+                };
+
+                var client = new HttpClient();
+                var jsonRequestBody = JsonConvert.SerializeObject(requestBody);
+                var content = new StringContent(jsonRequestBody, Encoding.UTF8, "application/json");
+
+                try
+                {
+                    var response = await client.PostAsync("https://localhost:44364/api/AngelCandel/getCandleDataForTest", content);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var responseData = await response.Content.ReadAsStringAsync();
+                        List<Candel> CandelData = JsonConvert.DeserializeObject<List<Candel>>(responseData);
+
+                        MainCandelDataList.Add(CandelData);
+
+                        foreach (var candel in CandelData)
+                        {
+                            _context.Candel.Add(candel);
+                            await _context.SaveChangesAsync();
+                        }
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An error occurred: {ex.Message}");
+                }
+
+            }
+
+
+            return Ok(MainCandelDataList);
+        }
+
+
+
+
 
 
         private bool IsSmallWick(Candel candel)
