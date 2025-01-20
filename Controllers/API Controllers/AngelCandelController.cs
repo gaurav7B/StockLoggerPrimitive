@@ -139,6 +139,74 @@ namespace StockLogger.Controllers.API_Controllers
                 if (!response.IsSuccessStatusCode)
                 {
                     HttpResponseMessage tokenResponse = await client.PostAsync("https://localhost:44364/api/Token", null); //Creats new JWT token in database
+
+
+                    if (tokenResponse.IsSuccessStatusCode)
+                    {
+                        // Step 2: Parse the response to retrieve the auth token
+                        var tokenData = await tokenResponse.Content.ReadFromJsonAsync<Token>();
+
+                        if (tokenData?.AuthToken != null)
+                        {
+                            // Set the headers
+                            requestMessage.Headers.Add("Accept", "application/json");
+                            requestMessage.Headers.Add("X-SourceID", "WEB");
+                            requestMessage.Headers.Add("X-ClientLocalIP", "192.168.56.177");  // Your local IP from ipconfig
+                            requestMessage.Headers.Add("X-ClientPublicIP", await GetPublicIPAsync());  // Fetching the public IP dynamically
+                            requestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX"); // Replace with your actual MAC address
+                            requestMessage.Headers.Add("X-UserType", "USER");
+                            requestMessage.Headers.Add("Authorization", "Bearer " + tokenData.AuthToken);
+                            requestMessage.Headers.Add("X-PrivateKey", "DcsJlRJp"); // Your actual API Key
+
+                            // Send request to get historical data
+                            HttpResponseMessage response2 = await client.SendAsync(requestMessage);
+
+                            response2.EnsureSuccessStatusCode();
+
+                            string responseContent2 = await response2.Content.ReadAsStringAsync();
+                            dynamic candleData2 = JsonConvert.DeserializeObject(responseContent2);
+                            var rawCandelData2 = candleData2.data;
+
+                            List<Candel> ModifiedCandelDataList2 = new List<Candel>();
+
+
+                            if (rawCandelData2 == null)
+                            {
+                                return null;
+                            }
+
+
+                            foreach (var rawCandel in rawCandelData2)
+                            {
+                                Candel newCandel = new Candel
+                                {
+                                    OpenTime = DateTime.Parse(rawCandel[0].ToString()),
+                                    CloseTime = DateTime.Parse(rawCandel[0].ToString()).AddMinutes(1),
+
+                                    StartPrice = Convert.ToDecimal(rawCandel[1]),
+                                    HighestPrice = Convert.ToDecimal(rawCandel[2]),
+                                    LowestPrice = Convert.ToDecimal(rawCandel[3]),
+                                    EndPrice = Convert.ToDecimal(rawCandel[4]),
+
+                                    Ticker = matchingStock.ticker,
+                                    TickerId = matchingStock.id,
+                                    Exchange = matchingStock.exchange,
+
+                                    Volume = Convert.ToDecimal(rawCandel[5]),
+                                };
+                                newCandel.SetBullBearStatus();
+                                newCandel.SetPriceChange();
+
+                                if (newCandel.CloseTime < DateTime.Now)
+                                {
+                                    ModifiedCandelDataList2.Add(newCandel);
+                                }
+
+                            }
+
+                            return Ok(ModifiedCandelDataList2);  // Return the fetched historical candle data
+                        }
+                    }
                 }
 
                 response.EnsureSuccessStatusCode();

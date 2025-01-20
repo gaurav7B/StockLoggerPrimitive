@@ -20,44 +20,10 @@ namespace StockLogger.Controllers.API_Controllers
             _context = context;
         }
 
+        //POST https://localhost:44364/api/Candel
         [HttpPost]
         public async Task<ActionResult> CreateCandel(Candel candel)
         {
-            var existingCandel = await _context.Candel
-                .FirstOrDefaultAsync(c =>
-                    c.OpenTime == candel.OpenTime &&
-                    c.Ticker == candel.Ticker
-                );
-
-            if (existingCandel != null)
-            {
-                // Update the existing candel with new data
-                existingCandel.StartPrice = candel.StartPrice;
-                existingCandel.HighestPrice = candel.HighestPrice;
-                existingCandel.LowestPrice = candel.LowestPrice;
-                existingCandel.EndPrice = candel.EndPrice;
-
-                existingCandel.OpenTime = candel.OpenTime;
-                existingCandel.CloseTime = candel.CloseTime;
-
-                existingCandel.Ticker = candel.Ticker;
-                existingCandel.TickerId = candel.TickerId;
-                existingCandel.Exchange = candel.Exchange;
-
-                existingCandel.IsBullish = candel.IsBullish;
-                existingCandel.IsBearish = candel.IsBearish;
-
-                existingCandel.PriceChange = candel.PriceChange;
-                existingCandel.PriceChangePercentage = candel.PriceChangePercentage;
-                
-                existingCandel.Volume = candel.Volume;
-
-                // Save the changes to the database
-                await _context.SaveChangesAsync();
-
-                return Ok(); // Return the updated candel
-            }
-
             // If no duplicate, add the new candel
             _context.Candel.Add(candel);
             await _context.SaveChangesAsync();

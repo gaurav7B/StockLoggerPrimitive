@@ -271,10 +271,10 @@ namespace StockLogger.Controllers.API_Controllers
                                 Candel firstCandel = detectedCandelList[0];
                                 Candel lastCandel = detectedCandelList[5];//5
 
-                                var expectedPrice = firstCandel.EndPrice * 1.001429m; // 1.429 R profit on 1000 R // 285 on 2 Lakh
+                                //var expectedPrice = firstCandel.EndPrice * 1.001429m; // 1.429 R profit on 1000 R // 285 on 2 Lakh
                                 //var expectedPrice = firstCandel.EndPrice * 1.005m; //  5 R profit on 1000 R //997 on 2lakh
                                 //var expectedPrice = firstCandel.EndPrice * 1.01m;  //  10 R profit on 1000 R //1995 okkkn 2 lakh
-                                //var expectedPrice = firstCandel.EndPrice * 1.0025m; // 2.5 R profit on 1000 R //450 on 2Lakh
+                                var expectedPrice = firstCandel.EndPrice * 1.0025m; // 2.5 R profit on 1000 R //450 on 2Lakh
 
                                 decimal profitMargin = 0;
                                 if (expectedPrice == firstCandel.EndPrice * 1.0025m)
@@ -479,6 +479,74 @@ namespace StockLogger.Controllers.API_Controllers
         }
 
 
+
+
+
+        //POST https://localhost:44364/api/Test/InsertCandelsToDB
+        [HttpPost("InsertCandelsToDB")]
+        public async Task<IActionResult> InsertCandelsToDB([FromBody] BulkTestRequestModel request)
+        {
+            List<List<Candel>> MainCandelDataList = new List<List<Candel>>();
+
+            var Tokenresponse = await _context.Token.FirstOrDefaultAsync();
+
+            string authtoken = Tokenresponse.AuthToken;
+
+            if (request.StartDate.DayOfWeek == DayOfWeek.Saturday || request.StartDate.DayOfWeek == DayOfWeek.Sunday)
+            {
+                return Ok(MainCandelDataList);
+            }
+
+            foreach (var stock in _stocks)
+            {
+
+                var token = authtoken;
+
+                var requestBody = new
+                {
+                    SymbolToken = stock.symboltoken,
+                    AuthorizationToken = token,
+                    StartDate = request.StartDate.ToString("o"), // ISO string format
+                    EndDate = request.EndDate.ToString("o") // ISO string format
+                };
+
+                var client = new HttpClient();
+                var jsonRequestBody = JsonConvert.SerializeObject(requestBody);
+                var content = new StringContent(jsonRequestBody, Encoding.UTF8, "application/json");
+
+                try
+                {
+                    var response = await client.PostAsync("https://localhost:44364/api/AngelCandel/getCandleDataForTest", content);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var responseData = await response.Content.ReadAsStringAsync();
+                        List<Candel> CandelData = JsonConvert.DeserializeObject<List<Candel>>(responseData);
+
+                        MainCandelDataList.Add(CandelData);
+
+                        foreach (var candel in CandelData)
+                        {
+                            _context.Candel.Add(candel);
+                            await _context.SaveChangesAsync();
+                        }
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"An error occurred: {ex.Message}");
+                }
+
+            }
+            return Ok(MainCandelDataList);
+        }
+
+
+
+
+
+
         // Function to identify Dragonfly Doji candles
 
         private List<Candel> IdentifyInvertedHammerCandles(List<Candel> CandelData, List<Candel> CandelDataPreviousDay)
@@ -493,7 +561,7 @@ namespace StockLogger.Controllers.API_Controllers
 
                 if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
                 {
-                    return result; // Skip the rest of this iteration and proceed to the next object
+                    break; // Skip the rest of this iteration and proceed to the next object
                 }
 
 
@@ -581,7 +649,7 @@ namespace StockLogger.Controllers.API_Controllers
             {
                 if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
                 {
-                    continue; // Skip the rest of this iteration and proceed to the next object
+                    break; // Skip the rest of this iteration and proceed to the next object
                 }
 
 

@@ -143,6 +143,10 @@
                     <i class="fas fa-chart-bar icon"></i>
                     <h2>LOGIC TESTER</h2>
                 </div>
+                <div class="sidebarMenuediv" onclick="redirectToDBCandels()">
+                    <i class="fas fa-chart-bar icon"></i>
+                    <h2>DB CANDELS</h2>
+                </div>
                 <div class="sidebarMenuediv" onclick="redirectToDashboard()">
                     <i class="fas fa-chart-bar icon"></i>
                     <h2>DASHBOARD</h2>
@@ -201,6 +205,11 @@
         function redirectToLogicTester()
         {
             window.location.href = '/LogicTesterMVC/Index'
+        }
+
+        function redirectToDBCandels()
+        {
+            window.location.href = '/DBCandels/Index'
         }
 
         function redirectToDashboard()
