@@ -168,6 +168,8 @@ namespace StockLogger.Controllers.API_Controllers
                             //dragonFlyDojiCandles = IdentifyInvertedHammerCandles(CandelData, CandelDataPreviousDay);
 
 
+                            //////////////////////////////////////////////////////////////////////////////
+
                             foreach (Candel testCandel in CandelData)
                             {
                                 if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
@@ -269,10 +271,10 @@ namespace StockLogger.Controllers.API_Controllers
                                 Candel firstCandel = detectedCandelList[0];
                                 Candel lastCandel = detectedCandelList[5];//5
 
-                                //var expectedPrice = firstCandel.EndPrice * 1.001429m; // 1.429 R profit on 1000 R // 285 on 2 Lakh
+                                var expectedPrice = firstCandel.EndPrice * 1.001429m; // 1.429 R profit on 1000 R // 285 on 2 Lakh
                                 //var expectedPrice = firstCandel.EndPrice * 1.005m; //  5 R profit on 1000 R //997 on 2lakh
                                 //var expectedPrice = firstCandel.EndPrice * 1.01m;  //  10 R profit on 1000 R //1995 okkkn 2 lakh
-                                var expectedPrice = firstCandel.EndPrice * 1.0025m; // 2.5 R profit on 1000 R //450 on 2Lakh
+                                //var expectedPrice = firstCandel.EndPrice * 1.0025m; // 2.5 R profit on 1000 R //450 on 2Lakh
 
                                 decimal profitMargin = 0;
                                 if (expectedPrice == firstCandel.EndPrice * 1.0025m)
