@@ -525,6 +525,7 @@ namespace StockLogger.Controllers.API_Controllers
                 MainLoss,
                 MainCorrectPredictionList,
                 MainWrongPredictionList,
+                allCandelsOfCorrectPredictions,
                 MainMasterList
             });
 
