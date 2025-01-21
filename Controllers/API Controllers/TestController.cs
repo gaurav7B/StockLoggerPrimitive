@@ -366,9 +366,9 @@ namespace StockLogger.Controllers.API_Controllers
                                 }
 
 
-                                decimal NoOfStocks = 200000 / firstCandel.EndPrice;
-                                decimal BoughtStockPrice = NoOfStocks * firstCandel.EndPrice;
-                                decimal EndTotalPrice = NoOfStocks * EndCandel.EndPrice;
+                                //decimal NoOfStocks = 200000 / firstCandel.EndPrice;
+                                //decimal BoughtStockPrice = NoOfStocks * firstCandel.EndPrice;
+                                //decimal EndTotalPrice = NoOfStocks * EndCandel.EndPrice;
 
 
                                 Candel CandelWithHighestPrice = CandelData?
@@ -537,20 +537,20 @@ namespace StockLogger.Controllers.API_Controllers
 
             }
 
-            //List<Candel> allCandelsOfCorrectPredictions = MainCorrectPredictionList
-            //                         .SelectMany(outerList => outerList.SelectMany(innerList => innerList))
-            //                         .ToList();
-
             List<Candel> allCandelsOfCorrectPredictions = MainCorrectPredictionList
-                                       .SelectMany(outerList => outerList.SelectMany(innerList => innerList))
-                                       .Distinct()
-                                       .ToList();
+                                     .SelectMany(outerList => outerList.SelectMany(innerList => innerList))
+                                     .ToList();
 
 
             // Assuming Candel is a predefined class
             List<List<Candel>> extractedList = MainWrongPredictionList
                 .SelectMany(innerList => innerList)
                 .ToList();
+
+
+
+
+
 
             foreach (List<Candel> mainList in extractedList)
             {
