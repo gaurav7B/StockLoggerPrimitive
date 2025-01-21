@@ -141,7 +141,7 @@ namespace StockLogger.Controllers.API_Controllers
                 {
                     var response = await client.PostAsync("https://localhost:44364/api/AngelCandel/getCandleDataForTest", content);
 
-                    var responseForPreviousDaysData = await client.PostAsync("https://localhost:44364/api/AngelCandel/getCandleDataForTest", contentForPreviousDaysData);
+                    //var responseForPreviousDaysData = await client.PostAsync("https://localhost:44364/api/AngelCandel/getCandleDataForTest", contentForPreviousDaysData);
 
                     if (response.IsSuccessStatusCode 
                         //&& responseForPreviousDaysData.IsSuccessStatusCode
@@ -151,8 +151,8 @@ namespace StockLogger.Controllers.API_Controllers
                         var responseData = await response.Content.ReadAsStringAsync();
                         CandelData = JsonConvert.DeserializeObject<List<Candel>>(responseData);
 
-                        var responseDataForPreviousDaysData = await responseForPreviousDaysData.Content.ReadAsStringAsync();
-                        List<Candel> CandelDataPreviousDay = JsonConvert.DeserializeObject<List<Candel>>(responseDataForPreviousDaysData);
+                        //var responseDataForPreviousDaysData = await responseForPreviousDaysData.Content.ReadAsStringAsync();
+                        //List<Candel> CandelDataPreviousDay = JsonConvert.DeserializeObject<List<Candel>>(responseDataForPreviousDaysData);
 
                         //Candel EndCandel = CandelData.LastOrDefault();
 
@@ -175,15 +175,15 @@ namespace StockLogger.Controllers.API_Controllers
 
                             foreach (Candel testCandel in CandelData)
                             {
-                                if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
-                                {
-                                    break; // Skip the rest of this iteration and proceed to the next object
-                                }
+                                //if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
+                                //{
+                                //    break; // Skip the rest of this iteration and proceed to the next object
+                                //}
 
-                                if (testCandel.OpenTime.TimeOfDay < new TimeSpan(9, 45, 0))
-                                {
-                                    continue; // Skip the rest of this iteration and proceed to the next object
-                                }
+                                //if (testCandel.OpenTime.TimeOfDay < new TimeSpan(9, 45, 0))
+                                //{
+                                //    continue; // Skip the rest of this iteration and proceed to the next object
+                                //}
 
 
                                 var diff = 5;
@@ -209,27 +209,27 @@ namespace StockLogger.Controllers.API_Controllers
                                         BFSecond.StartPrice < BFfirst.EndPrice && // Current start below previous end
                                         BFSecond.EndPrice > BFfirst.StartPrice;  // Current end above previous start
 
-                                    bool BFisFit = false;
+                                    //bool BFisFit = false;
 
-                                    Candel BFPreviousDayHighestPriceCandel = null;
+                                    //Candel BFPreviousDayHighestPriceCandel = null;
 
-                                    if (testCandel != null)
-                                    {
-                                        BFPreviousDayHighestPriceCandel = CandelDataPreviousDay
-                                            .Where(c => c.OpenTime.TimeOfDay > testCandel.OpenTime.TimeOfDay) // Compare only the time
-                                            .OrderByDescending(c => c.HighestPrice)                            // Order by HighestPrice descending
-                                            .FirstOrDefault();                                                 // Take the first (highest)
-                                    }
+                                    //if (testCandel != null)
+                                    //{
+                                    //    BFPreviousDayHighestPriceCandel = CandelDataPreviousDay
+                                    //        .Where(c => c.OpenTime.TimeOfDay > testCandel.OpenTime.TimeOfDay) // Compare only the time
+                                    //        .OrderByDescending(c => c.HighestPrice)                            // Order by HighestPrice descending
+                                    //        .FirstOrDefault();                                                 // Take the first (highest)
+                                    //}
 
-                                    if (BFPreviousDayHighestPriceCandel != null && testCandel != null && testCandel.EndPrice < BFPreviousDayHighestPriceCandel.HighestPrice)
-                                    {
-                                        var percentageDifference = ((BFPreviousDayHighestPriceCandel.HighestPrice - testCandel.EndPrice) / testCandel.EndPrice) * 100;
+                                    //if (BFPreviousDayHighestPriceCandel != null && testCandel != null && testCandel.EndPrice < BFPreviousDayHighestPriceCandel.HighestPrice)
+                                    //{
+                                    //    var percentageDifference = ((BFPreviousDayHighestPriceCandel.HighestPrice - testCandel.EndPrice) / testCandel.EndPrice) * 100;
 
-                                        if (percentageDifference > diff)
-                                        {
-                                            BFisFit = true; // IHisFit is true
-                                        }
-                                    }
+                                    //    if (percentageDifference > diff)
+                                    //    {
+                                    //        BFisFit = true; // IHisFit is true
+                                    //    }
+                                    //}
 
                                     if (
                                      isPreviousBearish
