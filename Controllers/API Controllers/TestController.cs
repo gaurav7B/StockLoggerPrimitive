@@ -175,10 +175,10 @@ namespace StockLogger.Controllers.API_Controllers
 
                             foreach (Candel testCandel in CandelData)
                             {
-                                //if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
-                                //{
-                                //    break; // Skip the rest of this iteration and proceed to the next object
-                                //}
+                                if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
+                                {
+                                    break; // Skip the rest of this iteration and proceed to the next object
+                                }
 
                                 //if (testCandel.OpenTime.TimeOfDay < new TimeSpan(9, 45, 0))
                                 //{
@@ -321,6 +321,7 @@ namespace StockLogger.Controllers.API_Controllers
                                 //var expectedPrice = firstCandel.EndPrice * 1.0025m; // 2.5 R profit on 1000 R //450 on 2Lakh
 
                                 decimal profitMargin = 0;
+
                                 if (expectedPrice == firstCandel.EndPrice * 1.0025m)
                                 {
                                     profitMargin = 450 - 117;
