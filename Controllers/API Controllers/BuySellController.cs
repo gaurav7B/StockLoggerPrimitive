@@ -2,12 +2,17 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Microsoft.Identity.Client;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OtpNet;
 using StockLogger.Data;
 using StockLogger.Models.Candel;
+using System;
 using System.Text;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using System.Web.Helpers;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace StockLogger.Controllers.API_Controllers
@@ -117,7 +122,7 @@ namespace StockLogger.Controllers.API_Controllers
                 producttype = "INTRADAY",         
                 duration = "DAY",             
                 price = "0",             
-                squareoff = "0",                             
+                squareoff = "11",     // Sets the target price where the order is to be sold                  
                 stoploss = "0",                             
                 quantity = "1"                  
             };
@@ -256,20 +261,62 @@ namespace StockLogger.Controllers.API_Controllers
                 }
             }
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     }
 }
+
+
+
+
+
+
+
+//If you want to place an intraday market order where the order executes at the current market price, you can set "price": "0".
+//Along with this, you can define the squareoff value to set a target profit level.
+
+//Here’s the updated payload for your requirement:
+
+//Updated JSON:
+//json
+//Copy
+//Edit
+//{
+//  "variety": "NORMAL",
+//  "tradingsymbol": "SBIN-EQ",
+//  "symboltoken": "3045",
+//  "transactiontype": "BUY",
+//  "exchange": "NSE",
+//  "ordertype": "MARKET",
+//  "producttype": "INTRADAY",
+//  "duration": "DAY",
+//  "price": "0",
+//  "squareoff": "1.95",
+//  "stoploss": "0",
+//  "quantity": "1"
+//}
+//Key Points:
+//price: "0":
+
+//Setting the price to 0 ensures that the order is placed at the current market rate.
+//squareoff Parameter:
+
+//The squareoff value determines your profit target.
+//In this case, it's set to 1.95, which is approximately 1% of your expected buying price (194.50).
+//Example Execution Logic:
+
+//Assuming the current market price is 194.50, the system will:
+//Execute the buy order at the market price.
+//Place a sell order with a target price at:
+//Target Price
+//=
+//Market Price
+//+
+//Squareoff
+//Target Price=Market Price+Squareoff
+//Target Price
+//=
+//194.50
+//+
+//1.95
+//=
+//196.45
+//Target Price=194.50+1.95=196.45
