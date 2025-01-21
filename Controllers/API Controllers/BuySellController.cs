@@ -41,15 +41,15 @@ namespace StockLogger.Controllers.API_Controllers
                 variety = "NORMAL",
                 tradingsymbol = "IDEA-EQ",
                 symboltoken = "14366",
-                transactiontype ="BUY",
-                exchange ="NSE",
-                ordertype ="MARKET",
-                producttype ="INTRADAY",
-                duration ="DAY",
-                price ="0",
-                squareoff ="0",
-                stoploss ="0",
-                quantity ="1"
+                transactiontype = "BUY",
+                exchange = "NSE",
+                ordertype = "MARKET",
+                producttype = "INTRADAY",
+                duration = "DAY",
+                price = "0",
+                squareoff = "0",
+                stoploss = "0",
+                quantity = "1"
             };
 
             var jsonData = JsonConvert.SerializeObject(data);
@@ -63,7 +63,6 @@ namespace StockLogger.Controllers.API_Controllers
 
             // Set the headers
             requestMessage.Headers.Add("Accept", "application/json");
-            //requestMessage.Headers.Add("Content-Type", "application/json");
             requestMessage.Headers.Add("X-SourceID", "WEB");
             requestMessage.Headers.Add("X-ClientLocalIP", "192.168.56.177");  // Your local IP from ipconfig
             requestMessage.Headers.Add("X-ClientPublicIP", await GetPublicIPAsync());  // Fetching the public IP dynamically
@@ -112,15 +111,15 @@ namespace StockLogger.Controllers.API_Controllers
                 variety = "NORMAL",
                 tradingsymbol = "IDEA-EQ",
                 symboltoken = "14366",
-                transactiontype = "SELL",                     // Transaction type is "SELL"
-                exchange = "NSE",                             // Exchange is "NSE"
-                ordertype = "MARKET",                         // Use market order
-                producttype = "INTRADAY",                     // Intraday product type
-                duration = "DAY",                             // Valid for the day
-                price = "0",                                  // Market price
-                squareoff = "0",                              // No square off limit for intraday
-                stoploss = "0",                               // No stop loss limit for intraday
-                quantity = "1"                   // Quantity provided in the request
+                transactiontype = "SELL",              
+                exchange = "NSE",             
+                ordertype = "MARKET",        
+                producttype = "INTRADAY",         
+                duration = "DAY",             
+                price = "0",             
+                squareoff = "0",                             
+                stoploss = "0",                             
+                quantity = "1"                  
             };
 
             var jsonData = JsonConvert.SerializeObject(data);
@@ -134,7 +133,6 @@ namespace StockLogger.Controllers.API_Controllers
 
             // Set the headers
             requestMessage.Headers.Add("Accept", "application/json");
-            //requestMessage.Headers.Add("Content-Type", "application/json");
             requestMessage.Headers.Add("X-SourceID", "WEB");
             requestMessage.Headers.Add("X-ClientLocalIP", "192.168.56.177");  // Your local IP from ipconfig
             requestMessage.Headers.Add("X-ClientPublicIP", await GetPublicIPAsync());  // Fetching the public IP dynamically
