@@ -175,10 +175,10 @@ namespace StockLogger.Controllers.API_Controllers
 
                             foreach (Candel testCandel in CandelData)
                             {
-                                if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
-                                {
-                                    break; // Skip the rest of this iteration and proceed to the next object
-                                }
+                                //if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
+                                //{
+                                //    break; // Skip the rest of this iteration and proceed to the next object
+                                //}
 
                                 //if (testCandel.OpenTime.TimeOfDay < new TimeSpan(9, 45, 0))
                                 //{
@@ -186,7 +186,7 @@ namespace StockLogger.Controllers.API_Controllers
                                 //}
 
 
-                                var diff = 5;
+                                var diff = 10;
 
                                 /// BULLISH ENGULFING
                                 Candel BFfirst = testCandel;
@@ -195,9 +195,18 @@ namespace StockLogger.Controllers.API_Controllers
                                     .OrderBy(c => c.OpenTime)
                                     .FirstOrDefault();
 
+                                Candel BFVerification = null;
+
+                                if (BFSecond != null)
+                                {
+                                    BFVerification = CandelData
+                                        .Where(c => c.OpenTime > BFSecond.OpenTime)
+                                        .OrderBy(c => c.OpenTime)
+                                        .FirstOrDefault();
+                                }
+
                                 if (BFfirst != null && BFSecond != null)
                                 {
-
                                     // Check if the previous candle is bearish
                                     bool isPreviousBearish = BFfirst.EndPrice < BFfirst.StartPrice;
 
@@ -208,6 +217,17 @@ namespace StockLogger.Controllers.API_Controllers
                                     bool isEngulfingBody =
                                         BFSecond.StartPrice < BFfirst.EndPrice && // Current start below previous end
                                         BFSecond.EndPrice > BFfirst.StartPrice;  // Current end above previous start
+
+                                    // Check if the current candle is larger (stronger) than the previous one
+                                    bool isCurrentCandleLarge =
+                                        (BFSecond.EndPrice - BFSecond.StartPrice) >= (2 * (BFfirst.EndPrice - BFfirst.StartPrice)); // Current body at least twice as large as the previous one
+
+                                    // Check if the current candle's volume is higher than the previous one
+                                    bool isVolumeHigh = BFSecond.Volume > BFfirst.Volume;
+
+                                    bool isVerificationCandelBullish = BFVerification != null && BFVerification.IsBullish.HasValue;
+                                    bool isVerificationCandelPriceGreater = BFVerification != null && BFVerification.EndPrice > BFSecond.EndPrice;
+
 
                                     //bool BFisFit = false;
 
@@ -235,10 +255,14 @@ namespace StockLogger.Controllers.API_Controllers
                                      isPreviousBearish
                                      && isCurrentBullish
                                      && isEngulfingBody
+                                     && isCurrentCandleLarge
+                                     && isVolumeHigh
+                                     && isVerificationCandelBullish
+                                     && isVerificationCandelPriceGreater
                                      //&& BFisFit
                                      )
                                     {
-                                        dragonFlyDojiCandles.Add(BFSecond);
+                                        dragonFlyDojiCandles.Add(BFVerification);
                                     }
                                 }
 
@@ -314,15 +338,24 @@ namespace StockLogger.Controllers.API_Controllers
                             {
                                 Candel firstCandel = dojiCandle;
 
-
-                                var expectedPrice = firstCandel.EndPrice * 1.001429m; // 1.429 R profit on 1000 R // 285 on 2 Lakh
+                                //var expectedPrice = firstCandel.EndPrice * 1.0008014m; 
+                                //var expectedPrice = firstCandel.EndPrice * 1.001429m; // 1.429 R profit on 1000 R // 285 on 2 Lakh
                                 //var expectedPrice = firstCandel.EndPrice * 1.005m; //  5 R profit on 1000 R //997 on 2lakh
                                 //var expectedPrice = firstCandel.EndPrice * 1.01m;  //  10 R profit on 1000 R //1995 okkkn 2 lakh
-                                //var expectedPrice = firstCandel.EndPrice * 1.0025m; // 2.5 R profit on 1000 R //450 on 2Lakh
+                                decimal expectedPrice = 0; // 2.5 R profit on 1000 R //450 on 2Lakh
+
+                                if(firstCandel != null)
+                                {
+                                    expectedPrice = (firstCandel.EndPrice * 1.001429m);
+                                }
 
                                 decimal profitMargin = 0;
 
-                                if (expectedPrice == firstCandel.EndPrice * 1.0025m)
+                                if (expectedPrice == firstCandel.EndPrice * 1.0008014m)
+                                {
+                                    profitMargin = 40;
+                                }
+                                else if (expectedPrice == firstCandel.EndPrice * 1.0025m)
                                 {
                                     profitMargin = 450 - 117;
                                 }
@@ -367,9 +400,10 @@ namespace StockLogger.Controllers.API_Controllers
                                 }
 
 
-                                //decimal NoOfStocks = 200000 / firstCandel.EndPrice;
-                                //decimal BoughtStockPrice = NoOfStocks * firstCandel.EndPrice;
-                                //decimal EndTotalPrice = NoOfStocks * EndCandel.EndPrice;
+
+
+                                List<Candel> CandelDataAfterFirstCandel = CandelData
+                                         .Where(candel => candel.OpenTime > firstCandel.OpenTime).ToList();
 
 
                                 Candel CandelWithHighestPrice = CandelData?
@@ -388,12 +422,15 @@ namespace StockLogger.Controllers.API_Controllers
 
                                 Candel profitCandel = null;
 
-                                        profitCandel = CandelData
-                                                      .Where(c => c.HighestPrice >= expectedPrice || c.LowestPrice >= expectedPrice || c.EndPrice >= expectedPrice || c.StartPrice >= expectedPrice && c.OpenTime > firstCandel.OpenTime)
-                                                      .OrderBy(c => c.OpenTime)
-                                                      .FirstOrDefault();
 
-
+                                profitCandel = CandelDataAfterFirstCandel
+                                              .Where(c =>
+                                                  (c.HighestPrice >= expectedPrice ||
+                                                   c.LowestPrice >= expectedPrice ||
+                                                   c.EndPrice >= expectedPrice ||
+                                                   c.StartPrice >= expectedPrice))
+                                              .OrderBy(c => c.OpenTime)
+                                              .FirstOrDefault();
 
 
 
@@ -454,7 +491,7 @@ namespace StockLogger.Controllers.API_Controllers
                                 //else
                                 //{
                                 //if (expectedPrice < CandelWithHighestPrice.HighestPrice)
-                                    if (profitCandel != null)
+                                if (profitCandel != null)
                                     {
                                        List<Candel> CandelPair = new List<Candel>();
 
@@ -544,23 +581,27 @@ namespace StockLogger.Controllers.API_Controllers
 
 
             // Assuming Candel is a predefined class
-            List<List<Candel>> extractedList = MainWrongPredictionList
-                .SelectMany(innerList => innerList)
-                .ToList();
+            List<List<Candel>> extractedListWrongPredictions = MainWrongPredictionList
+                                              .SelectMany(innerList => innerList)
+                                              .ToList();
+
+            List<List<Candel>> extractedListCorrectPredictions = MainCorrectPredictionList
+                                              .SelectMany(innerList => innerList)
+                                              .ToList();
 
 
 
 
-
-
-            foreach (List<Candel> mainList in extractedList)
+            foreach (List<Candel> mainList in extractedListWrongPredictions)
             {
                 Candel firstCandel = mainList[0];
                 Candel secondCandel = mainList[1];
 
                 decimal NoofStocks = 200000 / firstCandel.EndPrice;
+                //decimal NoofStocks = 50000 / firstCandel.EndPrice;
+                //decimal NoofStocks = 3391 / firstCandel.EndPrice;
 
-                MainLoss = MainLoss + (NoofStocks * (firstCandel.EndPrice - secondCandel.EndPrice));
+                MainLoss = MainLoss + (NoofStocks * (firstCandel.EndPrice - secondCandel.EndPrice)) - 117;
 
             }
 
@@ -574,10 +615,10 @@ namespace StockLogger.Controllers.API_Controllers
                 Net = MainProfit - MainLoss,
                 MainProfit,
                 MainLoss,
-                MainCorrectPredictionList,
-                MainWrongPredictionList,
-                CorrectPrediction = (allCandelsOfCorrectPredictions.Count/2),
-                 WrongPredictions = (extractedList.Count),
+                //MainCorrectPredictionList,
+                //MainWrongPredictionList,
+                extractedListCorrectPredictions,
+                extractedListWrongPredictions,
                 MainMasterList
             });
 

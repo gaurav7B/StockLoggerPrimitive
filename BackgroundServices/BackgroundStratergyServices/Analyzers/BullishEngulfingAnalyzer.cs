@@ -19,23 +19,31 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices.Analyzers
             // Get the last two candles (most recent and the previous one)
             List<Candel> recentTwoCandles = candelList.OrderByDescending(c => c.CloseTime).Take(2).ToList();
 
-            Candel previousCandle = recentTwoCandles[1];
-            Candel currentCandle = recentTwoCandles[0];
+            Candel BFfirst = recentTwoCandles[1];
+            Candel BFSecond = recentTwoCandles[0];
 
-            // Check conditions for Bullish Engulfing pattern
-            bool previousBearish = previousCandle.IsBearish == true; // Previous candle is bearish
-            bool currentBullish = currentCandle.IsBullish == true;   // Current candle is bullish
+            Candel currentCandle = BFSecond;
 
-            // Check if the body of the current bullish candle fully engulfs the body of the previous bearish candle
-            bool bodyEngulfed = (currentCandle.EndPrice > previousCandle.StartPrice) &&
-                                (currentCandle.StartPrice < previousCandle.EndPrice);
+            // Check if the previous candle is bearish
+            bool isPreviousBearish = BFfirst.EndPrice < BFfirst.StartPrice;
 
-            // Optionally, check if shadows are small relative to the body
-            decimal currentRange = currentCandle.HighestPrice - currentCandle.LowestPrice;
-            bool strongBody = currentRange != 0 && (currentCandle.EndPrice - currentCandle.StartPrice) / currentRange > 0.6m;
+            // Check if the current candle is bullish
+            bool isCurrentBullish = BFSecond.EndPrice > BFSecond.StartPrice;
+
+            // Check if the current candle's body engulfs the previous candle's body
+            bool isEngulfingBody =
+                BFSecond.StartPrice < BFfirst.EndPrice && // Current start below previous end
+                BFSecond.EndPrice > BFfirst.StartPrice;  // Current end above previous start
+
 
             // Combine all conditions to detect the Bullish Engulfing pattern
-            if (previousBearish && currentBullish && bodyEngulfed && strongBody)
+            if
+             (
+              isPreviousBearish
+              && isCurrentBullish
+              && isEngulfingBody
+              //&& BFisFit
+              )
             {
                 if (Range == 1)
                 {

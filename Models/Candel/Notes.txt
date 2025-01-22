@@ -1,0 +1,106 @@
+﻿
+
+
+678.14 R
+
+Buy side charges = 1.42
+Sell side charges = 2.6
+
+Brokrage included
+
+Total amount with charges = 682.16
+
+We take 5x leverage so we have bought stocks worth 3,390.7
+
+var expectedPrice = firstCandel.EndPrice * 1.001429m
+
+expectedPrice  = 3,395.54
+
+profit = 3395.54 - 3390.7 = 4.84
+
+so basicaly profit is 4.84 rupees on 678.14
+
+after deductimg charges from profit  = 4.84 - 1.42 - 2.6 = 0.82 R
+
+
+
+
+
+
+
+
+
+4742.50 R
+
+Buy side charges = 9.96
+Sell side charges = 15.16
+
+Brokrage included
+
+Total amount with charges = 4767.62
+
+
+
+9474.88 R
+
+Buy side charges = 19.93
+Sell side charges = 30.33
+
+Brokrage included
+
+Total amount with charges = 9525.14
+
+
+
+19652.47 R
+
+Buy side charges = 30.20
+Sell side charges = 51.75
+
+Brokrage included
+
+Total amount with charges = 19734.42
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
