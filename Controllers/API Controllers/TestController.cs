@@ -818,23 +818,26 @@ namespace StockLogger.Controllers.API_Controllers
             }
 
 
-            foreach (List<Candel> mainList in extractedListWrongPredictions)
-            {
-                Candel firstCandel = mainList[0];
-                Candel secondCandel = mainList[1];
+            //foreach (List<Candel> mainList in extractedListWrongPredictions)
+            //{
+            //    Candel firstCandel = mainList[0];
+            //    Candel secondCandel = mainList[1];
 
-                decimal NoofStocks = 200000 / firstCandel.EndPrice;
-                //decimal NoofStocks = 50000 / firstCandel.EndPrice;
-                //decimal NoofStocks = 3391 / firstCandel.EndPrice;
+            //    decimal NoofStocks = 200000 / firstCandel.EndPrice;
+            //    //decimal NoofStocks = 50000 / firstCandel.EndPrice;
+            //    //decimal NoofStocks = 3391 / firstCandel.EndPrice;
 
-                MainLoss = MainLoss + (NoofStocks * (firstCandel.EndPrice - secondCandel.EndPrice)) + 117;
+            //    MainLoss = MainLoss + (NoofStocks * (firstCandel.EndPrice - secondCandel.EndPrice)) + 117;
 
-            }
-
-
+            //}
 
 
-            MainProfit = extractedListCorrectPredictions.Count * ConstForProfit;
+
+
+            //MainProfit = extractedListCorrectPredictions.Count * ConstForProfit;
+            MainProfit = CPred.Count * ConstForProfit;
+
+            MainLoss = MainLoss + WPred.Count;
 
             return Ok(new
             {
