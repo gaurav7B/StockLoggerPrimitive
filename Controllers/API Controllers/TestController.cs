@@ -178,12 +178,12 @@ namespace StockLogger.Controllers.API_Controllers
                             foreach (Candel c in CandelData)
                             {
 
-                                if (c.OpenTime.TimeOfDay > new TimeSpan(13, 00, 0))
+                                if (c.OpenTime.TimeOfDay > new TimeSpan(15, 00, 0))
                                 {
                                     break; // Skip the rest of this iteration and proceed to the next object
                                 }
 
-                                if (c.OpenTime.TimeOfDay < new TimeSpan(11, 00, 0))
+                                if (c.OpenTime.TimeOfDay < new TimeSpan(13, 00, 0))
                                 {
                                     continue; // Skip the rest of this iteration and proceed to the next object
                                 }
@@ -449,8 +449,7 @@ namespace StockLogger.Controllers.API_Controllers
 
                                 if(firstCandel != null)
                                 {
-                                    //expectedPrice = firstCandel.EndPrice * 1.00065m;
-                                    expectedPrice = firstCandel.EndPrice * 1.01m;
+                                    expectedPrice = firstCandel.EndPrice * 1.00065m;
                                 }
 
                                 decimal profitMargin = 0;
@@ -520,7 +519,7 @@ namespace StockLogger.Controllers.API_Controllers
 
                                 //Highest HighestPrice
                                 Candel candleWithHighestHighestPrice = CandelDataAfterFirstCandel
-                                                                 .OrderByDescending(c => c.StartPrice)
+                                                                 .OrderByDescending(c => c.HighestPrice)
                                                                  .FirstOrDefault();
 
                                 //Highest LowestPrice
@@ -586,6 +585,15 @@ namespace StockLogger.Controllers.API_Controllers
                                 }
 
 
+                                /// RANGE LOGIC
+                                Candel RANGE_HIGH = CandelDataAfterFirstCandel
+                                                                  .OrderByDescending(c => c.HighestPrice)
+                                                                  .FirstOrDefault();
+
+
+
+
+
 
                                 //if (stoplossCandel != null)
                                 //{
@@ -642,8 +650,9 @@ namespace StockLogger.Controllers.API_Controllers
                                 ////}
                                 //else
                                 //{
-                                if (suceessFound == true)
+                                //if (suceessFound == true)
                                 //if (profitCandel != null)
+                                if(RANGE_HIGH.HighestPrice > expectedPrice)
                                 {
                                     List<Candel> CandelPair = new List<Candel>();
 
