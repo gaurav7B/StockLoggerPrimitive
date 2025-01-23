@@ -135,8 +135,8 @@ namespace StockLogger.Controllers.API_Controllers
                     EndDate = adjustedEndDate.ToString("o")     // Final adjusted date
                 };
 
-                var jsonRequestBodyForPreviousDaysData = JsonConvert.SerializeObject(requestBodyforPrevousDayData);
-                var contentForPreviousDaysData = new StringContent(jsonRequestBodyForPreviousDaysData, Encoding.UTF8, "application/json");
+                //var jsonRequestBodyForPreviousDaysData = JsonConvert.SerializeObject(requestBodyforPrevousDayData);
+                //var contentForPreviousDaysData = new StringContent(jsonRequestBodyForPreviousDaysData, Encoding.UTF8, "application/json");
 
                 try
                 {
@@ -177,33 +177,29 @@ namespace StockLogger.Controllers.API_Controllers
 
                             foreach (Candel c in CandelData)
                             {
-                                //if (c.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
-                                //{
-                                //    break; // Skip the rest of this iteration and proceed to the next object
-                                //}
+
+                                if (c.OpenTime.TimeOfDay > new TimeSpan(13, 00, 0))
+                                {
+                                    break; // Skip the rest of this iteration and proceed to the next object
+                                }
+
+                                if (c.OpenTime.TimeOfDay < new TimeSpan(11, 00, 0))
+                                {
+                                    continue; // Skip the rest of this iteration and proceed to the next object
+                                }
 
                                 Candel recentCandel = c;
 
                                 Candel verificationCandel = CandelData
                                                    .Where(c => c.CloseTime > recentCandel.CloseTime)
-                                                   .OrderBy(c => c.CloseTime) // Ensures we get the closest one
+                                                   .OrderBy(c => c.CloseTime)
                                                    .FirstOrDefault();
 
                                 Candel previousCandel = CandelData
                                             .Where(c => c.CloseTime < recentCandel.CloseTime)
-                                            .OrderByDescending(c => c.CloseTime) // Ensures we get the closest one before recentCandel
+                                            .OrderByDescending(c => c.CloseTime)
                                             .FirstOrDefault();
 
-                                //List<Candel> futureCandels = CandelData
-                                //              .Where(c => c.CloseTime > recentCandel.CloseTime)
-                                //              .OrderBy(c => c.CloseTime)
-                                //              .Take(3)
-                                //              .ToList();
-
-
-                                //Candel v1 = futureCandels[0];
-                                //Candel v2 = futureCandels[1];
-                                //Candel verificationCandel = futureCandels[1];
 
                                 // Check if it is a Doji with a small body
                                 bool isDoji = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.1m;
@@ -213,26 +209,6 @@ namespace StockLogger.Controllers.API_Controllers
 
                                 // The body of the candle should be small and at the top of the range
                                 bool smallBodyAtTop = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.3m;
-
-                                //// Preceding candle's trend should be bullish (for confirming upward momentum)
-                                ////bool precedingBullishTrend = CandelData.Where(x => x.CloseTime < recentCandel.OpenTime)
-                                ////                                       .OrderByDescending(x => x.CloseTime)
-                                ////                                       .Take(3)
-                                ////                                       .All(x => x.EndPrice > x.StartPrice); // At least the last 3 candles should be bullish
-
-
-                                //// Check for higher volume
-                                //bool higherVolume = recentCandel.Volume > CandelData.TakeLast(10).Max(x => x.Volume) * 0.75m; // Volume above 75% of the max in last 10 candles
-
-
-                                // Find the index of the recentCandel
-                                int recentCandelIndex = CandelData.IndexOf(recentCandel);
-
-                                // Get the 10 candles immediately before the recentCandel
-                                var last10CandelsBefore = CandelData.Skip(recentCandelIndex - 10).Take(10);
-
-                                // Determine if the volume of recentCandel is higher than 75% of the max volume from the previous 10 candles
-                                bool higherVolume = recentCandel.Volume > last10CandelsBefore.Max(x => x.Volume) * 0.75m;
 
 
                                 ////The next candle should also be bullish for confirmation
@@ -261,12 +237,11 @@ namespace StockLogger.Controllers.API_Controllers
                                 if (isDoji
                                     && longLowerShadow
                                     && smallBodyAtTop
-                                    //&& higherVolume
                                     && nextCandleBullish
                                     && previousCandelBearish
                                     )
                                 {
-                                        dragonFlyDojiCandles.Add(verificationCandel);
+                                    dragonFlyDojiCandles.Add(verificationCandel);
                                 }
 
                             }
@@ -371,6 +346,8 @@ namespace StockLogger.Controllers.API_Controllers
 
                             //foreach (Candel latestCandel in CandelData)
                             //{
+                            //    var diff = 3;
+
                             //    // Fetch the previous and next candles
                             //    Candel previousCandel = CandelData
                             //        .Where(c => c.CloseTime < latestCandel.CloseTime)
@@ -407,6 +384,30 @@ namespace StockLogger.Controllers.API_Controllers
 
                             //    bool nextCandelBullish = verificationCandel?.IsBullish == true;
 
+
+                            //    //bool BFisFit = false;
+
+                            //    //Candel BFPreviousDayHighestPriceCandel = null;
+
+                            //    //if (verificationCandel != null)
+                            //    //{
+                            //    //    BFPreviousDayHighestPriceCandel = CandelDataPreviousDay
+                            //    //        .Where(c => c.OpenTime.TimeOfDay > verificationCandel.OpenTime.TimeOfDay) // Compare only the time
+                            //    //        .OrderByDescending(c => c.HighestPrice)                            // Order by HighestPrice descending
+                            //    //        .FirstOrDefault();                                                 // Take the first (highest)
+                            //    //}
+
+                            //    //if (BFPreviousDayHighestPriceCandel != null && verificationCandel != null && verificationCandel.EndPrice < BFPreviousDayHighestPriceCandel.HighestPrice)
+                            //    //{
+                            //    //    var percentageDifference = ((BFPreviousDayHighestPriceCandel.HighestPrice - verificationCandel.EndPrice) / verificationCandel.EndPrice) * 100;
+
+                            //    //    if (percentageDifference > diff)
+                            //    //    {
+                            //    //        BFisFit = true; // IHisFit is true
+                            //    //    }
+                            //    //}
+
+
                             //    // Combine conditions
                             //    if (
                             //        isBullish
@@ -416,12 +417,13 @@ namespace StockLogger.Controllers.API_Controllers
                             //        && highVolume
                             //        && significantPriceChange
                             //        && nextCandelBullish
+                            //        //&& BFisFit
                             //        )
                             //    {
-                            //        if (verificationCandel?.OpenTime.TimeOfDay < new TimeSpan(11, 00, 0))
-                            //        {
-                            //            dragonFlyDojiCandles.Add(verificationCandel);
-                            //        }
+                            //        //if (verificationCandel?.OpenTime.TimeOfDay < new TimeSpan(11, 00, 0))
+                            //        //{
+                            //        dragonFlyDojiCandles.Add(verificationCandel);
+                            //        //}
                             //    }
                             //}
 
@@ -447,7 +449,8 @@ namespace StockLogger.Controllers.API_Controllers
 
                                 if(firstCandel != null)
                                 {
-                                    expectedPrice = firstCandel.EndPrice * 1.00065m;
+                                    //expectedPrice = firstCandel.EndPrice * 1.00065m;
+                                    expectedPrice = firstCandel.EndPrice * 1.01m;
                                 }
 
                                 decimal profitMargin = 0;
@@ -751,140 +754,34 @@ namespace StockLogger.Controllers.API_Controllers
                                               .Distinct()
                                               .ToList();
 
-            List<List<Candel>> TotalList = new List<List<Candel>>();
 
-            foreach (List<Candel> ToAdd in extractedListCorrectPredictions)
+
+            foreach (List<Candel> mainList in extractedListWrongPredictions)
             {
-                TotalList.Add(ToAdd);
+                Candel firstCandel = mainList[0];
+                Candel secondCandel = mainList[1];
+
+                decimal NoofStocks = 200000 / firstCandel.EndPrice;
+                //decimal NoofStocks = 50000 / firstCandel.EndPrice;
+                //decimal NoofStocks = 3391 / firstCandel.EndPrice;
+
+                MainLoss = MainLoss + (NoofStocks * (firstCandel.EndPrice - secondCandel.EndPrice)) + 117;
+
             }
 
-            foreach (List<Candel> ToAdd in extractedListWrongPredictions)
-            {
-                TotalList.Add(ToAdd);
-            }
-
-            List<Candel> finalList = new List<Candel>();
-
-            foreach (List<Candel> extractedCandel in TotalList)
-            {
-                Candel firstCandel = extractedCandel[0];
-                Candel SecondCandel = extractedCandel[1];
-
-                finalList.Add(SecondCandel);
-            }
-
-
-            List<Candel> CorrectPred = new List<Candel>();
-            foreach (List<Candel> extractedCandel in extractedListCorrectPredictions)
-            {
-                Candel firstCandel = extractedCandel[0];
-                Candel SecondCandel = extractedCandel[1];
-
-                CorrectPred.Add(SecondCandel);
-            }
-
-            List<Candel> WrongPred = new List<Candel>();
-            foreach (List<Candel> extractedCandel in extractedListWrongPredictions)
-            {
-                Candel firstCandel = extractedCandel[0];
-                Candel SecondCandel = extractedCandel[1];
-
-                CorrectPred.Add(SecondCandel);
-            }
-
-
-
-            // Order the list by OpenTime in ascending order (lowest to highest)
-            finalList = finalList.OrderBy(c => c.OpenTime).ToList();
-
-            List<Candel> finalOrderList = new List<Candel>();
-            finalOrderList = finalList.OrderBy(c => c.OpenTime).ToList();
-
-            List<Candel> selectedCandels = SelectUniqueCandels(finalOrderList);
-
-            List<Candel> CPred = new List<Candel>();
-            List<Candel> WPred = new List<Candel>();
-
-            foreach (Candel candel in selectedCandels)
-            {
-                if (CorrectPred.Any(c => c.Equals(candel)))
-                {
-                    CPred.Add(candel);
-                }
-                else if (WrongPred.Any(c => c.Equals(candel)))
-                {
-                    WPred.Add(candel);
-                }
-            }
-
-
-            //foreach (List<Candel> mainList in extractedListWrongPredictions)
-            //{
-            //    Candel firstCandel = mainList[0];
-            //    Candel secondCandel = mainList[1];
-
-            //    decimal NoofStocks = 200000 / firstCandel.EndPrice;
-            //    //decimal NoofStocks = 50000 / firstCandel.EndPrice;
-            //    //decimal NoofStocks = 3391 / firstCandel.EndPrice;
-
-            //    MainLoss = MainLoss + (NoofStocks * (firstCandel.EndPrice - secondCandel.EndPrice)) + 117;
-
-            //}
-
-
-
-
-            //MainProfit = extractedListCorrectPredictions.Count * ConstForProfit;
-            MainProfit = CPred.Count * ConstForProfit;
-
-            MainLoss = MainLoss + WPred.Count;
+            MainProfit = extractedListCorrectPredictions.Count * ConstForProfit;
 
             return Ok(new
             {
                 Net = MainProfit - MainLoss,
-                MainProfit,
-                MainLoss,
+                //MainProfit,
+                //MainLoss,
                 extractedListCorrectPredictions,
                 extractedListWrongPredictions,
-                MainMasterList,
-                CPred,
-                WPred
+                MainMasterList
             });
 
         }
-
-
-        public static List<Candel> SelectUniqueCandels(List<Candel> finalOrderList)
-        {
-            Random random = new Random();
-
-            // Shuffle the list
-            var shuffledList = finalOrderList.OrderBy(x => random.Next()).ToList();
-
-            // Use a HashSet to track the unique OpenTimes
-            HashSet<DateTime> openTimes = new HashSet<DateTime>();
-
-            // Result list to store unique Candels
-            List<Candel> uniqueCandels = new List<Candel>();
-
-            foreach (var candel in shuffledList)
-            {
-                if (!openTimes.Contains(candel.OpenTime))
-                {
-                    openTimes.Add(candel.OpenTime);
-                    uniqueCandels.Add(candel);
-                }
-
-                // Stop once we have 160 unique Candels
-                if (uniqueCandels.Count == 160)
-                    break;
-            }
-
-            return uniqueCandels;
-        }
-
-
-
 
 
         // Function to identify Dragonfly Doji candles

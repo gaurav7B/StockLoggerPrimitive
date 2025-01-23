@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using OtpNet;
 using System;
+using static StockLogger.Controllers.API_Controllers.BuySellController;
 
 namespace StockLogger.Controllers.API_Controllers
 {
@@ -359,6 +360,75 @@ namespace StockLogger.Controllers.API_Controllers
                 return BadRequest(new { Message = "Error fetching candle data: " + ex.Message });
             }
         }
+
+        public class TradingDataResponse
+        {
+            public bool Status { get; set; }
+            public string Message { get; set; }
+            public string ErrorCode { get; set; }
+            public TradingData Data { get; set; }
+        }
+
+        public class TradingData
+        {
+            public string Net { get; set; }
+            public string AvailableCash { get; set; }
+            public string AvailableIntradayPayin { get; set; }
+            public string AvailableLimitMargin { get; set; }
+            public string Collateral { get; set; }
+            public string M2MUnrealized { get; set; }
+            public string M2MRealized { get; set; }
+            public string UtilisedDebits { get; set; }
+            public string UtilisedSpan { get; set; }
+            public string UtilisedOptionPremium { get; set; }
+            public string UtilisedHoldingSales { get; set; }
+            public string UtilisedExposure { get; set; }
+            public string UtilisedTurnover { get; set; }
+            public string UtilisedPayout { get; set; }
+        }
+
+        // GET https://localhost:44364/api/AngelCandel/getFunds
+        [HttpGet("getFunds")]
+        public async Task<IActionResult> GetFundDetails()
+        {
+            var client = new HttpClient();
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, "https://apiconnect.angelone.in/rest/secure/angelbroking/user/v1/getRMS");
+
+            var token = await _context.Token.FirstOrDefaultAsync();
+
+            // Set the headers
+            requestMessage.Headers.Add("Accept", "application/json");
+            requestMessage.Headers.Add("X-SourceID", "WEB");
+            requestMessage.Headers.Add("X-ClientLocalIP", "192.168.56.177");  // Your local IP from ipconfig
+            requestMessage.Headers.Add("X-ClientPublicIP", await GetPublicIPAsync());  // Fetching the public IP dynamically
+            requestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX"); // Replace with your actual MAC address
+            requestMessage.Headers.Add("X-UserType", "USER");
+            requestMessage.Headers.Add("Authorization", "Bearer " + token.AuthToken);
+            requestMessage.Headers.Add("X-PrivateKey", "DcsJlRJp"); // Your actual API Key
+
+
+            try
+            {
+                // Send request to get historical data
+                HttpResponseMessage response = await client.SendAsync(requestMessage);
+
+                response.EnsureSuccessStatusCode();
+                string responseContent = await response.Content.ReadAsStringAsync();
+                // Deserialize into the custom ApiResponse class
+                var parsedContent = JsonConvert.DeserializeObject<TradingDataResponse>(responseContent);
+
+                // Return the parsed content as JSON result
+                return new JsonResult(parsedContent);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = "Error fetching data: " + ex.Message });
+            }
+
+        }
+
+
 
         // Fetches the public IP from ipify API
         private static async Task<string> GetPublicIPAsync()

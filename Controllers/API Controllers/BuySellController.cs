@@ -34,6 +34,153 @@ namespace StockLogger.Controllers.API_Controllers
                 .ToList();
         }
 
+        public class LTPData
+        {
+            public string Exchange { get; set; }
+            public string TradingSymbol { get; set; }
+            public string SymbolToken { get; set; }
+            public decimal Open { get; set; }
+            public decimal High { get; set; }
+            public decimal Low { get; set; }
+            public decimal Close { get; set; }
+            public decimal Ltp { get; set; }
+        }
+
+        public class LTPApiResponse
+        {
+            public bool Status { get; set; }
+            public string Message { get; set; }
+            public string ErrorCode { get; set; }
+            public LTPData Data { get; set; }
+        }
+
+        //POST https://localhost:44364/api/BuySell/LTP
+        [HttpPost("LTP")]
+        public async Task<IActionResult> LTP()
+        {
+            // Fetch the authorization token (assuming this is a string)
+            string authToken = await GetAuthorizationTokenAsync();
+
+            var client = new HttpClient();
+
+
+            var LTPData = new
+            {
+                exchange = "NSE",
+                tradingsymbol = "IDEA-EQ",
+                symboltoken = "14366"
+            };
+
+            var LTPjsonData = JsonConvert.SerializeObject(LTPData);
+
+            var LTPrequestMessage = new HttpRequestMessage(HttpMethod.Post, "https://apiconnect.angelone.in/rest/secure/angelbroking/order/v1/getLtpData")
+            {
+                Content = new StringContent(LTPjsonData, Encoding.UTF8, "application/json")
+            };
+
+            LTPrequestMessage.Headers.Add("Accept", "application/json");
+            LTPrequestMessage.Headers.Add("X-SourceID", "WEB");
+            LTPrequestMessage.Headers.Add("X-ClientLocalIP", "192.168.56.177");
+            LTPrequestMessage.Headers.Add("X-ClientPublicIP", await GetPublicIPAsync());
+            LTPrequestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX");
+            LTPrequestMessage.Headers.Add("X-UserType", "USER");
+            LTPrequestMessage.Headers.Add("Authorization", "Bearer " + authToken);
+            LTPrequestMessage.Headers.Add("X-PrivateKey", "GmTkiYil");
+
+
+            try
+            {
+                HttpResponseMessage response = await client.SendAsync(LTPrequestMessage);
+
+                response.EnsureSuccessStatusCode();
+
+                string responseContent = await response.Content.ReadAsStringAsync();
+
+                // Deserialize into the custom ApiResponse class
+                var parsedContent = JsonConvert.DeserializeObject<LTPApiResponse>(responseContent);
+
+                // Return the parsed content as JSON result
+                return new JsonResult(parsedContent.Data.Ltp);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+        }
+
+        public class StockTradeResponse
+        {
+            public bool Status { get; set; }
+            public string Message { get; set; }
+            public string ErrorCode { get; set; }
+            public List<TodaysTradeData> Data { get; set; }
+        }
+
+        public class TodaysTradeData
+        {
+            public string Exchange { get; set; }
+            public string ProductType { get; set; }
+            public string TradingSymbol { get; set; }
+            public string InstrumentType { get; set; }
+            public string SymbolGroup { get; set; }
+            public string StrikePrice { get; set; }
+            public string OptionType { get; set; }
+            public string ExpiryDate { get; set; }
+            public string MarketLot { get; set; }
+            public string Precision { get; set; }
+            public string Multiplier { get; set; }
+            public string TradeValue { get; set; }
+            public string TransactionType { get; set; }
+            public string FillPrice { get; set; }
+            public string FillSize { get; set; }
+            public string OrderId { get; set; }
+            public string FillId { get; set; }
+            public string FillTime { get; set; }
+        }
+
+
+        //GET https://localhost:44364/api/BuySell/GetTodaysOrders
+        [HttpGet("GetTodaysOrders")]
+        public async Task<IActionResult> GetTodaysOrders()
+        {
+            // Fetch the authorization token (assuming this is a string)
+            string authToken = await GetAuthorizationTokenAsync();
+
+            var client = new HttpClient();
+
+            var LTPrequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://apiconnect.angelone.in/rest/secure/angelbroking/order/v1/getTradeBook");
+
+            LTPrequestMessage.Headers.Add("Accept", "application/json");
+            LTPrequestMessage.Headers.Add("X-SourceID", "WEB");
+            LTPrequestMessage.Headers.Add("X-ClientLocalIP", "192.168.56.177");
+            LTPrequestMessage.Headers.Add("X-ClientPublicIP", await GetPublicIPAsync());
+            LTPrequestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX");
+            LTPrequestMessage.Headers.Add("X-UserType", "USER");
+            LTPrequestMessage.Headers.Add("Authorization", "Bearer " + authToken);
+            LTPrequestMessage.Headers.Add("X-PrivateKey", "GmTkiYil");
+
+
+            try
+            {
+                HttpResponseMessage response = await client.SendAsync(LTPrequestMessage);
+
+                response.EnsureSuccessStatusCode();
+
+                string responseContent = await response.Content.ReadAsStringAsync();
+
+                // Deserialize into the custom ApiResponse class
+                var parsedContent = JsonConvert.DeserializeObject<StockTradeResponse>(responseContent);
+
+                // Return the parsed content as JSON result
+                return new JsonResult(parsedContent);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+        }
+
+
         //POST https://localhost:44364/api/BuySell/buy
         [HttpPost("buy")]
         public async Task<IActionResult> BuyIntradayStock()
@@ -41,30 +188,114 @@ namespace StockLogger.Controllers.API_Controllers
             // Fetch the authorization token (assuming this is a string)
             string authToken = await GetAuthorizationTokenAsync();
 
+            var client = new HttpClient();
+
+            string LTP = "";
+            string ExpectedPrice = "";
+
+            var LTPData = new
+            {
+                exchange = "NSE",
+                tradingsymbol = "IDEA-EQ",
+                symboltoken = "14366"
+            };
+
+            var LTPjsonData = JsonConvert.SerializeObject(LTPData);
+
+            var LTPrequestMessage = new HttpRequestMessage(HttpMethod.Post, "https://apiconnect.angelone.in/rest/secure/angelbroking/order/v1/getLtpData")
+            {
+                Content = new StringContent(LTPjsonData, Encoding.UTF8, "application/json")
+            };
+
+            LTPrequestMessage.Headers.Add("Accept", "application/json");
+            LTPrequestMessage.Headers.Add("X-SourceID", "WEB");
+            LTPrequestMessage.Headers.Add("X-ClientLocalIP", "192.168.56.177");
+            LTPrequestMessage.Headers.Add("X-ClientPublicIP", await GetPublicIPAsync());
+            LTPrequestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX");
+            LTPrequestMessage.Headers.Add("X-UserType", "USER");
+            LTPrequestMessage.Headers.Add("Authorization", "Bearer " + authToken);
+            LTPrequestMessage.Headers.Add("X-PrivateKey", "GmTkiYil");
+
+
+            try
+            {
+                HttpResponseMessage response = await client.SendAsync(LTPrequestMessage);
+
+                response.EnsureSuccessStatusCode();
+
+                string responseContent = await response.Content.ReadAsStringAsync();
+
+                // Deserialize into the custom ApiResponse class
+                var parsedContent = JsonConvert.DeserializeObject<LTPApiResponse>(responseContent);
+
+                LTP = parsedContent.Data.Ltp.ToString();
+
+                var expPrice = parsedContent.Data.Ltp + 0.5m;
+
+                ExpectedPrice = expPrice.ToString();
+
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+
+            //var data = new
+            //{
+            //    variety = "NORMAL",
+            //    tradingsymbol = "IDEA-EQ",
+            //    symboltoken = "14366",
+            //    transactiontype = "BUY",
+            //    exchange = "NSE",
+            //    ordertype = "MARKET",
+            //    producttype = "INTRADAY",
+            //    duration = "DAY",
+            //    price = "0",
+            //    squareoff = "0",
+            //    stoploss = "0",
+            //    quantity = "1"
+            //};
+
             var data = new
             {
-                variety = "NORMAL",
+                variety = "ROBO", // Use Bracket Order for a Robo order
                 tradingsymbol = "IDEA-EQ",
                 symboltoken = "14366",
                 transactiontype = "BUY",
                 exchange = "NSE",
-                ordertype = "MARKET",
+                ordertype = "MARKET", // Buy at current market price
                 producttype = "INTRADAY",
                 duration = "DAY",
-                price = "0",
-                squareoff = "0",
-                stoploss = "0",
+                price = "0", // This will be 0 for market order
+                squareoff = ExpectedPrice, // Set your target price for profit
+                stoploss = "0", // Set your stop-loss price
                 quantity = "1"
             };
 
+
+            //var data = new
+            //{
+            //    variety = "ROBO",
+            //    tradingsymbol = "IDEA-EQ",
+            //    symboltoken = "14366",
+            //    transactiontype = "BUY",
+            //    exchange = "NSE",
+            //    ordertype = "LIMIT", // Change this to LIMIT
+            //    producttype = "INTRADAY",
+            //    duration = "DAY",
+            //    price = LTP, // You will need to specify a limit price here
+            //    squareoff = ExpectedPrice,
+            //    stoploss = "0.1", // You can use a stop loss value here
+            //    quantity = "1"
+            //};
+
             var jsonData = JsonConvert.SerializeObject(data);
-            var client = new HttpClient();
 
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, "https://apiconnect.angelone.in/rest/secure/angelbroking/order/v1/placeOrder")
             {
                 Content = new StringContent(jsonData, Encoding.UTF8, "application/json")
             };
-
 
             // Set the headers
             requestMessage.Headers.Add("Accept", "application/json");
@@ -81,14 +312,11 @@ namespace StockLogger.Controllers.API_Controllers
             {
                 HttpResponseMessage response = await client.SendAsync(requestMessage);
 
-                if (!response.IsSuccessStatusCode)
-                {
-
-                }
-
                 response.EnsureSuccessStatusCode();
 
-                string responseContent = await response.Content.ReadAsStringAsync();
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+
 
                 return Ok(responseContent);
 
@@ -111,20 +339,34 @@ namespace StockLogger.Controllers.API_Controllers
             // Fetch the authorization token (assuming this is a string)
             string authToken = await GetAuthorizationTokenAsync();
 
+            //var data = new
+            //{
+            //    variety = "NORMAL",
+            //    tradingsymbol = "IDEA-EQ",
+            //    symboltoken = "14366",
+            //    transactiontype = "SELL",              
+            //    exchange = "NSE",             
+            //    ordertype = "MARKET",        
+            //    producttype = "INTRADAY",         
+            //    duration = "DAY",             
+            //    price = "0",             
+            //    squareoff = "0",     // Sets the target price where the order is to be sold                  
+            //    stoploss = "0",                             
+            //    quantity = "1"                  
+            //};
+
             var data = new
             {
                 variety = "NORMAL",
                 tradingsymbol = "IDEA-EQ",
                 symboltoken = "14366",
-                transactiontype = "SELL",              
-                exchange = "NSE",             
-                ordertype = "MARKET",        
-                producttype = "INTRADAY",         
-                duration = "DAY",             
-                price = "0",             
-                squareoff = "11",     // Sets the target price where the order is to be sold                  
-                stoploss = "0",                             
-                quantity = "1"                  
+                transactiontype = "SELL",
+                exchange = "NSE",
+                ordertype = "LIMIT",         // LIMIT to sell at the target price
+                producttype = "INTRADAY",
+                duration = "DAY",
+                price = "11",             // Set the target price at which you want to sell
+                quantity = "1"
             };
 
             var jsonData = JsonConvert.SerializeObject(data);
