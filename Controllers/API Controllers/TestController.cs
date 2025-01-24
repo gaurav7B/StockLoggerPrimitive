@@ -656,9 +656,9 @@ namespace StockLogger.Controllers.API_Controllers
                                     smallBody
                                     && longUpperWick
                                     && minimalLowerWick
-                                    //&& isVerificationCandelHighestPriceGreater
-                                    //&& isVerificationCandelBullish
-                                    //&& isDowntrend
+                                    && isVerificationCandelHighestPriceGreater
+                                    && isVerificationCandelBullish
+                                    && isDowntrend
                                     ////&& isVolumeHigh
                                     )
                                 {
