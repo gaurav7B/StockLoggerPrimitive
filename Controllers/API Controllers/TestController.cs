@@ -662,12 +662,12 @@ namespace StockLogger.Controllers.API_Controllers
                                     ////&& isVolumeHigh
                                     )
                                 {
-                                    //if ((verificationCandel != null) && (verificationCandel.HighestPrice > testCandel.HighestPrice) && (verificationCandel.IsBullish.HasValue))
-                                    //{
-                                    //    dragonFlyDojiCandles.Add(verificationCandel);
-                                    //}
+                                    if ((verificationCandel != null) && (verificationCandel.HighestPrice > testCandel.HighestPrice) && (verificationCandel.IsBullish.HasValue))
+                                    {
+                                        dragonFlyDojiCandles.Add(verificationCandel);
+                                    }
 
-                                    dragonFlyDojiCandles.Add(testCandel);
+                                    //dragonFlyDojiCandles.Add(testCandel);
 
                                 }
 
