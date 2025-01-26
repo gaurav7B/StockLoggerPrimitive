@@ -167,11 +167,11 @@ namespace StockLogger.Controllers.API_Controllers
             {
                 exchange = "NSE",
                 symboltoken = stockRequest.SymbolToken,
-                //interval = "ONE_MINUTE",
-                interval = "THREE_MINUTE",
+                interval = "ONE_MINUTE",
+                //interval = "THREE_MINUTE",
                 //interval = "FIVE_MINUTE",
                 //interval = "TEN_MINUTE",
-                //interval = FIFTEEN_MINUTE,
+                //interval = "FIFTEEN_MINUTE",
                 fromdate = startDateWithTime900.ToString("yyyy-MM-dd HH:mm"),
                 todate = startDateWithTime330.ToString("yyyy-MM-dd HH:mm")
             };
