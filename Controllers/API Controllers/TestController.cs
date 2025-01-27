@@ -1490,6 +1490,8 @@ namespace StockLogger.Controllers.API_Controllers
 
             List<Candel> MasterList2 = new List<Candel>();
 
+
+            //ORDER THE LIST
             TotalList = TotalList.OrderBy(candel => candel.OpenTime).ToList();
 
             //foreach (Candel testCandel in TotalList)
@@ -1536,10 +1538,14 @@ namespace StockLogger.Controllers.API_Controllers
                         {
                             CorrectPred.Add(nextCandel);
                         }
-                        else if (WPRed.Any(c => c.Equals(nextCandel)))
+                        else
                         {
                             WrongPred.Add(nextCandel);
                         }
+                        //else if (WPRed.Any(c => c.Equals(nextCandel)))
+                        //{
+                        //    WrongPred.Add(nextCandel);
+                        //}
 
 
                     iterationCount++;
