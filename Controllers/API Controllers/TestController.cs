@@ -1519,7 +1519,10 @@ namespace StockLogger.Controllers.API_Controllers
                     int maxIterations = 160;
                     int iterationCount = 0;
 
-                    while (nextCandel != TotalList.LastOrDefault() && iterationCount < maxIterations)
+                    while 
+                    (nextCandel != TotalList.LastOrDefault()
+                    && iterationCount < maxIterations
+                    )
                     {
                         MasterList2.Add(nextCandel);
     
@@ -1591,8 +1594,35 @@ namespace StockLogger.Controllers.API_Controllers
 
             MainProfit = CorrectPred.Count * ConstForProfit;
 
-            MainLoss = 0;
 
+            List<List<Candel>> WrongTotal = new List<List<Candel>>();
+
+            foreach (Candel testCandel in WrongPred)
+            {
+
+                foreach (List<Candel> mainList in extractedListWrongPredictions)
+                {
+                    if(testCandel == mainList[0])
+                    {
+                        WrongTotal.Add(mainList);
+                    }
+                }
+
+            }
+
+
+            foreach (List<Candel> mainList in WrongTotal)
+            {
+                Candel firstCandel = mainList[0];
+                Candel secondCandel = mainList[1];
+
+                decimal NoofStocks = 200000 / firstCandel.EndPrice;
+                //decimal NoofStocks = 50000 / firstCandel.EndPrice;
+                //decimal NoofStocks = 3391 / firstCandel.EndPrice;
+
+                MainLoss = MainLoss + (NoofStocks * (firstCandel.EndPrice - secondCandel.EndPrice)) + 117;
+
+            }
 
             return Ok(new
             {
