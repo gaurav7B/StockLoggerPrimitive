@@ -1221,10 +1221,10 @@ namespace StockLogger.Controllers.API_Controllers
                                 {
                                     //expectedPrice = firstCandel.EndPrice * 1.000595m;
                                     //expectedPrice = firstCandel.EndPrice * 1.00061m;
-                                    expectedPrice = firstCandel.EndPrice * 1.00065m;
+                                    //expectedPrice = firstCandel.EndPrice * 1.00065m;
                                     //expectedPrice = firstCandel.EndPrice * 1.01m;
                                     //expectedPrice = firstCandel.EndPrice * 1.005m;
-                                    //expectedPrice = firstCandel.EndPrice * 1.0025m;
+                                    expectedPrice = firstCandel.EndPrice * 1.0025m;
                                 }
 
                                 decimal profitMargin = 0;
@@ -1539,7 +1539,7 @@ namespace StockLogger.Controllers.API_Controllers
 
                     referenceCandel = nextCandel;
 
-                    int maxIterations = 160;
+                    int maxIterations = 1;
                     int iterationCount = 0;
 
                     while 
