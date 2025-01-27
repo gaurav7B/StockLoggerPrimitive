@@ -563,86 +563,93 @@ namespace StockLogger.Controllers.API_Controllers
                             //////////////////////////////////////////////////////////////////////////////
 
 
-                            foreach (Candel testCandel in CandelData)
-                            {
-                                // Get the next 10 candles after the current candle for analysis
-                                List<Candel> next10Candles = CandelData
-                                    .Where(c => c.OpenTime > testCandel.OpenTime)
-                                    .OrderBy(c => c.OpenTime)
-                                    .Take(10)
-                                    .ToList();
-
-                                if (next10Candles.Count < 10) continue; // Skip if not enough candles to analyze
-
-                                List<Candel> leftCup = next10Candles.Take(5).ToList(); // Left part (cup decline)
-                                List<Candel> rightCup = next10Candles.Skip(5).Take(5).ToList(); // Right part (cup rise and handle)
-
-                                // LEFT SIDE IN DOWNTREND
-                                bool isleftDownTrend = leftCup[4].EndPrice < leftCup[0].EndPrice;
-                                // RIGHT SIDE IN UPTREND
-                                bool isRigtUpTrend = rightCup[4].EndPrice > rightCup[0].EndPrice;
-
-                                if(isleftDownTrend && isRigtUpTrend)
-                                {
-                                    dragonFlyDojiCandles.Add(next10Candles[9]);
-                                }
-
-                            }
-
-
                             //foreach (Candel testCandel in CandelData)
                             //{
-                            //    try
+
+                            //    // Get the next 10 candles after the current candle for analysis
+                            //    List<Candel> next10Candles = CandelData
+                            //        .Where(c => c.OpenTime > testCandel.OpenTime)
+                            //        .OrderBy(c => c.OpenTime)
+                            //        .Take(10)
+                            //        .ToList();
+
+                            //    if (next10Candles.Count < 10) continue; // Skip if not enough candles to analyze
+
+                            //    List<Candel> leftCup = next10Candles.Take(5).ToList(); // Left part (cup decline)
+                            //    List<Candel> rightCup = next10Candles.Skip(5).Take(5).ToList(); // Right part (cup rise and handle)
+
+                            //    // LEFT SIDE IN DOWNTREND
+                            //    bool isleftDownTrend = leftCup[4].EndPrice < leftCup[0].EndPrice;
+                            //    // RIGHT SIDE IN UPTREND
+                            //    bool isRigtUpTrend = rightCup[4].EndPrice > rightCup[0].EndPrice;
+
+                            //    if(isleftDownTrend && isRigtUpTrend)
                             //    {
-
-                            //        decimal wickToBodyRatio = 2.0m;
-
-                            //        decimal bodySize = Math.Abs(testCandel.EndPrice - testCandel.StartPrice);
-
-                            //        decimal upperWickSize = testCandel.HighestPrice - Math.Max(testCandel.StartPrice, testCandel.EndPrice);
-
-                            //        decimal lowerWickSize = Math.Min(testCandel.StartPrice, testCandel.EndPrice) - testCandel.LowestPrice;
-
-                            //        bool longUpperWick = upperWickSize >= wickToBodyRatio * bodySize;
-
-                            //        bool smallLowerWick = lowerWickSize <= 0.025m * bodySize;
-
-                            //        bool smallBody = bodySize <= (testCandel.HighestPrice - testCandel.LowestPrice) * 0.2m;   
-
-                            //        Candel verificationCandel = CandelData
-                            //                           .Where(c => c.OpenTime > testCandel.OpenTime)
-                            //                           .OrderBy(c => c.OpenTime)
-                            //                           .FirstOrDefault();
-
-                            //        bool isVerificationCandelBullish = (verificationCandel != null) && (verificationCandel.IsBullish.HasValue) && (verificationCandel.IsBullish == true);
-
-                            //        bool isVerificationCandelHighGreater = (verificationCandel != null) && (verificationCandel.EndPrice > testCandel.HighestPrice);
-
-                            //        bool isverificationCandelVolumeGreater = (verificationCandel != null) && (verificationCandel.Volume > testCandel.Volume);
-
-                            //        if (
-                            //            longUpperWick
-                            //            && smallLowerWick
-                            //            && smallBody
-                            //            && (testCandel.IsBullish.HasValue && testCandel.IsBullish == true)
-                            //            && (testCandel.StartPrice == testCandel.LowestPrice)
-                            //            && isVerificationCandelBullish
-                            //            && isVerificationCandelHighGreater
-                            //            && isverificationCandelVolumeGreater
-                            //            )
-                            //        {
-                            //            dragonFlyDojiCandles.Add(verificationCandel);
-                            //            //dragonFlyDojiCandles.Add(testCandel);
-                            //        }
-
-
-                            //    }
-                            //    catch (Exception ex)
-                            //    {
-                            //        Console.WriteLine($"An error occurred: {ex.Message}");
+                            //        dragonFlyDojiCandles.Add(next10Candles[9]);
                             //    }
 
                             //}
+
+
+                            foreach (Candel testCandel in CandelData)
+                            {
+
+                                if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
+                                {
+                                    break; // Skip the rest of this iteration and proceed to the next object
+                                }
+
+                                try
+                                {
+
+                                    decimal wickToBodyRatio = 2.0m;
+
+                                    decimal bodySize = Math.Abs(testCandel.EndPrice - testCandel.StartPrice);
+
+                                    decimal upperWickSize = testCandel.HighestPrice - Math.Max(testCandel.StartPrice, testCandel.EndPrice);
+
+                                    decimal lowerWickSize = Math.Min(testCandel.StartPrice, testCandel.EndPrice) - testCandel.LowestPrice;
+
+                                    bool longUpperWick = upperWickSize >= wickToBodyRatio * bodySize;
+
+                                    bool smallLowerWick = lowerWickSize <= 0.025m * bodySize;
+
+                                    bool smallBody = bodySize <= (testCandel.HighestPrice - testCandel.LowestPrice) * 0.2m;
+
+                                    Candel verificationCandel = CandelData
+                                                       .Where(c => c.OpenTime > testCandel.OpenTime)
+                                                       .OrderBy(c => c.OpenTime)
+                                                       .FirstOrDefault();
+
+                                    bool isVerificationCandelBullish = (verificationCandel != null) && (verificationCandel.IsBullish.HasValue) && (verificationCandel.IsBullish == true);
+
+                                    bool isVerificationCandelHighGreater = (verificationCandel != null) && (verificationCandel.EndPrice > testCandel.HighestPrice);
+
+                                    bool isverificationCandelVolumeGreater = (verificationCandel != null) && (verificationCandel.Volume > testCandel.Volume);
+
+                                    if (
+                                        longUpperWick
+                                        && smallLowerWick
+                                        && smallBody
+                                        && (testCandel.IsBullish.HasValue && testCandel.IsBullish == true)
+                                        && (testCandel.StartPrice == testCandel.LowestPrice)
+                                        //&& isVerificationCandelBullish
+                                        //&& isVerificationCandelHighGreater
+                                        //&& isverificationCandelVolumeGreater
+                                        )
+                                    {
+                                        //dragonFlyDojiCandles.Add(verificationCandel);
+                                        dragonFlyDojiCandles.Add(testCandel);
+                                    }
+
+
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine($"An error occurred: {ex.Message}");
+                                }
+
+                            }
 
 
 
