@@ -1527,7 +1527,7 @@ namespace StockLogger.Controllers.API_Controllers
 
                     referenceList = TotalList;
 
-                referenceList.RemoveAll(c => c.OpenTime <= referenceCandel.OpenTime);
+                referenceList.RemoveAll(c => c.OpenTime <= referenceCandel.CloseTime);
 
                 Candel nextCandel = referenceList
                                    .Where(c => c.OpenTime > testCandel.OpenTime)
@@ -1549,7 +1549,7 @@ namespace StockLogger.Controllers.API_Controllers
                     {
                         MasterList2.Add(nextCandel);
     
-                        referenceList.RemoveAll(c => c.OpenTime <= referenceCandel.OpenTime);
+                        referenceList.RemoveAll(c => c.OpenTime <= referenceCandel.CloseTime);
 
                          Candel nextCandel2 = referenceList
                             .Where(c => c.OpenTime > referenceCandel.OpenTime)
@@ -1568,13 +1568,7 @@ namespace StockLogger.Controllers.API_Controllers
                        {
                            WrongPred.Add(testCandel);
                        }
-                    //else if (WPRed.Any(c => c.Equals(nextCandel)))
-                    //{
-                    //    WrongPred.Add(nextCandel);
-                    //}
-
-
-                    iterationCount++;
+                       iterationCount++;
                     }
 
             }
