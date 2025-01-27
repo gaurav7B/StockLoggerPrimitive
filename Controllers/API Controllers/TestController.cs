@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+//using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using OtpNet;
@@ -561,90 +562,199 @@ namespace StockLogger.Controllers.API_Controllers
 
                             //////////////////////////////////////////////////////////////////////////////
 
+
                             foreach (Candel testCandel in CandelData)
                             {
-                                decimal wickToBodyRatio = 2.0m;
+                                // Get the next 10 candles after the current candle for analysis
+                                List<Candel> next10Candles = CandelData
+                                    .Where(c => c.OpenTime > testCandel.OpenTime)
+                                    .OrderBy(c => c.OpenTime)
+                                    .Take(10)
+                                    .ToList();
 
-                                //if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
-                                //{
-                                //    break; // Skip the rest of this iteration and proceed to the next object
-                                //}
+                                if (next10Candles.Count < 10) continue; // Skip if not enough candles to analyze
 
-                                // Calculate body size
-                                decimal bodySize = Math.Abs(testCandel.EndPrice - testCandel.StartPrice);
+                                // We need at least 6 to 8 candles for cup and handle formation
+                                // Assuming that the pattern is formed when 3 to 4 candles form the decline (left cup) and the remaining 2 to 3 form the handle
 
-                                // Calculate wick sizes
-                                decimal upperWickSize = testCandel.HighestPrice - Math.Max(testCandel.StartPrice, testCandel.EndPrice);
+                                List<Candel> leftCup = next10Candles.Take(5).ToList(); // Left part (cup decline)
+                                List<Candel> rightCup = next10Candles.Skip(5).Take(5).ToList(); // Right part (cup rise and handle)
 
-                                decimal lowerWickSize = Math.Min(testCandel.StartPrice, testCandel.EndPrice) - testCandel.LowestPrice;
+                                if (leftCup.Count < 3 || rightCup.Count < 3) continue; // Ensure we have enough candles
 
-                                // Check if the lower wick is at least `wickToBodyRatio` times the body size
-                                bool longLowerWick = lowerWickSize >= wickToBodyRatio * bodySize;
+                                // Check if there is a clear "cup" shape (decline followed by an increase)
+                                decimal leftCupLow = leftCup.Min(c => c.LowestPrice);
+                                decimal rightCupHigh = rightCup.Max(c => c.HighestPrice);
+                                decimal cupDepth = leftCupLow - rightCupHigh; // Measure the "depth" of the cup
 
-                                // Ensure the upper wick is very small
-                                //bool smallUpperWick = upperWickSize <= 0.25m * bodySize;
-                                bool smallUpperWick = upperWickSize <= 0.025m * bodySize;
+                                // Now, let's check the handle: Look for smaller consolidations
+                                // This can be done by checking that the last few candles are in a range where the price doesn't drop significantly
+                                bool isHandleValid = rightCup.All(c => c.EndPrice >= leftCupLow);
 
-                                // Ensure the real body is relatively small
-                                bool smallBody = bodySize <= (testCandel.HighestPrice - testCandel.LowestPrice) * 0.2m;
+                                // Finally, look for a breakout condition (bullish reversal) where the price is rising after the handle
+                                bool breakout = next10Candles.Last().EndPrice > rightCupHigh;
 
-                                //Candel previousTenth = CandelData
-                                //                     .Where(c => c.OpenTime < testCandel.OpenTime) // Select candles before the test candle
-                                //                     .OrderByDescending(c => c.OpenTime)          // Sort in descending order of OpenTime
-                                //                     .Skip(7)                                     // Skip the first 9 candles
-                                //                     .FirstOrDefault();                           // Take the 10th one (or default if none exist)
+                                // LEFT SIDE IN DOWNTREND
+                                bool isleftDownTrend = leftCup[4].EndPrice < leftCup[0].EndPrice;
+                                // RIGHT SIDE IN UPTREND
+                                bool isRigtUpTrend = rightCup[4].EndPrice > rightCup[0].EndPrice;
 
-                                //// Hammer must appear after a downtrend (additional logic to determine downtrend can be added)
-                                //bool isInDowntrend = false; // Example threshold for downtrend check
-
-                                //if ((previousTenth != null) && (testCandel.EndPrice < previousTenth.EndPrice))
-                                //{
-                                //    isInDowntrend = true;
-                                //}
-
-                                Candel previousTenth = CandelData
-                                                      .Where(c => c.OpenTime < testCandel.OpenTime) // Select candles before the test candle
-                                                      .OrderByDescending(c => c.OpenTime)          // Sort in descending order of OpenTime
-                                                      .Skip(7)                                     // Skip the first 9 candles 
-                                                      .FirstOrDefault();                           // Take the 10th one (or default if none exist)
-
-                                // Hammer must appear after a downtrend (additional logic to determine downtrend can be added)
-                                bool isInDowntrend = false; // Example threshold for downtrend check
-
-                                if ((previousTenth != null) && (testCandel.EndPrice < previousTenth.EndPrice))
+                                if(isleftDownTrend && isRigtUpTrend)
                                 {
-                                    isInDowntrend = true;
+                                    dragonFlyDojiCandles.Add(next10Candles[9]);
                                 }
 
 
-                                Candel verificationCandel = CandelData
-                                                   .Where(c => c.OpenTime > testCandel.OpenTime)
-                                                   .OrderBy(c => c.OpenTime)
-                                                   .FirstOrDefault();
 
-                                bool isVerificationCandelBullish = (verificationCandel != null) && (verificationCandel.IsBullish.HasValue) && (verificationCandel.IsBullish == true);
-
-                                bool isVerificationCandelHighGreater = (verificationCandel != null) && (verificationCandel.EndPrice > testCandel.HighestPrice);
-
-                                bool isverificationCandelVolumeGreater = (verificationCandel != null) && (verificationCandel.Volume > testCandel.Volume);
-
-                                if (
-                                    longLowerWick
-                                    && smallUpperWick
-                                    && smallBody
-                                    && isInDowntrend
-                                    && isVerificationCandelBullish
-                                    && isVerificationCandelHighGreater
-                                    && testCandel.IsBullish.HasValue
-                                    && isverificationCandelVolumeGreater
-                                    )
-                                {
-                                    dragonFlyDojiCandles.Add(verificationCandel);
-                                    //dragonFlyDojiCandles.Add(testCandel);
-                                }
-
-
+                                //// Detect the bullish Cup and Handle Pattern
+                                //if (cupDepth > 0.5m && isHandleValid && breakout) // Adjust the 0.5 as per your logic for handle depth/size
+                                //{
+                                //    dragonFlyDojiCandles.Add(next10Candles[9]);
+                                //}
                             }
+
+
+                            //foreach (Candel testCandel in CandelData)
+                            //{
+                            //    try
+                            //    {
+
+                            //        decimal wickToBodyRatio = 2.0m;
+
+                            //        decimal bodySize = Math.Abs(testCandel.EndPrice - testCandel.StartPrice);
+
+                            //        decimal upperWickSize = testCandel.HighestPrice - Math.Max(testCandel.StartPrice, testCandel.EndPrice);
+
+                            //        decimal lowerWickSize = Math.Min(testCandel.StartPrice, testCandel.EndPrice) - testCandel.LowestPrice;
+
+                            //        bool longUpperWick = upperWickSize >= wickToBodyRatio * bodySize;
+
+                            //        bool smallLowerWick = lowerWickSize <= 0.025m * bodySize;
+
+                            //        bool smallBody = bodySize <= (testCandel.HighestPrice - testCandel.LowestPrice) * 0.2m;   
+
+                            //        Candel verificationCandel = CandelData
+                            //                           .Where(c => c.OpenTime > testCandel.OpenTime)
+                            //                           .OrderBy(c => c.OpenTime)
+                            //                           .FirstOrDefault();
+
+                            //        bool isVerificationCandelBullish = (verificationCandel != null) && (verificationCandel.IsBullish.HasValue) && (verificationCandel.IsBullish == true);
+
+                            //        bool isVerificationCandelHighGreater = (verificationCandel != null) && (verificationCandel.EndPrice > testCandel.HighestPrice);
+
+                            //        bool isverificationCandelVolumeGreater = (verificationCandel != null) && (verificationCandel.Volume > testCandel.Volume);
+
+                            //        if (
+                            //            longUpperWick
+                            //            && smallLowerWick
+                            //            && smallBody
+                            //            && (testCandel.IsBullish.HasValue && testCandel.IsBullish == true)
+                            //            && (testCandel.StartPrice == testCandel.LowestPrice)
+                            //            && isVerificationCandelBullish
+                            //            && isVerificationCandelHighGreater
+                            //            && isverificationCandelVolumeGreater
+                            //            )
+                            //        {
+                            //            dragonFlyDojiCandles.Add(verificationCandel);
+                            //            //dragonFlyDojiCandles.Add(testCandel);
+                            //        }
+
+
+                            //    }
+                            //    catch (Exception ex)
+                            //    {
+                            //        Console.WriteLine($"An error occurred: {ex.Message}");
+                            //    }
+
+                            //}
+
+
+
+
+                            //foreach (Candel testCandel in CandelData)
+                            //{
+                            //    decimal wickToBodyRatio = 2.0m;
+
+                            //    //if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
+                            //    //{
+                            //    //    break; // Skip the rest of this iteration and proceed to the next object
+                            //    //}
+
+                            //    // Calculate body size
+                            //    decimal bodySize = Math.Abs(testCandel.EndPrice - testCandel.StartPrice);
+
+                            //    // Calculate wick sizes
+                            //    decimal upperWickSize = testCandel.HighestPrice - Math.Max(testCandel.StartPrice, testCandel.EndPrice);
+
+                            //    decimal lowerWickSize = Math.Min(testCandel.StartPrice, testCandel.EndPrice) - testCandel.LowestPrice;
+
+                            //    // Check if the lower wick is at least `wickToBodyRatio` times the body size
+                            //    bool longLowerWick = lowerWickSize >= wickToBodyRatio * bodySize;
+
+                            //    // Ensure the upper wick is very small
+                            //    //bool smallUpperWick = upperWickSize <= 0.25m * bodySize;
+                            //    bool smallUpperWick = upperWickSize <= 0.025m * bodySize;
+
+                            //    // Ensure the real body is relatively small
+                            //    bool smallBody = bodySize <= (testCandel.HighestPrice - testCandel.LowestPrice) * 0.2m;
+
+                            //    //Candel previousTenth = CandelData
+                            //    //                     .Where(c => c.OpenTime < testCandel.OpenTime) // Select candles before the test candle
+                            //    //                     .OrderByDescending(c => c.OpenTime)          // Sort in descending order of OpenTime
+                            //    //                     .Skip(7)                                     // Skip the first 9 candles
+                            //    //                     .FirstOrDefault();                           // Take the 10th one (or default if none exist)
+
+                            //    //// Hammer must appear after a downtrend (additional logic to determine downtrend can be added)
+                            //    //bool isInDowntrend = false; // Example threshold for downtrend check
+
+                            //    //if ((previousTenth != null) && (testCandel.EndPrice < previousTenth.EndPrice))
+                            //    //{
+                            //    //    isInDowntrend = true;
+                            //    //}
+
+                            //    Candel previousTenth = CandelData
+                            //                          .Where(c => c.OpenTime < testCandel.OpenTime) // Select candles before the test candle
+                            //                          .OrderByDescending(c => c.OpenTime)          // Sort in descending order of OpenTime
+                            //                          .Skip(7)                                     // Skip the first 9 candles 
+                            //                          .FirstOrDefault();                           // Take the 10th one (or default if none exist)
+
+                            //    // Hammer must appear after a downtrend (additional logic to determine downtrend can be added)
+                            //    bool isInDowntrend = false; // Example threshold for downtrend check
+
+                            //    if ((previousTenth != null) && (testCandel.EndPrice < previousTenth.EndPrice))
+                            //    {
+                            //        isInDowntrend = true;
+                            //    }
+
+
+                            //    Candel verificationCandel = CandelData
+                            //                       .Where(c => c.OpenTime > testCandel.OpenTime)
+                            //                       .OrderBy(c => c.OpenTime)
+                            //                       .FirstOrDefault();
+
+                            //    bool isVerificationCandelBullish = (verificationCandel != null) && (verificationCandel.IsBullish.HasValue) && (verificationCandel.IsBullish == true);
+
+                            //    bool isVerificationCandelHighGreater = (verificationCandel != null) && (verificationCandel.EndPrice > testCandel.HighestPrice);
+
+                            //    bool isverificationCandelVolumeGreater = (verificationCandel != null) && (verificationCandel.Volume > testCandel.Volume);
+
+                            //    if (
+                            //        longLowerWick
+                            //        && smallUpperWick
+                            //        && smallBody
+                            //        && isInDowntrend
+                            //        && isVerificationCandelBullish
+                            //        && isVerificationCandelHighGreater
+                            //        && testCandel.IsBullish.HasValue
+                            //        && isverificationCandelVolumeGreater
+                            //        )
+                            //    {
+                            //        dragonFlyDojiCandles.Add(verificationCandel);
+                            //        //dragonFlyDojiCandles.Add(testCandel);
+                            //    }
+
+
+                            //}
 
 
                             //foreach (Candel testCandel in CandelData)
@@ -1127,8 +1237,8 @@ namespace StockLogger.Controllers.API_Controllers
                                 if (firstCandel != null)
                                 {
                                     //expectedPrice = firstCandel.EndPrice * 1.000595m;
-                                    expectedPrice = firstCandel.EndPrice * 1.00061m;
-                                    //expectedPrice = firstCandel.EndPrice * 1.00065m;
+                                    //expectedPrice = firstCandel.EndPrice * 1.00061m;
+                                    expectedPrice = firstCandel.EndPrice * 1.00065m;
                                     //expectedPrice = firstCandel.EndPrice * 1.01m;
                                     //expectedPrice = firstCandel.EndPrice * 1.005m;
                                     //expectedPrice = firstCandel.EndPrice * 1.0025m;
@@ -1136,33 +1246,33 @@ namespace StockLogger.Controllers.API_Controllers
 
                                 decimal profitMargin = 0;
 
-                                //if (expectedPrice == firstCandel.EndPrice * 1.00065m)
-                                //{
-                                //    profitMargin = 130 - 117;
-                                //}
-                                //else if (expectedPrice == firstCandel.EndPrice * 1.0008014m)
-                                //{
-                                //    profitMargin = 160 - 117;
-                                //}
-                                //else if (expectedPrice == firstCandel.EndPrice * 1.0025m)
-                                //{
-                                //    profitMargin = 450 - 117;
-                                //}
-                                //else if (expectedPrice == firstCandel.EndPrice * 1.01m)
-                                //{
-                                //    profitMargin = 1995 - 117;
-                                //}
-                                //else if (expectedPrice == firstCandel.EndPrice * 1.005m)
-                                //{
-                                //    profitMargin = 997 - 117;
-                                //}
-                                //else if (expectedPrice == firstCandel.EndPrice * 1.001429m)
-                                //{
-                                //    profitMargin = 285 - 117;
-                                //}
+                                if (expectedPrice == firstCandel.EndPrice * 1.00065m)
+                                {
+                                    profitMargin = 130 - 117;
+                                }
+                                else if (expectedPrice == firstCandel.EndPrice * 1.0008014m)
+                                {
+                                    profitMargin = 160 - 117;
+                                }
+                                else if (expectedPrice == firstCandel.EndPrice * 1.0025m)
+                                {
+                                    profitMargin = 450 - 117;
+                                }
+                                else if (expectedPrice == firstCandel.EndPrice * 1.01m)
+                                {
+                                    profitMargin = 1995 - 117;
+                                }
+                                else if (expectedPrice == firstCandel.EndPrice * 1.005m)
+                                {
+                                    profitMargin = 997 - 117;
+                                }
+                                else if (expectedPrice == firstCandel.EndPrice * 1.001429m)
+                                {
+                                    profitMargin = 285 - 117;
+                                }
 
                                 //profitMargin = 1;
-                                profitMargin = 5;
+                                //profitMargin = 5;
 
                                 ConstForProfit = profitMargin;
 
@@ -1288,135 +1398,31 @@ namespace StockLogger.Controllers.API_Controllers
 
 
 
-
-
-                                //if (stoplossCandel != null)
-                                //{
-                                //    if (profitCandel != null && stoplossCandel != null)
-                                //    {
-                                //        if (profitCandel.OpenTime > stoplossCandel.OpenTime)
-                                //        {
-                                //            List<Candel> CandelPair = new List<Candel>();
-                                //            CandelPair.Add(dojiCandle);
-                                //            CandelPair.Add(stoplossCandel);
-
-                                //            WrongPredictionList.Add(CandelPair);
-                                //            MainWrongPredictionList.Add(WrongPredictionList);
-                                //        }
-                                //        else if (profitCandel.OpenTime < stoplossCandel.OpenTime)
-                                //        {
-                                //            List<Candel> CandelPair = new List<Candel>();
-
-                                //            CandelPair.Add(dojiCandle);
-                                //            CandelPair.Add(profitCandel);
-
-                                //            CorrectPredictionList.Add(CandelPair);
-                                //            MainCorrectPredictionList.Add(CorrectPredictionList);
-                                //        }
-                                //    }
-                                //}
-                                //else if (stoplossCandel == null && profitCandel != null)
-                                //{
-                                //    List<Candel> CandelPair = new List<Candel>();
-
-                                //    CandelPair.Add(dojiCandle);
-                                //    CandelPair.Add(profitCandel);
-
-                                //    CorrectPredictionList.Add(CandelPair);
-                                //    MainCorrectPredictionList.Add(CorrectPredictionList);
-                                //}
-                                //else if (profitCandel == null && stoplossCandel != null)
-                                //{
-                                //    List<Candel> CandelPair = new List<Candel>();
-                                //    CandelPair.Add(dojiCandle);
-                                //    CandelPair.Add(stoplossCandel);
-
-                                //    WrongPredictionList.Add(CandelPair);
-                                //    MainWrongPredictionList.Add(WrongPredictionList);
-                                //}
-                                ////else if (profitCandel == null && stoplossCandel == null)
-                                ////{
-                                ////    List<Candel> CandelPair = new List<Candel>();
-                                ////    CandelPair.Add(dojiCandle);
-                                ////    CandelPair.Add(EndCandel);
-
-                                ////    WrongPredictionList.Add(CandelPair);
-                                ////    MainWrongPredictionList.Add(WrongPredictionList);
-                                ////}
-                                //else
-                                //{
-                                //if (suceessFound == true)
-                                //if (profitCandel != null)
-                                //if ((RANGE_HIGH != null && RANGE_HIGH.HighestPrice >= expectedPrice) || (suceessFound == true))
-                                if((highestCandel != null) && (highestCandel.HighestPrice >= expectedPrice) || ((RANGE_HIGH != null && RANGE_HIGH.HighestPrice >= expectedPrice) || (suceessFound == true)))
+                                if(
+                                    (highestCandel != null) 
+                                    && (highestCandel.HighestPrice >= expectedPrice) || ((RANGE_HIGH != null && RANGE_HIGH.HighestPrice >= expectedPrice) || (suceessFound == true))
+                                  )
                                 {
                                     List<Candel> CandelPair = new List<Candel>();
 
                                     CandelPair.Add(dojiCandle);
                                     CandelPair.Add(earliestCandle);
+                                    CandelPair.Add(RANGE_HIGH);
 
                                     CorrectPredictionList.Add(CandelPair);
                                     MainCorrectPredictionList.Add(CorrectPredictionList);
                                 }
-                                //else if (suceessFound == false && stoplossCandel != null)
-                                //{
-                                //    List<Candel> CandelPair = new List<Candel>();
-                                //    CandelPair.Add(dojiCandle);
-                                //    CandelPair.Add(stoplossCandel);
-
-                                //    WrongPredictionList.Add(CandelPair);
-                                //    MainWrongPredictionList.Add(WrongPredictionList);
-                                //}
-                                //else if (profitCandel == null)
                                 else
                                 {
-                                    //if (EndCandel != null && firstCandel != null)
-                                    //{
-                                    //    if (EndCandel.EndPrice > firstCandel.EndPrice)
-                                    //    {
-                                    //        CorrectPredictionList.Add(detectedCandelList);
-                                    //        MainCorrectPredictionList.Add(CorrectPredictionList);
-
-                                    //        TotalProfit = TotalProfit + (EndCandel.EndPrice - firstCandel.EndPrice);
-                                    //        MainProfit = MainProfit + (EndCandel.EndPrice - firstCandel.EndPrice);
-                                    //    }
-                                    //    else
-                                    //    {
-                                    //        WrongPredictionList.Add(detectedCandelList);
-                                    //        MainWrongPredictionList.Add(WrongPredictionList);
-                                    //        NetLoss = NetLoss + (firstCandel.EndPrice - EndCandel.EndPrice);
-                                    //        MainLoss = MainLoss + (firstCandel.EndPrice - EndCandel.EndPrice);
-                                    //    }
-                                    //}
-
-
-                                    //if (stoplossCandel != null)
-                                    //{
-                                    //    List<Candel> CandelPair = new List<Candel>();
-                                    //    CandelPair.Add(dojiCandle);
-                                    //    CandelPair.Add(stoplossCandel);
-
-                                    //    WrongPredictionList.Add(CandelPair);
-                                    //    MainWrongPredictionList.Add(WrongPredictionList);
-                                    //}
-                                    //else
-                                    //{
-
                                     List<Candel> CandelPair = new List<Candel>();
                                     CandelPair.Add(dojiCandle);
                                     CandelPair.Add(EndCandel);
+                                    CandelPair.Add(RANGE_HIGH);
 
                                     WrongPredictionList.Add(CandelPair);
                                     MainWrongPredictionList.Add(WrongPredictionList);
-                                    //}
 
                                 }
-
-                                //}
-
-
-
-
 
                             }
 
@@ -1461,6 +1467,117 @@ namespace StockLogger.Controllers.API_Controllers
 
 
 
+
+
+
+            List<List<Candel>> TotalPredictions = new List<List<Candel>>();
+
+
+                    TotalPredictions = MainWrongPredictionList
+                                             .SelectMany(innerList => innerList)
+                                             .Distinct()
+                                             .ToList();
+
+                   TotalPredictions = MainCorrectPredictionList
+                                             .SelectMany(innerList => innerList)
+                                             .Distinct()
+                                             .ToList();
+
+            List<Candel> CPred = new List<Candel>();
+            List<Candel> WPRed = new List<Candel>();
+
+            List<Candel> TotalList = new List<Candel>();
+
+
+            foreach (List<Candel> testList in TotalPredictions)
+            {
+                TotalList.Add(testList[1]);
+            }
+
+            foreach (List<Candel> testList in extractedListCorrectPredictions)
+            {
+                CPred.Add(testList[1]);
+            }
+
+            foreach (List<Candel> testList in extractedListWrongPredictions)
+            {
+                WPRed.Add(testList[1]);
+            }
+
+
+
+            Candel referenceCandel = new Candel();
+            List<Candel> referenceList = new List<Candel>();
+
+            List<Candel> MasterList2 = new List<Candel>();
+
+            TotalList = TotalList.OrderBy(candel => candel.OpenTime).ToList();
+
+            //foreach (Candel testCandel in TotalList)
+            if (TotalList != null)
+            {
+                Candel testCandel = TotalList[0];
+
+
+                    referenceCandel = testCandel;
+
+                    referenceList = TotalList;
+
+                referenceList.RemoveAll(c => c.OpenTime < referenceCandel.OpenTime);
+
+                Candel nextCandel = referenceList
+                                   .Where(c => c.OpenTime > testCandel.OpenTime)
+                                   .OrderBy(c => c.OpenTime)
+                                   .FirstOrDefault();
+
+
+                    MasterList2.Add(testCandel);
+
+                    referenceCandel = nextCandel;
+
+                    int maxIterations = 160;
+                    int iterationCount = 0;
+
+                    while (nextCandel != TotalList.LastOrDefault() && iterationCount < maxIterations)
+                    {
+                        referenceList.RemoveAll(c => c.CloseTime <= referenceCandel.CloseTime);
+
+                        nextCandel = referenceList
+                            .Where(c => c.OpenTime > referenceCandel.OpenTime)
+                            .OrderBy(c => c.OpenTime)
+                            .FirstOrDefault();
+
+                        referenceCandel = nextCandel;
+
+                        MasterList2.Add(testCandel);
+                        iterationCount++;
+                    }
+
+            }
+
+
+            List<Candel> CorrectPred = new List<Candel>();
+            List<Candel> WrongPred = new List<Candel>();
+
+
+            foreach (Candel testCandel in MasterList2)
+            {
+
+                if (CPred.Any(c => c.Equals(testCandel)))
+                {
+                    CorrectPred.Add(testCandel);
+                }
+                else if(WPRed.Any(c => c.Equals(testCandel)))
+                {
+                    WrongPred.Add(testCandel);
+                }
+            }
+
+
+
+
+
+
             foreach (List<Candel> mainList in extractedListWrongPredictions)
             {
                 Candel firstCandel = mainList[0];
@@ -1481,8 +1598,10 @@ namespace StockLogger.Controllers.API_Controllers
                 Net = MainProfit - MainLoss,
                 //MainProfit,
                 //MainLoss,
-                extractedListCorrectPredictions,
-                extractedListWrongPredictions,
+                //extractedListCorrectPredictions,
+                //extractedListWrongPredictions,
+                CorrectPred,
+                WrongPred,
                 MainMasterList
             });
 
