@@ -1517,7 +1517,7 @@ namespace StockLogger.Controllers.API_Controllers
                 {
                     CorrectPred.Add(testCandel);
                 }
-                else
+                else if(WPRed.Any(c => c.Equals(testCandel)))
                 {
                     WrongPred.Add(testCandel);
                 }
@@ -1560,18 +1560,18 @@ namespace StockLogger.Controllers.API_Controllers
 
                         nextCandel = referenceCandel;
 
-                        if (CPred.Any(c => c.Equals(nextCandel)))
-                        {
-                            CorrectPred.Add(nextCandel);
-                        }
-                        else
-                        {
-                            WrongPred.Add(nextCandel);
-                        }
-                        //else if (WPRed.Any(c => c.Equals(nextCandel)))
-                        //{
-                        //    WrongPred.Add(nextCandel);
-                        //}
+                       if (CPred.Any(c => c.Equals(testCandel)))
+                       {
+                           CorrectPred.Add(testCandel);
+                       }
+                       else if (WPRed.Any(c => c.Equals(testCandel)))
+                       {
+                           WrongPred.Add(testCandel);
+                       }
+                    //else if (WPRed.Any(c => c.Equals(nextCandel)))
+                    //{
+                    //    WrongPred.Add(nextCandel);
+                    //}
 
 
                     iterationCount++;
