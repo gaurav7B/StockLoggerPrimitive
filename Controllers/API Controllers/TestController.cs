@@ -574,25 +574,8 @@ namespace StockLogger.Controllers.API_Controllers
 
                                 if (next10Candles.Count < 10) continue; // Skip if not enough candles to analyze
 
-                                // We need at least 6 to 8 candles for cup and handle formation
-                                // Assuming that the pattern is formed when 3 to 4 candles form the decline (left cup) and the remaining 2 to 3 form the handle
-
                                 List<Candel> leftCup = next10Candles.Take(5).ToList(); // Left part (cup decline)
                                 List<Candel> rightCup = next10Candles.Skip(5).Take(5).ToList(); // Right part (cup rise and handle)
-
-                                if (leftCup.Count < 3 || rightCup.Count < 3) continue; // Ensure we have enough candles
-
-                                // Check if there is a clear "cup" shape (decline followed by an increase)
-                                decimal leftCupLow = leftCup.Min(c => c.LowestPrice);
-                                decimal rightCupHigh = rightCup.Max(c => c.HighestPrice);
-                                decimal cupDepth = leftCupLow - rightCupHigh; // Measure the "depth" of the cup
-
-                                // Now, let's check the handle: Look for smaller consolidations
-                                // This can be done by checking that the last few candles are in a range where the price doesn't drop significantly
-                                bool isHandleValid = rightCup.All(c => c.EndPrice >= leftCupLow);
-
-                                // Finally, look for a breakout condition (bullish reversal) where the price is rising after the handle
-                                bool breakout = next10Candles.Last().EndPrice > rightCupHigh;
 
                                 // LEFT SIDE IN DOWNTREND
                                 bool isleftDownTrend = leftCup[4].EndPrice < leftCup[0].EndPrice;
@@ -604,13 +587,6 @@ namespace StockLogger.Controllers.API_Controllers
                                     dragonFlyDojiCandles.Add(next10Candles[9]);
                                 }
 
-
-
-                                //// Detect the bullish Cup and Handle Pattern
-                                //if (cupDepth > 0.5m && isHandleValid && breakout) // Adjust the 0.5 as per your logic for handle depth/size
-                                //{
-                                //    dragonFlyDojiCandles.Add(next10Candles[9]);
-                                //}
                             }
 
 
@@ -1491,20 +1467,23 @@ namespace StockLogger.Controllers.API_Controllers
 
             foreach (List<Candel> testList in TotalPredictions)
             {
-                TotalList.Add(testList[1]);
+                TotalList.Add(testList[0]);
             }
 
             foreach (List<Candel> testList in extractedListCorrectPredictions)
             {
-                CPred.Add(testList[1]);
+                CPred.Add(testList[0]);
             }
 
             foreach (List<Candel> testList in extractedListWrongPredictions)
             {
-                WPRed.Add(testList[1]);
+                WPRed.Add(testList[0]);
             }
 
 
+
+            List<Candel> CorrectPred = new List<Candel>();
+            List<Candel> WrongPred = new List<Candel>();
 
             Candel referenceCandel = new Candel();
             List<Candel> referenceList = new List<Candel>();
@@ -1523,7 +1502,7 @@ namespace StockLogger.Controllers.API_Controllers
 
                     referenceList = TotalList;
 
-                referenceList.RemoveAll(c => c.OpenTime < referenceCandel.OpenTime);
+                referenceList.RemoveAll(c => c.OpenTime <= referenceCandel.OpenTime);
 
                 Candel nextCandel = referenceList
                                    .Where(c => c.OpenTime > testCandel.OpenTime)
@@ -1540,68 +1519,84 @@ namespace StockLogger.Controllers.API_Controllers
 
                     while (nextCandel != TotalList.LastOrDefault() && iterationCount < maxIterations)
                     {
-                        referenceList.RemoveAll(c => c.CloseTime <= referenceCandel.CloseTime);
+                        MasterList2.Add(nextCandel);
+    
+                        referenceList.RemoveAll(c => c.OpenTime <= referenceCandel.OpenTime);
 
-                        nextCandel = referenceList
+                         Candel nextCandel2 = referenceList
                             .Where(c => c.OpenTime > referenceCandel.OpenTime)
                             .OrderBy(c => c.OpenTime)
                             .FirstOrDefault();
 
-                        referenceCandel = nextCandel;
+                        referenceCandel = nextCandel2;
 
-                        MasterList2.Add(testCandel);
-                        iterationCount++;
+                        nextCandel = referenceCandel;
+
+                        if (CPred.Any(c => c.Equals(nextCandel)))
+                        {
+                            CorrectPred.Add(nextCandel);
+                        }
+                        else if (WPRed.Any(c => c.Equals(nextCandel)))
+                        {
+                            WrongPred.Add(nextCandel);
+                        }
+
+
+                    iterationCount++;
                     }
 
             }
 
 
-            List<Candel> CorrectPred = new List<Candel>();
-            List<Candel> WrongPred = new List<Candel>();
 
+            //foreach (Candel testCandel in MasterList2)
+            //{
 
-            foreach (Candel testCandel in MasterList2)
-            {
-
-                if (CPred.Any(c => c.Equals(testCandel)))
-                {
-                    CorrectPred.Add(testCandel);
-                }
-                else if(WPRed.Any(c => c.Equals(testCandel)))
-                {
-                    WrongPred.Add(testCandel);
-                }
-            }
+            //    if (CPred.Any(c => c.Equals(testCandel)))
+            //    {
+            //        CorrectPred.Add(testCandel);
+            //    }
+            //    else if(WPRed.Any(c => c.Equals(testCandel)))
+            //    {
+            //        WrongPred.Add(testCandel);
+            //    }
+            //}
 
 
 
 
 
 
-            foreach (List<Candel> mainList in extractedListWrongPredictions)
-            {
-                Candel firstCandel = mainList[0];
-                Candel secondCandel = mainList[1];
+            //foreach (List<Candel> mainList in extractedListWrongPredictions)
+            //{
+            //    Candel firstCandel = mainList[0];
+            //    Candel secondCandel = mainList[1];
 
-                decimal NoofStocks = 200000 / firstCandel.EndPrice;
-                //decimal NoofStocks = 50000 / firstCandel.EndPrice;
-                //decimal NoofStocks = 3391 / firstCandel.EndPrice;
+            //    decimal NoofStocks = 200000 / firstCandel.EndPrice;
+            //    //decimal NoofStocks = 50000 / firstCandel.EndPrice;
+            //    //decimal NoofStocks = 3391 / firstCandel.EndPrice;
 
-                MainLoss = MainLoss + (NoofStocks * (firstCandel.EndPrice - secondCandel.EndPrice)) + 117;
+            //    MainLoss = MainLoss + (NoofStocks * (firstCandel.EndPrice - secondCandel.EndPrice)) + 117;
 
-            }
+            //}
 
-            MainProfit = extractedListCorrectPredictions.Count * ConstForProfit;
+            //MainProfit = extractedListCorrectPredictions.Count * ConstForProfit;
+
+
+            MainProfit = CorrectPred.Count * ConstForProfit;
+
+            MainLoss = 0;
+
 
             return Ok(new
             {
                 Net = MainProfit - MainLoss,
                 //MainProfit,
                 //MainLoss,
-                //extractedListCorrectPredictions,
-                //extractedListWrongPredictions,
                 CorrectPred,
                 WrongPred,
+                extractedListCorrectPredictions,
+                extractedListWrongPredictions,
                 MainMasterList
             });
 
