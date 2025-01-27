@@ -1449,15 +1449,21 @@ namespace StockLogger.Controllers.API_Controllers
             List<List<Candel>> TotalPredictions = new List<List<Candel>>();
 
 
-                    TotalPredictions = MainWrongPredictionList
-                                             .SelectMany(innerList => innerList)
-                                             .Distinct()
-                                             .ToList();
+            // TotalPredictions = MainWrongPredictionList
+            //                          .SelectMany(innerList => innerList)
+            //                          .Distinct()
+            //                          .ToList();
 
-                   TotalPredictions = MainCorrectPredictionList
-                                             .SelectMany(innerList => innerList)
-                                             .Distinct()
-                                             .ToList();
+            //TotalPredictions = MainCorrectPredictionList
+            //                          .SelectMany(innerList => innerList)
+            //                          .Distinct()
+            //                          .ToList();
+
+            TotalPredictions = MainWrongPredictionList
+                       .SelectMany(innerList => innerList)
+                       .Concat(MainCorrectPredictionList.SelectMany(innerList => innerList))
+                       .Distinct()
+                       .ToList();
 
             List<Candel> CPred = new List<Candel>();
             List<Candel> WPRed = new List<Candel>();
@@ -1500,7 +1506,17 @@ namespace StockLogger.Controllers.API_Controllers
                 Candel testCandel = TotalList[0];
 
 
-                    referenceCandel = testCandel;
+                if (CPred.Any(c => c.Equals(testCandel)))
+                {
+                    CorrectPred.Add(testCandel);
+                }
+                else
+                {
+                    WrongPred.Add(testCandel);
+                }
+
+
+                referenceCandel = testCandel;
 
                     referenceList = TotalList;
 
