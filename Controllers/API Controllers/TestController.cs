@@ -1341,10 +1341,10 @@ namespace StockLogger.Controllers.API_Controllers
                                 {
                                     //expectedPrice = firstCandel.EndPrice * 1.000595m;
                                     //expectedPrice = firstCandel.EndPrice * 1.00061m;
-                                    expectedPrice = firstCandel.EndPrice * 1.00065m;
+                                    //expectedPrice = firstCandel.EndPrice * 1.00065m;
                                     //expectedPrice = firstCandel.EndPrice * 1.01m;
                                     //expectedPrice = firstCandel.EndPrice * 1.005m;
-                                    //expectedPrice = firstCandel.EndPrice * 1.0025m;
+                                    expectedPrice = firstCandel.EndPrice * 1.0025m;
                                 }
 
                                 decimal profitMargin = 0;
@@ -1510,18 +1510,18 @@ namespace StockLogger.Controllers.API_Controllers
                                     && (highestCandel.HighestPrice >= expectedPrice) || ((RANGE_HIGH != null && RANGE_HIGH.HighestPrice >= expectedPrice) || (suceessFound == true))
                                   )
                                 {
-                                    //if (stoplossCandel != null && earliestCandle.OpenTime > stoplossCandel.OpenTime)
-                                    //{
-                                    //    List<Candel> CandelPair = new List<Candel>();
-                                    //    CandelPair.Add(dojiCandle);
-                                    //    CandelPair.Add(stoplossCandel);
-                                    //    CandelPair.Add(RANGE_HIGH);
+                                    if (stoplossCandel != null && earliestCandle.OpenTime > stoplossCandel.OpenTime)
+                                    {
+                                        List<Candel> CandelPair = new List<Candel>();
+                                        CandelPair.Add(dojiCandle);
+                                        CandelPair.Add(stoplossCandel);
+                                        CandelPair.Add(RANGE_HIGH);
 
-                                    //    WrongPredictionList.Add(CandelPair);
-                                    //    MainWrongPredictionList.Add(WrongPredictionList);
-                                    //}
-                                    //else
-                                    //{
+                                        WrongPredictionList.Add(CandelPair);
+                                        MainWrongPredictionList.Add(WrongPredictionList);
+                                    }
+                                    else
+                                    {
                                         List<Candel> CandelPair = new List<Candel>();
 
                                         CandelPair.Add(dojiCandle);
@@ -1530,17 +1530,30 @@ namespace StockLogger.Controllers.API_Controllers
 
                                         CorrectPredictionList.Add(CandelPair);
                                         MainCorrectPredictionList.Add(CorrectPredictionList);
-                                    //}
+                                    }
                                 }
                                 else
                                 {
-                                    List<Candel> CandelPair = new List<Candel>();
-                                    CandelPair.Add(dojiCandle);
-                                    CandelPair.Add(EndCandel);
-                                    CandelPair.Add(RANGE_HIGH);
+                                    if(stoplossCandel != null)
+                                    {
+                                        List<Candel> CandelPair = new List<Candel>();
+                                        CandelPair.Add(dojiCandle);
+                                        CandelPair.Add(stoplossCandel);
+                                        CandelPair.Add(RANGE_HIGH);
 
-                                    WrongPredictionList.Add(CandelPair);
-                                    MainWrongPredictionList.Add(WrongPredictionList);
+                                        WrongPredictionList.Add(CandelPair);
+                                        MainWrongPredictionList.Add(WrongPredictionList);
+                                    }
+                                    else
+                                    {
+                                        List<Candel> CandelPair = new List<Candel>();
+                                        CandelPair.Add(dojiCandle);
+                                        CandelPair.Add(EndCandel);
+                                        CandelPair.Add(RANGE_HIGH);
+
+                                        WrongPredictionList.Add(CandelPair);
+                                        MainWrongPredictionList.Add(WrongPredictionList);
+                                    }
 
                                 }
 
