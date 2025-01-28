@@ -104,12 +104,12 @@ namespace StockLogger.Controllers.API_Controllers
             // Add Fibonacci levels
             levels.AddRange(new[]
             {
-        highestHigh - 0.236m * range, // 23.6%
-        highestHigh - 0.382m * range, // 38.2%
-        highestHigh - 0.5m * range,   // 50%
-        highestHigh - 0.618m * range, // 61.8%
-        highestHigh - 0.786m * range  // 78.6%
-    });
+                highestHigh - 0.236m * range, // 23.6%
+                highestHigh - 0.382m * range, // 38.2%
+                highestHigh - 0.5m * range,   // 50%
+                highestHigh - 0.618m * range, // 61.8%
+                highestHigh - 0.786m * range  // 78.6%
+            });
 
             // Calculate Moving Averages for common periods
             int[] periods = { 20, 50, 100, 200 };
@@ -129,61 +129,146 @@ namespace StockLogger.Controllers.API_Controllers
         }
 
 
-        //public List<Candel> FindHammersNearKeyLevels(List<Candel> candleData, decimal proximityPercentage = 1.0m)
-        //{
-        //    var results = new List<Candel>();
-        //    if (candleData == null || candleData.Count == 0) return results;
+        ////////////////////////////////////////
 
-        //    // Get support/resistance levels
-        //    var keyLevels = GetSupportResistanceLevels(candleData);
+        public bool IsListInUptrendAdvanced(List<Candel> candles)
+        {
+            const int minCandles = 10; // Minimum required candles for analysis
+            const int smaPeriod = 20;  // Moving average period
+            const double bullishThreshold = 0.65; // 65% bullish candles
+            const double volumeGrowthThreshold = 0.25; // 25% volume increase
 
-        //    // Sort candles chronologically
-        //    var sortedCandles = candleData.OrderBy(c => c.OpenTime).ToList();
+            // Initial validation
+            if (candles == null || candles.Count < minCandles)
+                return false;
 
-        //    foreach (var candle in sortedCandles)
-        //    {
-        //        if (IsHammer(candle) && IsNearKeyLevel(candle, keyLevels, proximityPercentage))
-        //        {
-        //            results.Add(candle);
-        //        }
-        //    }
+            // Ensure chronological order
+            var sorted = candles.OrderBy(c => c.OpenTime).ToList();
 
-        //    return results;
-        //}
+            // 1. Price Structure Analysis
+            var (higherHighs, higherLows) = AnalyzePriceStructure(sorted);
+            if (higherHighs < 0.7 || higherLows < 0.7)
+                return false;
 
-        //public bool IsHammer(Candel candle)
-        //{
-        //    decimal bodySize = Math.Abs(candle.EndPrice - candle.StartPrice);
-        //    decimal totalRange = candle.HighestPrice - candle.LowestPrice;
+            // 2. Moving Average Analysis
+            var smaValues = CalculateSMA(sorted, smaPeriod);
+            if (!IsPriceAboveSMA(sorted, smaValues, smaPeriod))
+                return false;
 
-        //    if (totalRange == 0) return false;
+            // 3. Momentum Analysis
+            if (!HasStrongMomentum(sorted))
+                return false;
 
-        //    // Calculate shadows
-        //    decimal upperShadow = candle.HighestPrice - Math.Max(candle.StartPrice, candle.EndPrice);
-        //    decimal lowerShadow = Math.Min(candle.StartPrice, candle.EndPrice) - candle.LowestPrice;
+            // 4. Volume Analysis
+            if (!HasVolumeConfirmation(sorted, volumeGrowthThreshold))
+                return false;
 
-        //    // Hammer criteria
-        //    bool validBody = bodySize <= totalRange * 0.2m;          // Body <= 20% of total range
-        //    bool validLowerShadow = lowerShadow >= 2 * bodySize;     // Lower shadow >= 2x body size
-        //    bool validUpperShadow = upperShadow <= totalRange * 0.1m;// Upper shadow <= 10% of total range
+            // 5. Bullish Consistency
+            if (CalculateBullishRatio(sorted) < bullishThreshold)
+                return false;
 
-        //    return validBody && validLowerShadow && validUpperShadow;
-        //}
+            return true;
+        }
 
-        //public bool IsNearKeyLevel(Candel candle, List<decimal> keyLevels, decimal thresholdPercent)
-        //{
-        //    decimal candleClose = candle.EndPrice;
-        //    decimal threshold = candleClose * (thresholdPercent / 100);
+        // Helper 1: Analyze higher highs and higher lows
+        private (double higherHighs, double higherLows) AnalyzePriceStructure(List<Candel> candles)
+        {
+            int hhCount = 0, hlCount = 0;
 
-        //    foreach (var level in keyLevels)
-        //    {
-        //        if (Math.Abs(candleClose - level) <= threshold)
-        //        {
-        //            return true;
-        //        }
-        //    }
-        //    return false;
-        //}
+            for (int i = 1; i < candles.Count; i++)
+            {
+                if (candles[i].HighestPrice > candles[i - 1].HighestPrice) hhCount++;
+                if (candles[i].LowestPrice > candles[i - 1].LowestPrice) hlCount++;
+            }
+
+            return (
+                (double)hhCount / (candles.Count - 1),
+                (double)hlCount / (candles.Count - 1)
+            );
+        }
+
+        // Helper 2: Calculate Simple Moving Average
+        private List<decimal> CalculateSMA(List<Candel> candles, int period)
+        {
+            List<decimal> sma = new List<decimal>();
+
+            for (int i = 0; i < candles.Count; i++)
+            {
+                if (i >= period - 1)
+                {
+                    decimal sum = candles.Skip(i - period + 1).Take(period).Sum(c => c.EndPrice);
+                    sma.Add(sum / period);
+                }
+                else
+                {
+                    sma.Add(decimal.MinValue); // Invalid value
+                }
+            }
+            return sma;
+        }
+
+        // Helper 3: Check price position relative to SMA
+        private bool IsPriceAboveSMA(List<Candel> candles, List<decimal> sma, int validPeriod)
+        {
+            int validChecks = 0;
+            int aboveCount = 0;
+
+            for (int i = validPeriod - 1; i < candles.Count; i++)
+            {
+                validChecks++;
+                if (candles[i].EndPrice > sma[i]) aboveCount++;
+            }
+
+            return validChecks > 0 && (double)aboveCount / validChecks >= 0.75;
+        }
+
+        // Helper 4: Check momentum using price changes
+        private bool HasStrongMomentum(List<Candel> candles)
+        {
+            int positiveCloses = 0;
+            decimal totalChange = 0;
+
+            for (int i = 1; i < candles.Count; i++)
+            {
+                decimal change = candles[i].EndPrice - candles[i - 1].EndPrice;
+                if (change > 0) positiveCloses++;
+                totalChange += change;
+            }
+
+            double positiveRatio = (double)positiveCloses / (candles.Count - 1);
+            decimal avgChange = totalChange / (candles.Count - 1);
+
+            return positiveRatio >= 0.6 && avgChange > 0;
+        }
+
+        // Helper 5: Analyze volume growth
+        private bool HasVolumeConfirmation(List<Candel> candles, double growthThreshold)
+        {
+            // Compare last third of data to first third
+            int segment = candles.Count / 3;
+            if (segment < 1) return true;
+
+            decimal earlyVolume = candles.Take(segment).Average(c => c.Volume);
+            decimal lateVolume = candles.TakeLast(segment).Average(c => c.Volume);
+
+            if (earlyVolume == 0) return true; // Avoid division by zero
+
+            double volumeGrowth = (double)((lateVolume - earlyVolume) / earlyVolume);
+            return volumeGrowth >= growthThreshold;
+        }
+
+        // Helper 6: Calculate bullish candle ratio
+        private double CalculateBullishRatio(List<Candel> candles)
+        {
+            int bullishCount = candles.Count(c => c.IsBullish == true);
+            return (double)bullishCount / candles.Count;
+        }
+
+
+
+
+
+
 
 
 
@@ -509,10 +594,36 @@ namespace StockLogger.Controllers.API_Controllers
                             {
                                 // THREE WHITE SOILDERS
 
-                                if (testCandel.OpenTime.TimeOfDay < new TimeSpan(10, 00, 0))
+                                if (testCandel.OpenTime.TimeOfDay < new TimeSpan(9, 30, 0))
                                 {
                                     continue; // Skip the rest of this iteration and proceed to the next object
                                 }
+
+
+                                //TREND DETECTION
+                                List<Candel> TrendCandels = CandelData
+                                              .Where(candel => candel.OpenTime < testCandel.OpenTime)
+                                              .OrderBy(c => c.OpenTime)
+                                              .Take(3)
+                                              .ToList();
+
+
+
+                                bool isUptrend = true;
+
+                                // Ensure the candles are sorted by OpenTime in ascending order (oldest first)
+                                List<Candel> sortedCandles = TrendCandels.OrderBy(c => c.OpenTime).ToList();
+
+                                // Check each consecutive pair of candles
+                                for (int i = 0; i < sortedCandles.Count - 1; i++)
+                                {
+                                    // If the next candle's close is not higher than the current, it's not an uptrend
+                                    if (sortedCandles[i + 1].EndPrice <= sortedCandles[i].EndPrice)
+                                        isUptrend = false;
+                                }
+
+
+                                //bool isUptrend = IsListInUptrendAdvanced(TrendCandels);
 
 
 
@@ -602,7 +713,7 @@ namespace StockLogger.Controllers.API_Controllers
                                         thirdBody < secondBody * minSizeRatio)
                                         continue;
 
-                                    if(IsNearKeyLevel == true)
+                                    if(IsNearKeyLevel == true && isUptrend == true)
                                     {
                                         dragonFlyDojiCandles.Add(third);
                                     }
@@ -1230,10 +1341,10 @@ namespace StockLogger.Controllers.API_Controllers
                                 {
                                     //expectedPrice = firstCandel.EndPrice * 1.000595m;
                                     //expectedPrice = firstCandel.EndPrice * 1.00061m;
-                                    expectedPrice = firstCandel.EndPrice * 1.00065m;
+                                    //expectedPrice = firstCandel.EndPrice * 1.00065m;
                                     //expectedPrice = firstCandel.EndPrice * 1.01m;
                                     //expectedPrice = firstCandel.EndPrice * 1.005m;
-                                    //expectedPrice = firstCandel.EndPrice * 1.0025m;
+                                    expectedPrice = firstCandel.EndPrice * 1.0025m;
                                 }
 
                                 decimal profitMargin = 0;
@@ -1479,114 +1590,114 @@ namespace StockLogger.Controllers.API_Controllers
 
 
 
-            List<List<Candel>> TotalPredictions = new List<List<Candel>>();
+            //List<List<Candel>> TotalPredictions = new List<List<Candel>>();
 
-            TotalPredictions = MainWrongPredictionList
-                       .SelectMany(innerList => innerList)
-                       .Concat(MainCorrectPredictionList.SelectMany(innerList => innerList))
-                       .Distinct()
-                       .ToList();
+            //TotalPredictions = MainWrongPredictionList
+            //           .SelectMany(innerList => innerList)
+            //           .Concat(MainCorrectPredictionList.SelectMany(innerList => innerList))
+            //           .Distinct()
+            //           .ToList();
 
-            List<Candel> CPred = new List<Candel>();
-            List<Candel> WPRed = new List<Candel>();
+            //List<Candel> CPred = new List<Candel>();
+            //List<Candel> WPRed = new List<Candel>();
 
-            List<Candel> TotalList = new List<Candel>();
-
-
-            foreach (List<Candel> testList in TotalPredictions)
-            {
-                TotalList.Add(testList[0]);
-            }
-
-            foreach (List<Candel> testList in extractedListCorrectPredictions)
-            {
-                CPred.Add(testList[0]);
-            }
-
-            foreach (List<Candel> testList in extractedListWrongPredictions)
-            {
-                WPRed.Add(testList[0]);
-            }
+            //List<Candel> TotalList = new List<Candel>();
 
 
+            //foreach (List<Candel> testList in TotalPredictions)
+            //{
+            //    TotalList.Add(testList[0]);
+            //}
 
-            List<Candel> CorrectPred = new List<Candel>();
-            List<Candel> WrongPred = new List<Candel>();
+            //foreach (List<Candel> testList in extractedListCorrectPredictions)
+            //{
+            //    CPred.Add(testList[0]);
+            //}
 
-            Candel referenceCandel = new Candel();
-            List<Candel> referenceList = new List<Candel>();
-
-            List<Candel> MasterList2 = new List<Candel>();
-
-
-            //ORDER THE LIST
-            TotalList = TotalList.OrderBy(candel => candel.OpenTime).ToList();
-
-            //foreach (Candel testCandel in TotalList)
-            if (TotalList != null)
-            {
-                Candel testCandel = TotalList[0];
+            //foreach (List<Candel> testList in extractedListWrongPredictions)
+            //{
+            //    WPRed.Add(testList[0]);
+            //}
 
 
-                if (CPred.Any(c => c.Equals(testCandel)))
-                {
-                    CorrectPred.Add(testCandel);
-                }
-                else if(WPRed.Any(c => c.Equals(testCandel)))
-                {
-                    WrongPred.Add(testCandel);
-                }
+
+            //List<Candel> CorrectPred = new List<Candel>();
+            //List<Candel> WrongPred = new List<Candel>();
+
+            //Candel referenceCandel = new Candel();
+            //List<Candel> referenceList = new List<Candel>();
+
+            //List<Candel> MasterList2 = new List<Candel>();
 
 
-                referenceCandel = testCandel;
+            ////ORDER THE LIST
+            //TotalList = TotalList.OrderBy(candel => candel.OpenTime).ToList();
 
-                    referenceList = TotalList;
-
-                referenceList.RemoveAll(c => c.OpenTime <= referenceCandel.CloseTime);
-
-                Candel nextCandel = referenceList
-                                   .Where(c => c.OpenTime > testCandel.OpenTime)
-                                   .OrderBy(c => c.OpenTime)
-                                   .FirstOrDefault();
+            ////foreach (Candel testCandel in TotalList)
+            //if (TotalList != null)
+            //{
+            //    Candel testCandel = TotalList[0];
 
 
-                    MasterList2.Add(testCandel);
+            //    if (CPred.Any(c => c.Equals(testCandel)))
+            //    {
+            //        CorrectPred.Add(testCandel);
+            //    }
+            //    else if(WPRed.Any(c => c.Equals(testCandel)))
+            //    {
+            //        WrongPred.Add(testCandel);
+            //    }
 
-                    referenceCandel = nextCandel;
 
-                    int maxIterations = 160;
-                    int iterationCount = 0;
+            //    referenceCandel = testCandel;
 
-                    while 
-                    (nextCandel != TotalList.LastOrDefault()
-                    && iterationCount < maxIterations
-                    )
-                    {
-                        MasterList2.Add(nextCandel);
+            //        referenceList = TotalList;
+
+            //    referenceList.RemoveAll(c => c.OpenTime <= referenceCandel.CloseTime);
+
+            //    Candel nextCandel = referenceList
+            //                       .Where(c => c.OpenTime > testCandel.OpenTime)
+            //                       .OrderBy(c => c.OpenTime)
+            //                       .FirstOrDefault();
+
+
+            //        MasterList2.Add(testCandel);
+
+            //        referenceCandel = nextCandel;
+
+            //        int maxIterations = 160;
+            //        int iterationCount = 0;
+
+            //        //while 
+            //        //(nextCandel != TotalList.LastOrDefault()
+            //        //&& iterationCount < maxIterations
+            //        //)
+            //        //{
+            //        //    MasterList2.Add(nextCandel);
     
-                        referenceList.RemoveAll(c => c.OpenTime <= referenceCandel.CloseTime);
+            //        //    referenceList.RemoveAll(c => c.OpenTime <= referenceCandel.CloseTime);
 
-                         Candel nextCandel2 = referenceList
-                            .Where(c => c.OpenTime > referenceCandel.OpenTime)
-                            .OrderBy(c => c.OpenTime)
-                            .FirstOrDefault();
+            //        //     Candel nextCandel2 = referenceList
+            //        //        .Where(c => c.OpenTime > referenceCandel.OpenTime)
+            //        //        .OrderBy(c => c.OpenTime)
+            //        //        .FirstOrDefault();
 
-                        referenceCandel = nextCandel2;
+            //        //    referenceCandel = nextCandel2;
 
-                        nextCandel = referenceCandel;
+            //        //    nextCandel = referenceCandel;
 
-                       if (CPred.Any(c => c.Equals(testCandel)))
-                       {
-                           CorrectPred.Add(testCandel);
-                       }
-                       else if (WPRed.Any(c => c.Equals(testCandel)))
-                       {
-                           WrongPred.Add(testCandel);
-                       }
-                       iterationCount++;
-                    }
+            //        //   if (CPred.Any(c => c.Equals(testCandel)))
+            //        //   {
+            //        //       CorrectPred.Add(testCandel);
+            //        //   }
+            //        //   else if (WPRed.Any(c => c.Equals(testCandel)))
+            //        //   {
+            //        //       WrongPred.Add(testCandel);
+            //        //   }
+            //        //   iterationCount++;
+            //        //}
 
-            }
+            //}
 
 
 

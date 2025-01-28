@@ -218,12 +218,36 @@ namespace StockLogger.Controllers.API_Controllers
                     return null;
                 }
 
+                var miutesToAdd = 0;
+
+                if (data.interval == "ONE_MINUTE")
+                {
+                    miutesToAdd = 1;
+                }
+                else if(data.interval == "THREE_MINUTE")
+                {
+                    miutesToAdd = 3;
+                }
+                else if (data.interval == "FIVE_MINUTE")
+                {
+                    miutesToAdd = 5;
+                }
+                else if (data.interval == "TEN_MINUTE")
+                {
+                    miutesToAdd = 10;
+                }
+                else if (data.interval == "FIFTEEN_MINUTE")
+                {
+                    miutesToAdd = 15;
+                }
+
                 foreach (var rawCandel in rawCandelData)
                 {
                     Candel newCandel = new Candel
                     {
                         OpenTime = DateTime.Parse(rawCandel[0].ToString()),
-                        CloseTime = DateTime.Parse(rawCandel[0].ToString()).AddMinutes(1),
+
+                        CloseTime = DateTime.Parse(rawCandel[0].ToString()).AddMinutes(miutesToAdd),
 
                         StartPrice = Convert.ToDecimal(rawCandel[1]),
                         HighestPrice = Convert.ToDecimal(rawCandel[2]),
