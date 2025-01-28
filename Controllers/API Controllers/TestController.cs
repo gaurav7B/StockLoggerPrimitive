@@ -1341,10 +1341,10 @@ namespace StockLogger.Controllers.API_Controllers
                                 {
                                     //expectedPrice = firstCandel.EndPrice * 1.000595m;
                                     //expectedPrice = firstCandel.EndPrice * 1.00061m;
-                                    //expectedPrice = firstCandel.EndPrice * 1.00065m;
+                                    expectedPrice = firstCandel.EndPrice * 1.00065m;
                                     //expectedPrice = firstCandel.EndPrice * 1.01m;
                                     //expectedPrice = firstCandel.EndPrice * 1.005m;
-                                    expectedPrice = firstCandel.EndPrice * 1.0025m;
+                                    //expectedPrice = firstCandel.EndPrice * 1.0025m;
                                 }
 
                                 decimal profitMargin = 0;
