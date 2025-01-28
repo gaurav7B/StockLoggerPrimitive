@@ -167,9 +167,9 @@ namespace StockLogger.Controllers.API_Controllers
             {
                 exchange = "NSE",
                 symboltoken = stockRequest.SymbolToken,
-                //interval = "ONE_MINUTE",
-                //interval = "THREE_MINUTE",
-                interval = "FIVE_MINUTE",//--
+                interval = "ONE_MINUTE",
+                //interval = "THREE_MINUTE", // DRAGON FLY DOJI
+                //interval = "FIVE_MINUTE",//--/// 3 white soilders worked at 100% accuracy prfit margin 0.0025
                 //interval = "TEN_MINUTE",
                 //interval = "FIFTEEN_MINUTE",
                 fromdate = startDateWithTime900.ToString("yyyy-MM-dd HH:mm"),

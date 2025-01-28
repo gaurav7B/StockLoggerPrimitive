@@ -78,5 +78,38 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Define the API URL
+                const apiUrl = 'https://localhost:44364/api/Token';
+
+                // Send the POST request
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                // Check if the response is okay
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                // Parse the response JSON
+                const data = await response.json();
+                console.log('Token created:', data);
+
+                // Perform further actions with the token, e.g., store it
+                localStorage.setItem('authToken', data.token);
+            } catch (error) {
+                console.error('Error creating token:', error);
+            }
+        });
+    </script>
+
 </body>
 </html>
