@@ -418,20 +418,12 @@ namespace StockLogger.Controllers.API_Controllers
                 {
                     var response = await client.PostAsync("https://localhost:44364/api/AngelCandel/getCandleDataForTest", content);
 
-                    //var responseForPreviousDaysData = await client.PostAsync("https://localhost:44364/api/AngelCandel/getCandleDataForTest", contentForPreviousDaysData);
 
-                    if (response.IsSuccessStatusCode
-                        //&& responseForPreviousDaysData.IsSuccessStatusCode
-                        )
+                    if (response.IsSuccessStatusCode)
                     {
 
                         var responseData = await response.Content.ReadAsStringAsync();
                         CandelData = JsonConvert.DeserializeObject<List<Candel>>(responseData);
-
-                        //var responseDataForPreviousDaysData = await responseForPreviousDaysData.Content.ReadAsStringAsync();
-                        //List<Candel> CandelDataPreviousDay = JsonConvert.DeserializeObject<List<Candel>>(responseDataForPreviousDaysData);
-
-                        //Candel EndCandel = CandelData.LastOrDefault();
 
                         Candel EndCandel = CandelData.FirstOrDefault(c => c.OpenTime.TimeOfDay == new TimeSpan(15, 15, 0));
 
@@ -1492,10 +1484,10 @@ namespace StockLogger.Controllers.API_Controllers
                                 {
                                     //expectedPrice = firstCandel.EndPrice * 1.000595m;
                                     //expectedPrice = firstCandel.EndPrice * 1.00061m;
-                                    //expectedPrice = firstCandel.EndPrice * 1.00065m;
+                                    expectedPrice = firstCandel.EndPrice * 1.00065m;
                                     //expectedPrice = firstCandel.EndPrice * 1.01m;
                                     //expectedPrice = firstCandel.EndPrice * 1.005m;
-                                    expectedPrice = firstCandel.EndPrice * 1.0025m;
+                                    //expectedPrice = firstCandel.EndPrice * 1.0025m;
 
                                     //expectedPrice = firstCandel.EndPrice * 1.0004953m; // 4 LAKH
 
