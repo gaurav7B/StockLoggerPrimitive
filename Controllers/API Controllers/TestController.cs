@@ -283,100 +283,45 @@ namespace StockLogger.Controllers.API_Controllers
 
 
 
+        /////////////////////////////////////////
 
+        //TO Check wether the stock is volatile
 
-        // Helper method to fetch the JWT token
-        private async Task<string> GetRefreshedAuthorizationTokenAsync()
+        public bool IsStockVolatile(List<Candel> candelData, int shortPeriod = 5, int longPeriod = 20, decimal volatilityMultiplier = 2.0m)
         {
-            var Token = await _context.Token.FirstOrDefaultAsync();
+            if (candelData == null || candelData.Count < longPeriod)
+                return false; // Not enough data to assess
 
-            var RefreshToken = Token.RefreshToken;
+            // Ensure data is sorted by time
+            var orderedData = candelData.OrderBy(c => c.OpenTime).ToList();
 
-            string authorizationToken = string.Empty;
+            // Split into historical (long period) and recent (short period) data
+            var historicalData = orderedData.Take(orderedData.Count - shortPeriod).ToList();
+            var recentData = orderedData.Skip(orderedData.Count - shortPeriod).ToList();
 
-            // Fetch public IP using ipify API
-            string publicIp = await GetPublicIPAsync();
+            // Calculate historical averages
+            decimal avgHistoricalRangePct = historicalData.Average(c =>
+                (c.HighestPrice - c.LowestPrice) / c.StartPrice * 100);
+            decimal avgHistoricalPriceChangePct = historicalData.Average(c =>
+                Math.Abs(c.PriceChangePercentage));
+            decimal avgHistoricalVolume = historicalData.Average(c => c.Volume);
 
-            // Setup login credentials and generate TOTP
-            var loginData = new
-            {
-                refreshToken = RefreshToken,
-            };
+            // Calculate recent averages
+            decimal avgRecentRangePct = recentData.Average(c =>
+                (c.HighestPrice - c.LowestPrice) / c.StartPrice * 100);
+            decimal avgRecentPriceChangePct = recentData.Average(c =>
+                Math.Abs(c.PriceChangePercentage));
+            decimal avgRecentVolume = recentData.Average(c => c.Volume);
 
-            var loginJsonData = JsonConvert.SerializeObject(loginData);
-            var loginClient = new HttpClient();
-            var loginRequestMessage = new HttpRequestMessage(HttpMethod.Post, "https://apiconnect.angelone.in/rest/auth/angelbroking/jwt/v1/generateTokens")
-            {
-                Content = new StringContent(loginJsonData, Encoding.UTF8, "application/json")
-            };
+            // Check if recent metrics exceed historical averages by the multiplier
+            bool isRangeVolatile = avgRecentRangePct > avgHistoricalRangePct * volatilityMultiplier;
+            bool isPriceChangeVolatile = avgRecentPriceChangePct > avgHistoricalPriceChangePct * volatilityMultiplier;
+            bool isVolumeSpiking = avgRecentVolume > avgHistoricalVolume * volatilityMultiplier;
 
-            // Set headers for login request
-            loginRequestMessage.Headers.Add("Authorization", "Bearer " + Token.AuthToken);
-            loginRequestMessage.Headers.Add("Accept", "application/json");
-            loginRequestMessage.Headers.Add("X-UserType", "USER");
-            loginRequestMessage.Headers.Add("X-SourceID", "WEB");
-            loginRequestMessage.Headers.Add("X-ClientLocalIP", "192.168.56.177");  // Your local IP from ipconfig
-            loginRequestMessage.Headers.Add("X-ClientPublicIP", publicIp);
-            loginRequestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX"); // Replace with your MAC address
-            loginRequestMessage.Headers.Add("X-PrivateKey", "DcsJlRJp");          // Your actual API Key
-
-            try
-            {
-                // Send login request and fetch login token
-                HttpResponseMessage loginResponse = await loginClient.SendAsync(loginRequestMessage);
-                loginResponse.EnsureSuccessStatusCode();  // Throws an exception if not successful
-                string loginResponseContent = await loginResponse.Content.ReadAsStringAsync();
-                dynamic loginResponseJson = JsonConvert.DeserializeObject(loginResponseContent);
-
-                // Check login status
-                if (loginResponseJson.status == true)
-                {
-                    authorizationToken = loginResponseJson.data.jwtToken;  // Assuming the token is present here
-
-
-                    // Look for an existing token
-                    var existingToken = await _context.Token.FirstOrDefaultAsync();
-
-                    if (existingToken != null)
-                    {
-                        // If a token exists, update it
-                        existingToken.AuthToken = loginResponseJson.data.jwtToken;  // Assuming `AuthToken` is the property to update
-                        existingToken.RefreshToken = loginResponseJson.data.refreshToken;
-                        existingToken.AuthTokenCreationTime = DateTime.UtcNow;  // Update the creation time
-
-                        // Mark the entry as modified
-                        _context.Entry(existingToken).State = EntityState.Modified;
-                    }
-                    else
-                    {
-                        // Otherwise, create a new token
-                        var token = new Token
-                        {
-                            AuthToken = loginResponseJson.data.jwtToken,
-                            RefreshToken = loginResponseJson.data.refreshToken,
-                            AuthTokenCreationTime = DateTime.UtcNow, // Set creation time
-                        };
-
-                        // Add the new token to the context
-                        _context.Token.Add(token);
-                    }
-
-                    // Save changes to the context (whether adding or updating)
-                    await _context.SaveChangesAsync();
-
-                }
-                else
-                {
-                    throw new Exception("Failed to authenticate: " + loginResponseJson.message);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error during login: {ex.Message}");
-                throw;
-            }
-
-            return authorizationToken;
+            // Consider volatility if any two indicators spike
+            return (isRangeVolatile && isPriceChangeVolatile) ||
+                   (isRangeVolatile && isVolumeSpiking) ||
+                   (isPriceChangeVolatile && isVolumeSpiking);
         }
 
 
@@ -387,8 +332,9 @@ namespace StockLogger.Controllers.API_Controllers
             //var Tokenresponse = await _context.Token.FirstOrDefaultAsync();
 
             //string authtoken = Tokenresponse.AuthToken;
+            string authtoken = "";
 
-            string authtoken = await GetRefreshedAuthorizationTokenAsync();
+            //string authtoken = await GetRefreshedAuthorizationTokenAsync();
 
             List<List<List<Candel>>> MainCorrectPredictionList = new List<List<List<Candel>>>();
             List<List<List<Candel>>> MainWrongPredictionList = new List<List<List<Candel>>>();
@@ -597,21 +543,21 @@ namespace StockLogger.Controllers.API_Controllers
                                                                     && (verificationCandel.HighestPrice > testCandel.HighestPrice)
                                                                     && (verificationCandel.EndPrice > verificationCandel.StartPrice);
 
+                                //if (
+                                //    isHammer
+                                //    && isVerificationCandelVerified
+                                //    )
+                                //{
+                                //    //dragonFlyDojiCandles.Add(testCandel);
+                                //    dragonFlyDojiCandles.Add(verificationCandel);
+                                //}
+
                                 if (
                                     isHammer
-                                    //&& isVerificationCandelVerified
                                     )
                                 {
                                     dragonFlyDojiCandles.Add(testCandel);
-                                    //dragonFlyDojiCandles.Add(verificationCandel);
                                 }
-
-                                //if (
-                                //    isHammer
-                                //    )
-                                //{
-                                //    dragonFlyDojiCandles.Add(testCandel);
-                                //}
                             }
 
 
@@ -1589,9 +1535,9 @@ namespace StockLogger.Controllers.API_Controllers
                                 ConstForProfit = profitMargin;
 
                                 //var stopLoss = firstCandel.EndPrice - (firstCandel.EndPrice * 0.03m);// 5985 on 2 lakh
-                                //var stopLoss = firstCandel.EndPrice - (firstCandel.EndPrice * 0.01m);// 2000 on 2 lakh
+                                var stopLoss = firstCandel.EndPrice - (firstCandel.EndPrice * 0.01m);// 2000 on 2 lakh
                                 //var stopLoss = firstCandel.EndPrice - (firstCandel.EndPrice * 0.005m);// 997.5 on 2 lakh
-                                var stopLoss = firstCandel.EndPrice - (firstCandel.EndPrice * 0.001429m); // 300 on 2 lakh
+                                //var stopLoss = firstCandel.EndPrice - (firstCandel.EndPrice * 0.001429m); // 300 on 2 lakh
                                 //var stopLoss = firstCandel.EndPrice - (firstCandel.EndPrice * 0.0025m); // 300 on 2 lakh
 
 
@@ -1621,7 +1567,8 @@ namespace StockLogger.Controllers.API_Controllers
 
 
                                 List<Candel> CandelDataAfterFirstCandel = CandelData
-                                         .Where(candel => candel.OpenTime > firstCandel.OpenTime).ToList();
+                                         .Where(candel => candel.OpenTime > firstCandel.OpenTime)
+                                         .ToList();
 
                                 Candel highestCandel = null;
 
@@ -1752,7 +1699,17 @@ namespace StockLogger.Controllers.API_Controllers
                                 }
                                 else
                                 {
-                                    //if(stoplossCandel != null)
+                                    //if (stoplossCandel != null)
+                                    //{
+                                    //    List<Candel> CandelPair = new List<Candel>();
+                                    //    CandelPair.Add(dojiCandle);
+                                    //    CandelPair.Add(stoplossCandel);
+                                    //    CandelPair.Add(RANGE_HIGH);
+
+                                    //    WrongPredictionList.Add(CandelPair);
+                                    //    MainWrongPredictionList.Add(WrongPredictionList);
+                                    //}
+                                    //else if(EndCandel.LowestPrice < stoplossCandel.LowestPrice)
                                     //{
                                     //    List<Candel> CandelPair = new List<Candel>();
                                     //    CandelPair.Add(dojiCandle);

@@ -87,10 +87,110 @@ namespace StockLogger.Controllers.API_Controllers
         }
 
 
+
+
+        // Helper method to fetch the JWT token
+        private async Task<string> GetRefreshedAuthorizationTokenAsync()
+        {
+            var Token = await _context.Token.FirstOrDefaultAsync();
+
+            var RefreshToken = Token.RefreshToken;
+
+            string authorizationToken = string.Empty;
+
+            // Fetch public IP using ipify API
+            string publicIp = await GetPublicIPAsync();
+
+            // Setup login credentials and generate TOTP
+            var loginData = new
+            {
+                refreshToken = RefreshToken,
+            };
+
+            var loginJsonData = JsonConvert.SerializeObject(loginData);
+            var loginClient = new HttpClient();
+            var loginRequestMessage = new HttpRequestMessage(HttpMethod.Post, "https://apiconnect.angelone.in/rest/auth/angelbroking/jwt/v1/generateTokens")
+            {
+                Content = new StringContent(loginJsonData, Encoding.UTF8, "application/json")
+            };
+
+            // Set headers for login request
+            loginRequestMessage.Headers.Add("Authorization", "Bearer " + Token.AuthToken);
+            loginRequestMessage.Headers.Add("Accept", "application/json");
+            loginRequestMessage.Headers.Add("X-UserType", "USER");
+            loginRequestMessage.Headers.Add("X-SourceID", "WEB");
+            loginRequestMessage.Headers.Add("X-ClientLocalIP", "192.168.56.177");  // Your local IP from ipconfig
+            loginRequestMessage.Headers.Add("X-ClientPublicIP", publicIp);
+            loginRequestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX"); // Replace with your MAC address
+            loginRequestMessage.Headers.Add("X-PrivateKey", "DcsJlRJp");          // Your actual API Key
+
+            try
+            {
+                // Send login request and fetch login token
+                HttpResponseMessage loginResponse = await loginClient.SendAsync(loginRequestMessage);
+                loginResponse.EnsureSuccessStatusCode();  // Throws an exception if not successful
+                string loginResponseContent = await loginResponse.Content.ReadAsStringAsync();
+                dynamic loginResponseJson = JsonConvert.DeserializeObject(loginResponseContent);
+
+                // Check login status
+                if (loginResponseJson.status == true)
+                {
+                    authorizationToken = loginResponseJson.data.jwtToken;  // Assuming the token is present here
+
+
+                    // Look for an existing token
+                    var existingToken = await _context.Token.FirstOrDefaultAsync();
+
+                    if (existingToken != null)
+                    {
+                        // If a token exists, update it
+                        existingToken.AuthToken = loginResponseJson.data.jwtToken;  // Assuming `AuthToken` is the property to update
+                        existingToken.RefreshToken = loginResponseJson.data.refreshToken;
+                        existingToken.AuthTokenCreationTime = DateTime.UtcNow;  // Update the creation time
+
+                        // Mark the entry as modified
+                        _context.Entry(existingToken).State = EntityState.Modified;
+                    }
+                    else
+                    {
+                        // Otherwise, create a new token
+                        var token = new Token
+                        {
+                            AuthToken = loginResponseJson.data.jwtToken,
+                            RefreshToken = loginResponseJson.data.refreshToken,
+                            AuthTokenCreationTime = DateTime.UtcNow, // Set creation time
+                        };
+
+                        // Add the new token to the context
+                        _context.Token.Add(token);
+                    }
+
+                    // Save changes to the context (whether adding or updating)
+                    await _context.SaveChangesAsync();
+
+                }
+                else
+                {
+                    throw new Exception("Failed to authenticate: " + loginResponseJson.message);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error during login: {ex.Message}");
+                throw;
+            }
+
+            return authorizationToken;
+        }
+
+
+
         // POST https://localhost:44364/api/AngelCandel/getCandleData
         [HttpPost("getCandleDataForTest")]
         public async Task<IActionResult> GetCandleDataForTest([FromBody] StockRequest stockRequest)
         {
+
+            string authtoken = await GetRefreshedAuthorizationTokenAsync();
 
             // Extract only the date part from StartDate
             var startDateOnly = stockRequest.StartDate.Date;
@@ -110,7 +210,7 @@ namespace StockLogger.Controllers.API_Controllers
                 symboltoken = stockRequest.SymbolToken,
                 //interval = "ONE_MINUTE",// COMPLEX HAMMER without stoploss working fine here
                 //interval = "THREE_MINUTE", // DRAGON FLY DOJI
-                interval = "FIVE_MINUTE",//--/// 3 white soilders worked at 100% accuracy prfit margin 0.0025
+                interval = "FIVE_MINUTE",//--/// 3 white soilders worked at 100% accuracy prfit margin 0.0025 // COMPLEX HAMMER working at 0.0025% profit
                 //interval = "TEN_MINUTE",
                 //interval = "FIFTEEN_MINUTE",
                 fromdate = startDateWithTime900.ToString("yyyy-MM-dd HH:mm"),
@@ -132,8 +232,8 @@ namespace StockLogger.Controllers.API_Controllers
             requestMessage.Headers.Add("X-ClientPublicIP", await GetPublicIPAsync());  // Fetching the public IP dynamically
             requestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX"); // Replace with your actual MAC address
             requestMessage.Headers.Add("X-UserType", "USER");
-            requestMessage.Headers.Add("Authorization", "Bearer " + stockRequest.AuthorizationToken);
-            //requestMessage.Headers.Add("Authorization", "Bearer " + authToken);
+            //requestMessage.Headers.Add("Authorization", "Bearer " + stockRequest.AuthorizationToken);
+            requestMessage.Headers.Add("Authorization", "Bearer " + authtoken);
             requestMessage.Headers.Add("X-PrivateKey", "DcsJlRJp"); // Your actual API Key
 
             try
