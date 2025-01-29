@@ -87,70 +87,11 @@ namespace StockLogger.Controllers.API_Controllers
         }
 
 
-        // Helper method to fetch the JWT token
-        private async Task<string> GetAuthorizationTokenAsync()
-        {
-            string authorizationToken = string.Empty;
-
-            // Fetch public IP using ipify API
-            string publicIp = await GetPublicIPAsync();
-
-            // Setup login credentials and generate TOTP
-            var loginData = new
-            {
-                clientcode = "AAAF282130",  // Your actual client code
-                password = "6366",          // Your actual pin
-                totp = GenerateTOTP("3IGPCM52A2WTQCH7FW2RYOCYIY") // Generate TOTP from secret key
-            };
-
-            var loginJsonData = JsonConvert.SerializeObject(loginData);
-            var loginClient = new HttpClient();
-            var loginRequestMessage = new HttpRequestMessage(HttpMethod.Post, "https://apiconnect.angelone.in/rest/auth/angelbroking/user/v1/loginByPassword")
-            {
-                Content = new StringContent(loginJsonData, Encoding.UTF8, "application/json")
-            };
-
-            // Set headers for login request
-            loginRequestMessage.Headers.Add("Accept", "application/json");
-            loginRequestMessage.Headers.Add("X-UserType", "USER");
-            loginRequestMessage.Headers.Add("X-SourceID", "WEB");
-            loginRequestMessage.Headers.Add("X-ClientLocalIP", "192.168.56.177");  // Your local IP from ipconfig
-            loginRequestMessage.Headers.Add("X-ClientPublicIP", publicIp);
-            loginRequestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX"); // Replace with your MAC address
-            loginRequestMessage.Headers.Add("X-PrivateKey", "DcsJlRJp");          // Your actual API Key
-
-            try
-            {
-                // Send login request and fetch login token
-                HttpResponseMessage loginResponse = await loginClient.SendAsync(loginRequestMessage);
-                loginResponse.EnsureSuccessStatusCode();  // Throws an exception if not successful
-                string loginResponseContent = await loginResponse.Content.ReadAsStringAsync();
-                dynamic loginResponseJson = JsonConvert.DeserializeObject(loginResponseContent);
-
-                // Check login status
-                if (loginResponseJson.status == true)
-                {
-                    authorizationToken = loginResponseJson.data.jwtToken;  // Assuming the token is present here
-                }
-                else
-                {
-                    throw new Exception("Failed to authenticate: " + loginResponseJson.message);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error during login: {ex.Message}");
-                throw;
-            }
-
-            return authorizationToken;
-        }
-
-
         // POST https://localhost:44364/api/AngelCandel/getCandleData
         [HttpPost("getCandleDataForTest")]
         public async Task<IActionResult> GetCandleDataForTest([FromBody] StockRequest stockRequest)
         {
+
             // Extract only the date part from StartDate
             var startDateOnly = stockRequest.StartDate.Date;
             var EndDateOnly = stockRequest.EndDate.Date;
@@ -167,9 +108,9 @@ namespace StockLogger.Controllers.API_Controllers
             {
                 exchange = "NSE",
                 symboltoken = stockRequest.SymbolToken,
-                interval = "ONE_MINUTE",
+                //interval = "ONE_MINUTE",// COMPLEX HAMMER without stoploss working fine here
                 //interval = "THREE_MINUTE", // DRAGON FLY DOJI
-                //interval = "FIVE_MINUTE",//--/// 3 white soilders worked at 100% accuracy prfit margin 0.0025
+                interval = "FIVE_MINUTE",//--/// 3 white soilders worked at 100% accuracy prfit margin 0.0025
                 //interval = "TEN_MINUTE",
                 //interval = "FIFTEEN_MINUTE",
                 fromdate = startDateWithTime900.ToString("yyyy-MM-dd HH:mm"),

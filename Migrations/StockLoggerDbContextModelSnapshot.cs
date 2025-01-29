@@ -316,6 +316,10 @@ namespace StockLogger.Migrations
                     b.Property<DateTime>("AuthTokenCreationTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("RefreshToken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Token");

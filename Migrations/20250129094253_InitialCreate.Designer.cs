@@ -12,7 +12,7 @@ using StockLogger.Data;
 namespace StockLogger.Migrations
 {
     [DbContext(typeof(StockLoggerDbContext))]
-    [Migration("20250113090602_InitialCreate")]
+    [Migration("20250129094253_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -318,6 +318,10 @@ namespace StockLogger.Migrations
 
                     b.Property<DateTime>("AuthTokenCreationTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("RefreshToken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

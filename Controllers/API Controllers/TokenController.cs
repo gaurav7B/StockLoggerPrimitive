@@ -50,7 +50,7 @@ namespace StockLogger.Controllers.API_Controllers
         public async Task<ActionResult<Token>> CreateToken()
         {
             // Fetch the authorization token (assuming this is a string)
-            string authToken = await GetAuthorizationTokenAsync();
+            var (authToken, refreshToken) = await GetAuthorizationTokenAsync();
 
             // Look for an existing token
             var existingToken = await _context.Token.FirstOrDefaultAsync();
@@ -59,6 +59,7 @@ namespace StockLogger.Controllers.API_Controllers
             {
                 // If a token exists, update it
                 existingToken.AuthToken = authToken;  // Assuming `AuthToken` is the property to update
+                existingToken.RefreshToken = refreshToken;
                 existingToken.AuthTokenCreationTime = DateTime.UtcNow;  // Update the creation time
 
                 // Mark the entry as modified
@@ -70,6 +71,7 @@ namespace StockLogger.Controllers.API_Controllers
                 var token = new Token
                 {
                     AuthToken = authToken,
+                    RefreshToken = refreshToken,
                     AuthTokenCreationTime = DateTime.UtcNow, // Set creation time
                 };
 
@@ -81,15 +83,14 @@ namespace StockLogger.Controllers.API_Controllers
             await _context.SaveChangesAsync();
 
             // Return the token (either newly created or updated)
-            return Ok(existingToken ?? new Token { AuthToken = authToken, AuthTokenCreationTime = DateTime.UtcNow });
+            return Ok(existingToken ?? new Token { AuthToken = authToken, RefreshToken = refreshToken, AuthTokenCreationTime = DateTime.UtcNow });
         }
 
-
-
         // Helper method to fetch the JWT token
-        private async Task<string> GetAuthorizationTokenAsync()
+        private async Task<(string AuthorizationToken, string RefreshToken)> GetAuthorizationTokenAsync()
         {
             string authorizationToken = string.Empty;
+            string refreshToken = string.Empty;
 
             // Fetch public IP using ipify API
             string publicIp = await GetPublicIPAsync();
@@ -130,6 +131,7 @@ namespace StockLogger.Controllers.API_Controllers
                 if (loginResponseJson.status == true)
                 {
                     authorizationToken = loginResponseJson.data.jwtToken;  // Assuming the token is present here
+                    refreshToken = loginResponseJson.data.refreshToken;
                 }
                 else
                 {
@@ -142,7 +144,7 @@ namespace StockLogger.Controllers.API_Controllers
                 throw;
             }
 
-            return authorizationToken;
+            return (authorizationToken, refreshToken);
         }
 
         // Fetches the public IP from ipify API
