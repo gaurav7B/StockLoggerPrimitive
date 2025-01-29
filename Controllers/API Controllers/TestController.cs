@@ -1475,9 +1475,7 @@ namespace StockLogger.Controllers.API_Controllers
 
                                 //var expectedPrice = firstCandel.EndPrice * 1.0008014m; 
                                 //var expectedPrice = firstCandel.EndPrice * 1.001429m; // 1.429 R profit on 1000 R // 285 on 2 Lakh
-                                //var expectedPrice = firstCandel.EndPrice * 1.005m; //  5 R profit on 1000 R //997 on 2lakh
-                                //var expectedPrice = firstCandel.EndPrice * 1.01m;  //  10 R profit on 1000 R //1995 okkkn 2 lakh
-                                //decimal expectedPrice = firstCandel.EndPrice * 1.0025m; // 2.5 R profit on 1000 R //450 on 2Lakh
+
                                 decimal expectedPrice = 0; // 2.5 R profit on 1000 R //450 on 2Lakh
 
                                 if (firstCandel != null)
@@ -1485,9 +1483,9 @@ namespace StockLogger.Controllers.API_Controllers
                                     //expectedPrice = firstCandel.EndPrice * 1.000595m;
                                     //expectedPrice = firstCandel.EndPrice * 1.00061m;
                                     expectedPrice = firstCandel.EndPrice * 1.00065m;
-                                    //expectedPrice = firstCandel.EndPrice * 1.01m;
-                                    //expectedPrice = firstCandel.EndPrice * 1.005m;
-                                    //expectedPrice = firstCandel.EndPrice * 1.0025m;
+                                    //expectedPrice = firstCandel.EndPrice * 1.01m; //  10 R profit on 1000 R //1995 okkkn 2 lakh
+                                    //expectedPrice = firstCandel.EndPrice * 1.005m; //  5 R profit on 1000 R //997 on 2lakh
+                                    //expectedPrice = firstCandel.EndPrice * 1.0025m; // 2.5 R profit on 1000 R //450 on 2Lakh
 
                                     //expectedPrice = firstCandel.EndPrice * 1.0004953m; // 4 LAKH
 
@@ -1527,10 +1525,11 @@ namespace StockLogger.Controllers.API_Controllers
                                 ConstForProfit = profitMargin;
 
                                 //var stopLoss = firstCandel.EndPrice - (firstCandel.EndPrice * 0.03m);// 5985 on 2 lakh
-                                var stopLoss = firstCandel.EndPrice - (firstCandel.EndPrice * 0.01m);// 2000 on 2 lakh
+                                //var stopLoss = firstCandel.EndPrice - (firstCandel.EndPrice * 0.01m);// 2000 on 2 lakh
+                                //var stopLoss = firstCandel.EndPrice - (firstCandel.EndPrice * 0.00065m);
                                 //var stopLoss = firstCandel.EndPrice - (firstCandel.EndPrice * 0.005m);// 997.5 on 2 lakh
                                 //var stopLoss = firstCandel.EndPrice - (firstCandel.EndPrice * 0.001429m); // 300 on 2 lakh
-                                //var stopLoss = firstCandel.EndPrice - (firstCandel.EndPrice * 0.0025m); // 300 on 2 lakh
+                                var stopLoss = firstCandel.EndPrice - (firstCandel.EndPrice * 0.0025m); // 300 on 2 lakh
 
 
                                 decimal lossMargin = 0;
@@ -1560,6 +1559,7 @@ namespace StockLogger.Controllers.API_Controllers
 
                                 List<Candel> CandelDataAfterFirstCandel = CandelData
                                          .Where(candel => candel.OpenTime > firstCandel.OpenTime)
+                                         .OrderBy(c => c.OpenTime)
                                          .ToList();
 
                                 Candel highestCandel = null;
@@ -1692,16 +1692,6 @@ namespace StockLogger.Controllers.API_Controllers
                                 else
                                 {
                                     //if (stoplossCandel != null)
-                                    //{
-                                    //    List<Candel> CandelPair = new List<Candel>();
-                                    //    CandelPair.Add(dojiCandle);
-                                    //    CandelPair.Add(stoplossCandel);
-                                    //    CandelPair.Add(RANGE_HIGH);
-
-                                    //    WrongPredictionList.Add(CandelPair);
-                                    //    MainWrongPredictionList.Add(WrongPredictionList);
-                                    //}
-                                    //else if(EndCandel.LowestPrice < stoplossCandel.LowestPrice)
                                     //{
                                     //    List<Candel> CandelPair = new List<Candel>();
                                     //    CandelPair.Add(dojiCandle);
