@@ -1658,67 +1658,67 @@ namespace StockLogger.Controllers.API_Controllers
                                     && (highestCandel.HighestPrice >= expectedPrice) || ((RANGE_HIGH != null && RANGE_HIGH.HighestPrice >= expectedPrice) || (suceessFound == true))
                                   )
                                 {
-                                    //if (stoplossCandel != null && earliestCandle.OpenTime > stoplossCandel.OpenTime)
-                                    //{
-                                    //    List<Candel> CandelPair = new List<Candel>();
-                                    //    CandelPair.Add(dojiCandle);
-                                    //    CandelPair.Add(stoplossCandel);
-                                    //    CandelPair.Add(RANGE_HIGH);
+                                    if (stoplossCandel != null && earliestCandle.OpenTime > stoplossCandel.OpenTime)
+                                    {
+                                        List<Candel> CandelPair = new List<Candel>();
+                                        CandelPair.Add(dojiCandle);
+                                        CandelPair.Add(stoplossCandel);
+                                        CandelPair.Add(RANGE_HIGH);
 
-                                    //    WrongPredictionList.Add(CandelPair);
-                                    //    MainWrongPredictionList.Add(WrongPredictionList);
-                                    //}
-                                    //else
-                                    //{
-                                    //    List<Candel> CandelPair = new List<Candel>();
+                                        WrongPredictionList.Add(CandelPair);
+                                        MainWrongPredictionList.Add(WrongPredictionList);
+                                    }
+                                    else
+                                    {
+                                        List<Candel> CandelPair = new List<Candel>();
 
-                                    //    CandelPair.Add(dojiCandle);
-                                    //    CandelPair.Add(earliestCandle);
-                                    //    CandelPair.Add(RANGE_HIGH);
+                                        CandelPair.Add(dojiCandle);
+                                        CandelPair.Add(earliestCandle);
+                                        CandelPair.Add(RANGE_HIGH);
 
-                                    //    CorrectPredictionList.Add(CandelPair);
-                                    //    MainCorrectPredictionList.Add(CorrectPredictionList);
-                                    //}
+                                        CorrectPredictionList.Add(CandelPair);
+                                        MainCorrectPredictionList.Add(CorrectPredictionList);
+                                    }
 
-                                    List<Candel> CandelPair = new List<Candel>();
+                                    //List<Candel> CandelPair = new List<Candel>();
 
-                                    CandelPair.Add(dojiCandle);
-                                    CandelPair.Add(earliestCandle);
-                                    CandelPair.Add(RANGE_HIGH);
+                                    //CandelPair.Add(dojiCandle);
+                                    //CandelPair.Add(earliestCandle);
+                                    //CandelPair.Add(RANGE_HIGH);
 
-                                    CorrectPredictionList.Add(CandelPair);
-                                    MainCorrectPredictionList.Add(CorrectPredictionList);
+                                    //CorrectPredictionList.Add(CandelPair);
+                                    //MainCorrectPredictionList.Add(CorrectPredictionList);
                                 }
                                 else
                                 {
-                                    //if (stoplossCandel != null)
-                                    //{
-                                    //    List<Candel> CandelPair = new List<Candel>();
-                                    //    CandelPair.Add(dojiCandle);
-                                    //    CandelPair.Add(stoplossCandel);
-                                    //    CandelPair.Add(RANGE_HIGH);
+                                    if (stoplossCandel != null)
+                                    {
+                                        List<Candel> CandelPair = new List<Candel>();
+                                        CandelPair.Add(dojiCandle);
+                                        CandelPair.Add(stoplossCandel);
+                                        CandelPair.Add(RANGE_HIGH);
 
-                                    //    WrongPredictionList.Add(CandelPair);
-                                    //    MainWrongPredictionList.Add(WrongPredictionList);
-                                    //}
-                                    //else
-                                    //{
-                                    //    List<Candel> CandelPair = new List<Candel>();
-                                    //    CandelPair.Add(dojiCandle);
-                                    //    CandelPair.Add(EndCandel);
-                                    //    CandelPair.Add(RANGE_HIGH);
+                                        WrongPredictionList.Add(CandelPair);
+                                        MainWrongPredictionList.Add(WrongPredictionList);
+                                    }
+                                    else
+                                    {
+                                        List<Candel> CandelPair = new List<Candel>();
+                                        CandelPair.Add(dojiCandle);
+                                        CandelPair.Add(EndCandel);
+                                        CandelPair.Add(RANGE_HIGH);
 
-                                    //    WrongPredictionList.Add(CandelPair);
-                                    //    MainWrongPredictionList.Add(WrongPredictionList);
-                                    //}
+                                        WrongPredictionList.Add(CandelPair);
+                                        MainWrongPredictionList.Add(WrongPredictionList);
+                                    }
 
-                                    List<Candel> CandelPair = new List<Candel>();
-                                    CandelPair.Add(dojiCandle);
-                                    CandelPair.Add(EndCandel);
-                                    CandelPair.Add(RANGE_HIGH);
+                                    //List<Candel> CandelPair = new List<Candel>();
+                                    //CandelPair.Add(dojiCandle);
+                                    //CandelPair.Add(EndCandel);
+                                    //CandelPair.Add(RANGE_HIGH);
 
-                                    WrongPredictionList.Add(CandelPair);
-                                    MainWrongPredictionList.Add(WrongPredictionList);
+                                    //WrongPredictionList.Add(CandelPair);
+                                    //MainWrongPredictionList.Add(WrongPredictionList);
 
                                 }
 
