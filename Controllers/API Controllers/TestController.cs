@@ -497,6 +497,30 @@ namespace StockLogger.Controllers.API_Controllers
 
                             }
 
+
+                            //foreach (Candel testCandel in CandelData)
+                            //{
+
+                            //    List<Candel> CandelDataBeforeTestCandel = CandelData
+                            //                  .Where(candel => candel.OpenTime < testCandel.OpenTime)
+                            //                  .OrderBy(c => c.OpenTime)
+                            //                  .ToList();
+
+                            //    bool isStockVolatile = IsStockVolatile(CandelDataBeforeTestCandel);
+
+                            //    bool isListinUptrend = IsListInUptrendAdvanced(CandelDataBeforeTestCandel);
+
+                            //    bool exists = dragonFlyDojiCandles?.Any(c => c.Ticker == testCandel.Ticker) ?? false;
+
+                            //    if (
+                            //       isListinUptrend
+                            //       )
+                            //    {
+                            //        dragonFlyDojiCandles.Add(testCandel);
+                            //    }
+
+                            //}
+
                             //foreach (Candel testCandel in CandelData)
                             //{
 
