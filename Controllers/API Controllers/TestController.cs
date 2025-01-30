@@ -457,7 +457,7 @@ namespace StockLogger.Controllers.API_Controllers
                         var responseData = await response.Content.ReadAsStringAsync();
                         CandelData = JsonConvert.DeserializeObject<List<Candel>>(responseData);
 
-                        Candel EndCandel = CandelData.FirstOrDefault(c => c.OpenTime.TimeOfDay == new TimeSpan(15, 15, 0));
+                        Candel EndCandel = CandelData.FirstOrDefault(c => c.OpenTime.TimeOfDay == new TimeSpan(15, 20, 0));
 
                         List<Candel>? dragonFlyDojiCandles = new List<Candel>();
 
