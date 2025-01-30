@@ -183,28 +183,13 @@ namespace StockLogger.Controllers.API_Controllers
             return authorizationToken;
         }
 
-        decimal count1 = 0;
 
         // POST https://localhost:44364/api/AngelCandel/getCandleData
         [HttpPost("getCandleDataForTest")]
         public async Task<IActionResult> GetCandleDataForTest([FromBody] StockRequest stockRequest)
         {
-            string authtoken = "";
-
-            if (count1 < 50)
-            {
-                var Tokenresponse = await _context.Token.FirstOrDefaultAsync();
-                authtoken = Tokenresponse.AuthToken;
-                count1++;
-            }
-            else
-            {
-                count1 = 0;
-                authtoken = await GetRefreshedAuthorizationTokenAsync();
-            }
-
-
-            //string authtoken = await GetRefreshedAuthorizationTokenAsync();
+            
+            string authtoken = await GetRefreshedAuthorizationTokenAsync();
 
             // Extract only the date part from StartDate
             var startDateOnly = stockRequest.StartDate.Date;
