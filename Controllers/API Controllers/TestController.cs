@@ -472,7 +472,7 @@ namespace StockLogger.Controllers.API_Controllers
 
                             //////////////////////////////////////////////////////////////////////////////
 
-
+                            // IsListInUptrendAdvanced
                             foreach (Candel testCandel in CandelData)
                             {
 
