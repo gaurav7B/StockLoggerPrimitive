@@ -59,8 +59,8 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
 
 
 
-                //    // Wait for all tasks to complete.
-                //    await Task.WhenAll(tasks);
+                //// Wait for all tasks to complete.
+                //await Task.WhenAll(tasks);
 
                 //stopwatch.Stop();
                 //iterationTimes.Add(stopwatch.Elapsed.TotalMilliseconds);
