@@ -181,6 +181,15 @@ namespace StockLogger.Controllers.API_Controllers
         }
 
 
+        public class BuyData
+        {
+            public string tradingsymbol { get; set; }
+            public string symboltoken { get; set; }
+            public int quantity { get; set; }
+            public decimal expectedPrice { get; set; }
+        }
+
+
         //POST https://localhost:44364/api/BuySell/buy
         [HttpPost("buy")]
         public async Task<IActionResult> BuyIntradayStock()
@@ -241,37 +250,37 @@ namespace StockLogger.Controllers.API_Controllers
                 return BadRequest(new { ex.Message });
             }
 
-            //var data = new
-            //{
-            //    variety = "NORMAL",
-            //    tradingsymbol = "IDEA-EQ",
-            //    symboltoken = "14366",
-            //    transactiontype = "BUY",
-            //    exchange = "NSE",
-            //    ordertype = "MARKET",
-            //    producttype = "INTRADAY",
-            //    duration = "DAY",
-            //    price = "0",
-            //    squareoff = ExpectedPrice,
-            //    stoploss = "0",
-            //    quantity = "1"
-            //};
-
             var data = new
             {
-                variety = "ROBO", // Bracket Order for Robo
+                variety = "NORMAL",
                 tradingsymbol = "IDEA-EQ",
                 symboltoken = "14366",
                 transactiontype = "BUY",
                 exchange = "NSE",
-                ordertype = "LIMIT", // Bracket Orders only allow LIMIT or STOPLOSS
+                ordertype = "MARKET",
                 producttype = "INTRADAY",
                 duration = "DAY",
-                price = LTP, // Replace with your desired entry price
-                squareoff = ExpectedPrice, // Set your target price for profit
-                stoploss = "0.1", // Set your stop-loss price
+                price = "0",
+                squareoff = ExpectedPrice,
+                stoploss = "-1%",
                 quantity = "1"
             };
+
+            //var data = new
+            //{
+            //    variety = "ROBO", // Bracket Order for Robo
+            //    tradingsymbol = "IDEA-EQ",
+            //    symboltoken = "14366",
+            //    transactiontype = "BUY",
+            //    exchange = "NSE",
+            //    ordertype = "LIMIT", // Bracket Orders only allow LIMIT or STOPLOSS
+            //    producttype = "INTRADAY",
+            //    duration = "DAY",
+            //    price = LTP, // Replace with your desired entry price
+            //    squareoff = ExpectedPrice, // Set your target price for profit
+            //    stoploss = "0.1", // Set your stop-loss price
+            //    quantity = "1"
+            //};
 
             var jsonData = JsonConvert.SerializeObject(data);
 

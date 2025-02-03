@@ -184,7 +184,7 @@ namespace StockLogger.Controllers.API_Controllers
         }
 
 
-        // POST https://localhost:44364/api/AngelCandel/getCandleData
+        // POST https://localhost:44364/api/AngelCandel/getCandleDataForTest
         [HttpPost("getCandleDataForTest")]
         public async Task<IActionResult> GetCandleDataForTest([FromBody] StockRequest stockRequest)
         {

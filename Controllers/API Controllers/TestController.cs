@@ -507,41 +507,67 @@ namespace StockLogger.Controllers.API_Controllers
                             foreach (Candel testCandel in CandelData)
                             {
 
-                                Candel candle2 = CandelData
-                                                .Where(c => c.OpenTime < testCandel.OpenTime) // Get only previous candles
-                                                .OrderByDescending(c => c.OpenTime) // Order in descending order
-                                                .Skip(5) // Skip the first previous candle
-                                                .FirstOrDefault(); // Get the second previous candle
+                                //Candel candle2 = CandelData
+                                //                .Where(c => c.OpenTime < testCandel.OpenTime) // Get only previous candles
+                                //                .OrderByDescending(c => c.OpenTime) // Order in descending order
+                                //                .Skip(5) // Skip the first previous candle
+                                //                .FirstOrDefault(); // Get the second previous candle
 
-                                if(candle2 != null)
+                                //if (candle2 != null)
+                                //{
+
+                                //    List<Candel> CandelDataBeforeTestCandel = CandelData
+                                //                       .Where(candel => candel.OpenTime < candle2.OpenTime)
+                                //                       .OrderByDescending(c => c.OpenTime)  // Sort in descending order to get latest first
+                                //                       .Take(10)  // Take the last 21 candles
+                                //                       .OrderBy(c => c.OpenTime)  // Reorder them back in ascending order
+                                //                       .ToList();
+
+                                //    //List<Candel> CandelDataBeforeTestCandel = CandelData
+                                //    //              .Where(candel => candel.OpenTime < testCandel.OpenTime)
+                                //    //              .OrderBy(c => c.OpenTime)
+                                //    //              .ToList();
+
+                                //    bool isListinUptrend = IsListInUptrendAdvanced(CandelDataBeforeTestCandel);
+
+                                //    bool exists = dragonFlyDojiCandles?.Any(c => c.Ticker == candle2.Ticker) ?? false;
+
+
+                                //    if (
+                                //       isListinUptrend
+                                //       && (exists == false)
+                                //       )
+                                //    {
+                                //        dragonFlyDojiCandles.Add(candle2);
+                                //    }
+
+                                //}
+
+
+
+                                List<Candel> CandelDataBeforeTestCandel = CandelData
+                                                   .Where(candel => candel.OpenTime < testCandel.OpenTime)
+                                                   .OrderByDescending(c => c.OpenTime)  // Sort in descending order to get latest first
+                                                   .Take(10)  // Take the last 21 candles
+                                                   .OrderBy(c => c.OpenTime)  // Reorder them back in ascending order
+                                                   .ToList();
+
+
+                                bool isListinUptrend = IsListInUptrendAdvanced(CandelDataBeforeTestCandel);
+
+                                bool exists = dragonFlyDojiCandles?.Any(c => c.Ticker == testCandel.Ticker) ?? false;
+
+
+                                if (
+                                   isListinUptrend
+                                   //&& (exists == false)
+                                   )
                                 {
-
-                                    List<Candel> CandelDataBeforeTestCandel = CandelData
-                                                       .Where(candel => candel.OpenTime < candle2.OpenTime)
-                                                       .OrderByDescending(c => c.OpenTime)  // Sort in descending order to get latest first
-                                                       .Take(10)  // Take the last 21 candles
-                                                       .OrderBy(c => c.OpenTime)  // Reorder them back in ascending order
-                                                       .ToList();
-
-                                    //List<Candel> CandelDataBeforeTestCandel = CandelData
-                                    //              .Where(candel => candel.OpenTime < testCandel.OpenTime)
-                                    //              .OrderBy(c => c.OpenTime)
-                                    //              .ToList();
-
-                                    bool isListinUptrend = IsListInUptrendAdvanced(CandelDataBeforeTestCandel);
-
-                                    bool exists = dragonFlyDojiCandles?.Any(c => c.Ticker == candle2.Ticker) ?? false;
-
-
-                                    if (
-                                       isListinUptrend
-                                       && (exists == false)
-                                       )
-                                    {
-                                        dragonFlyDojiCandles.Add(candle2);
-                                    }
-
+                                    dragonFlyDojiCandles.Add(testCandel);
                                 }
+
+
+
 
                             }
 
@@ -2686,7 +2712,7 @@ namespace StockLogger.Controllers.API_Controllers
 
                 selectedObject,
                 isInCorrectPredictions,
-                isInWrongPredictions,
+                //isInWrongPredictions,
 
                 //MainProfit,
                 //MainLoss,
