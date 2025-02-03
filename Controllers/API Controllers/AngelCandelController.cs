@@ -212,10 +212,10 @@ namespace StockLogger.Controllers.API_Controllers
                 //interval = "FIVE_MINUTE",//--/// 3 white soilders worked at 100% accuracy prfit margin 0.0025 // COMPLEX HAMMER working at 0.0025% profit
                 //interval = "TEN_MINUTE",
                 //interval = "FIFTEEN_MINUTE",
-                //fromdate = startDateWithTime900.ToString("yyyy-MM-dd HH:mm"),
-                //todate = startDateWithTime330.ToString("yyyy-MM-dd HH:mm")
-                fromdate = DateTime.Today.AddHours(9).AddMinutes(15).ToString("yyyy-MM-dd HH:mm"),
-                todate = DateTime.Now.ToString("yyyy-MM-dd HH:mm")
+                fromdate = startDateWithTime900.ToString("yyyy-MM-dd HH:mm"),
+                todate = startDateWithTime330.ToString("yyyy-MM-dd HH:mm")
+                //fromdate = DateTime.Today.AddHours(9).AddMinutes(15).ToString("yyyy-MM-dd HH:mm"),
+                //todate = DateTime.Now.ToString("yyyy-MM-dd HH:mm")
             };
 
             var jsonData = JsonConvert.SerializeObject(data);
