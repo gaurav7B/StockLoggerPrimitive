@@ -133,71 +133,24 @@ namespace StockLogger.Controllers.API_Controllers
         /////////////////////////////////////////////////////
 
         // TO_CHECK_UPTREND
-        //public bool IsInDowntrend(List<Candel> candelData, int confirmationCount = 2)
-        //{
-        //    if (candelData == null || candelData.Count < 10)
-        //        return false;
-
-        //    var ordered = candelData.OrderBy(c => c.OpenTime).ToList();
-        //    var recentCandles = ordered.TakeLast(10).ToList(); // Use last 10 candles
-
-        //    // Adaptive period calculation
-        //    int shortPeriod = Math.Max(3, recentCandles.Count / 3);
-        //    int mediumPeriod = Math.Max(5, recentCandles.Count / 2);
-
-        //    bool shortTerm = CheckDowntrendPriceStructure(recentCandles.TakeLast(shortPeriod).ToList());
-        //    bool mediumTerm = CheckDowntrendPriceStructure(recentCandles.TakeLast(mediumPeriod).ToList());
-
-        //    // Simplified moving average setup
-        //    var maFast = CalculateSMA(ordered, Math.Min(5, ordered.Count));
-        //    var maSlow = CalculateSMA(ordered, Math.Min(10, ordered.Count));
-
-        //    bool priceBelowMA = recentCandles.Last().EndPrice < maFast.Last()
-        //                      && maFast.Last() < maSlow.Last();
-
-        //    bool volumeIncreasing = CheckVolumeTrend(recentCandles);
-        //    bool momentumNegative = CheckDowntrendMomentum(recentCandles);
-        //    bool trendlineDownward = CalculateTrendlineSlope(recentCandles) < 0;
-
-        //    // Simplified scoring system
-        //    int score = 0;
-        //    score += shortTerm ? 3 : 0;
-        //    score += mediumTerm ? 4 : 0;
-        //    score += priceBelowMA ? 3 : 0;
-        //    score += volumeIncreasing ? 2 : 0;
-        //    score += momentumNegative ? 3 : 0;
-        //    score += trendlineDownward ? 2 : 0;
-
-        //    // Volume-based confirmation
-        //    decimal avgVolume = CalculateAverageVolume(ordered, Math.Min(5, ordered.Count));
-        //    int bearishConfirmation = ordered.TakeLast(confirmationCount)
-        //        .Count(c => (c.IsBearish ?? false) && c.Volume > avgVolume);
-
-        //    return score >= 10 && bearishConfirmation >= confirmationCount;
-        //}
-
-
         public bool IsInDowntrend(List<Candel> candelData, int confirmationCount = 2)
         {
-            // Check for at least 5 candles
-            if (candelData == null || candelData.Count < 5)
+            if (candelData == null || candelData.Count < 10)
                 return false;
 
             var ordered = candelData.OrderBy(c => c.OpenTime).ToList();
-            var recentCandles = ordered.TakeLast(5).ToList(); // Use last 5 candles
+            var recentCandles = ordered.TakeLast(10).ToList(); // Use last 10 candles
 
-            // Adjusted adaptive periods for 5-candle setup
-            int shortPeriod = Math.Max(2, recentCandles.Count / 3);  // 5/3 ≈ 1.67 → 2
-            int mediumPeriod = Math.Max(3, recentCandles.Count / 2); // 5/2 = 2.5 → 3
+            // Adaptive period calculation
+            int shortPeriod = Math.Max(3, recentCandles.Count / 3);
+            int mediumPeriod = Math.Max(5, recentCandles.Count / 2);
 
             bool shortTerm = CheckDowntrendPriceStructure(recentCandles.TakeLast(shortPeriod).ToList());
             bool mediumTerm = CheckDowntrendPriceStructure(recentCandles.TakeLast(mediumPeriod).ToList());
 
-            // Adjusted moving average periods for smaller dataset
-            int maFastPeriod = Math.Min(3, ordered.Count);
-            int maSlowPeriod = Math.Min(5, ordered.Count);
-            var maFast = CalculateSMA(ordered, maFastPeriod);
-            var maSlow = CalculateSMA(ordered, maSlowPeriod);
+            // Simplified moving average setup
+            var maFast = CalculateSMA(ordered, Math.Min(5, ordered.Count));
+            var maSlow = CalculateSMA(ordered, Math.Min(10, ordered.Count));
 
             bool priceBelowMA = recentCandles.Last().EndPrice < maFast.Last()
                               && maFast.Last() < maSlow.Last();
@@ -206,30 +159,27 @@ namespace StockLogger.Controllers.API_Controllers
             bool momentumNegative = CheckDowntrendMomentum(recentCandles);
             bool trendlineDownward = CalculateTrendlineSlope(recentCandles) < 0;
 
-            // Adjusted scoring weights for smaller dataset
+            // Simplified scoring system
             int score = 0;
-            score += shortTerm ? 2 : 0;       // Reduced weight for shorter term
-            score += mediumTerm ? 3 : 0;      // Adjusted medium term weight
+            score += shortTerm ? 3 : 0;
+            score += mediumTerm ? 4 : 0;
             score += priceBelowMA ? 3 : 0;
             score += volumeIncreasing ? 2 : 0;
-            score += momentumNegative ? 2 : 0; // Reduced weight for single-point momentum
+            score += momentumNegative ? 3 : 0;
             score += trendlineDownward ? 2 : 0;
 
-            // Volume-based confirmation with adjusted average calculation
-            decimal avgVolume = CalculateAverageVolume(ordered, Math.Min(3, ordered.Count));
+            // Volume-based confirmation
+            decimal avgVolume = CalculateAverageVolume(ordered, Math.Min(5, ordered.Count));
             int bearishConfirmation = ordered.TakeLast(confirmationCount)
                 .Count(c => (c.IsBearish ?? false) && c.Volume > avgVolume);
 
-            // Adjusted threshold for smaller dataset
-            return score >= 8 && bearishConfirmation >= confirmationCount;
+            return score >= 10 && bearishConfirmation >= confirmationCount;
         }
-
-        // Other helper methods remain the same but with contextual awareness for smaller datasets
 
         private bool CheckDowntrendPriceStructure(List<Candel> candles)
         {
-            // More tolerant exceptions for small datasets
-            int exceptionsAllowed = candles.Count <= 3 ? 1 : 0;
+            // Allow 1 exception in short sequences
+            int exceptionsAllowed = candles.Count <= 5 ? 1 : 0;
             int exceptions = 0;
 
             for (int i = 1; i < candles.Count; i++)
@@ -244,10 +194,59 @@ namespace StockLogger.Controllers.API_Controllers
             return true;
         }
 
+        //public bool IsInDowntrend(List<Candel> candelData, int confirmationCount = 2)
+        //{
+        //    // Check for at least 5 candles
+        //    if (candelData == null || candelData.Count < 5)
+        //        return false;
+
+        //    var ordered = candelData.OrderBy(c => c.OpenTime).ToList();
+        //    var recentCandles = ordered.TakeLast(5).ToList(); // Use last 5 candles
+
+        //    // Adjusted adaptive periods for 5-candle setup
+        //    int shortPeriod = Math.Max(2, recentCandles.Count / 3);  // 5/3 ≈ 1.67 → 2
+        //    int mediumPeriod = Math.Max(3, recentCandles.Count / 2); // 5/2 = 2.5 → 3
+
+        //    bool shortTerm = CheckDowntrendPriceStructure(recentCandles.TakeLast(shortPeriod).ToList());
+        //    bool mediumTerm = CheckDowntrendPriceStructure(recentCandles.TakeLast(mediumPeriod).ToList());
+
+        //    // Adjusted moving average periods for smaller dataset
+        //    int maFastPeriod = Math.Min(3, ordered.Count);
+        //    int maSlowPeriod = Math.Min(5, ordered.Count);
+        //    var maFast = CalculateSMA(ordered, maFastPeriod);
+        //    var maSlow = CalculateSMA(ordered, maSlowPeriod);
+
+        //    bool priceBelowMA = recentCandles.Last().EndPrice < maFast.Last()
+        //                      && maFast.Last() < maSlow.Last();
+
+        //    bool volumeIncreasing = CheckVolumeTrend(recentCandles);
+        //    bool momentumNegative = CheckDowntrendMomentum(recentCandles);
+        //    bool trendlineDownward = CalculateTrendlineSlope(recentCandles) < 0;
+
+        //    // Adjusted scoring weights for smaller dataset
+        //    int score = 0;
+        //    score += shortTerm ? 2 : 0;       // Reduced weight for shorter term
+        //    score += mediumTerm ? 3 : 0;      // Adjusted medium term weight
+        //    score += priceBelowMA ? 3 : 0;
+        //    score += volumeIncreasing ? 2 : 0;
+        //    score += momentumNegative ? 2 : 0; // Reduced weight for single-point momentum
+        //    score += trendlineDownward ? 2 : 0;
+
+        //    // Volume-based confirmation with adjusted average calculation
+        //    decimal avgVolume = CalculateAverageVolume(ordered, Math.Min(3, ordered.Count));
+        //    int bearishConfirmation = ordered.TakeLast(confirmationCount)
+        //        .Count(c => (c.IsBearish ?? false) && c.Volume > avgVolume);
+
+        //    // Adjusted threshold for smaller dataset
+        //    return score >= 8 && bearishConfirmation >= confirmationCount;
+        //}
+
+        //// Other helper methods remain the same but with contextual awareness for smaller datasets
+
         //private bool CheckDowntrendPriceStructure(List<Candel> candles)
         //{
-        //    // Allow 1 exception in short sequences
-        //    int exceptionsAllowed = candles.Count <= 5 ? 1 : 0;
+        //    // More tolerant exceptions for small datasets
+        //    int exceptionsAllowed = candles.Count <= 3 ? 1 : 0;
         //    int exceptions = 0;
 
         //    for (int i = 1; i < candles.Count; i++)
@@ -560,32 +559,30 @@ namespace StockLogger.Controllers.API_Controllers
                                 //}
 
 
+                                //Downtrend 5 Candel vs 10 Candel comparison
 
-                                //List<Candel> CandelDataBeforeTestCandel = CandelData
-                                //                    .Where(candel => candel.OpenTime < testCandel.OpenTime)
-                                //                    .OrderByDescending(c => c.OpenTime)  // Sort in descending order to get latest first
-                                //                    .Take(10)  // Take the last 21 candles
-                                //                    .OrderBy(c => c.OpenTime)  // Reorder them back in ascending order
-                                //                    .ToList();
+                                /////////////////////////////////////////
 
+                                //5 Candel
 
-                                //bool isListinDowntrend = IsInDowntrend(CandelDataBeforeTestCandel);
-
-                                //bool exists = dragonFlyDojiCandles?.Any(c => c.Ticker == testCandel.Ticker) ?? false;
+                                //924 / 70
+                                //1135 / 125
 
 
-                                //if (
-                                //   isListinDowntrend
-                                //   //&& (exists == false)
-                                //   )
-                                //{
-                                //    dragonFlyDojiCandles.Add(testCandel);
-                                //}
+                                /////////////////////////////////////////
+
+                                //10 Candel
+
+                                //902 / 69
+                                //1187 / 128
+
+
+
 
                                 List<Candel> CandelDataBeforeTestCandel = CandelData
                                                     .Where(candel => candel.OpenTime < testCandel.OpenTime)
                                                     .OrderByDescending(c => c.OpenTime)  // Sort in descending order to get latest first
-                                                    .Take(5)  // Take the last 21 candles
+                                                    .Take(10)  // Take the last 21 candles
                                                     .OrderBy(c => c.OpenTime)  // Reorder them back in ascending order
                                                     .ToList();
 
@@ -602,6 +599,27 @@ namespace StockLogger.Controllers.API_Controllers
                                 {
                                     dragonFlyDojiCandles.Add(testCandel);
                                 }
+
+                                //List<Candel> CandelDataBeforeTestCandel = CandelData
+                                //                    .Where(candel => candel.OpenTime < testCandel.OpenTime)
+                                //                    .OrderByDescending(c => c.OpenTime)  // Sort in descending order to get latest first
+                                //                    .Take(5)  // Take the last 21 candles
+                                //                    .OrderBy(c => c.OpenTime)  // Reorder them back in ascending order
+                                //                    .ToList();
+
+
+                                //bool isListinDowntrend = IsInDowntrend(CandelDataBeforeTestCandel);
+
+                                //bool exists = dragonFlyDojiCandles?.Any(c => c.Ticker == testCandel.Ticker) ?? false;
+
+
+                                //if (
+                                //   isListinDowntrend
+                                //   //&& (exists == false)
+                                //   )
+                                //{
+                                //    dragonFlyDojiCandles.Add(testCandel);
+                                //}
 
 
 
@@ -630,10 +648,10 @@ namespace StockLogger.Controllers.API_Controllers
                                 {
                                     //expectedPrice = firstCandel.EndPrice * 1.000595m;
                                     //expectedPrice = firstCandel.EndPrice * 1.00061m;
-                                    //expectedPrice = firstCandel.EndPrice - (firstCandel.EndPrice * 0.00065m);
+                                    expectedPrice = firstCandel.EndPrice - (firstCandel.EndPrice * 0.00065m);
                                     //firstCandel.EndPrice - (firstCandel.EndPrice * 0.01m); //  10 R profit on 1000 R //1995 on 2 lakh
                                     //expectedPrice = firstCandel.EndPrice - (firstCandel.EndPrice * 0.005m); //  5 R profit on 1000 R //997 on 2lakh
-                                    expectedPrice = firstCandel.EndPrice - (firstCandel.EndPrice * 0.0025m); // 2.5 R profit on 1000 R //450 on 2Lakh
+                                    //expectedPrice = firstCandel.EndPrice - (firstCandel.EndPrice * 0.0025m); // 2.5 R profit on 1000 R //450 on 2Lakh
 
                                     //expectedPrice = firstCandel.EndPrice * 1.0004953m; // 4 LAKH
 
