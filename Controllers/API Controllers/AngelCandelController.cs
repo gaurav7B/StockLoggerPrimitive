@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using OtpNet;
 using System;
 using static StockLogger.Controllers.API_Controllers.BuySellController;
+using StockLogger.Models.Stratergic_Models.Hammer;
 
 namespace StockLogger.Controllers.API_Controllers
 {
@@ -182,7 +183,6 @@ namespace StockLogger.Controllers.API_Controllers
 
             return authorizationToken;
         }
-
 
         // POST https://localhost:44364/api/AngelCandel/getCandleDataForTest
         [HttpPost("getCandleDataForTest")]

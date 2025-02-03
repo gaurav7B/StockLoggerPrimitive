@@ -36,43 +36,43 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                //var stopwatch = Stopwatch.StartNew();
+                var stopwatch = Stopwatch.StartNew();
 
-                ////// Fisher-Yates shuffle for better efficiency
-                ////for (int i = _stocks.Count - 1; i > 0; i--)
-                ////{
-                ////    int j = random.Next(0, i + 1);
-                ////    (_stocks[i], _stocks[j]) = (_stocks[j], _stocks[i]); // Swap elements
-                ////}
-
-
-                //var tasks = _stocks.Select(stock => Task.Run(async () =>
-                //    {
-                //        try
-                //        {
-                //            await _analyzer.Analyze1MinCandelAsync(stock.symboltoken, _httpClient, stoppingToken, authToken);
-                //        }
-                //        catch (Exception ex)
-                //        {
-                //        }
-                //    }, stoppingToken));
+                //// Fisher-Yates shuffle for better efficiency
+                //for (int i = _stocks.Count - 1; i > 0; i--)
+                //{
+                //    int j = random.Next(0, i + 1);
+                //    (_stocks[i], _stocks[j]) = (_stocks[j], _stocks[i]); // Swap elements
+                //}
 
 
+                var tasks = _stocks.Select(stock => Task.Run(async () =>
+                    {
+                        try
+                        {
+                            await _analyzer.Analyze1MinCandelAsync(stock.symboltoken, _httpClient, stoppingToken, authToken);
+                        }
+                        catch (Exception ex)
+                        {
+                        }
+                    }, stoppingToken));
 
-                //// Wait for all tasks to complete.
-                //await Task.WhenAll(tasks);
 
-                //stopwatch.Stop();
-                //iterationTimes.Add(stopwatch.Elapsed.TotalMilliseconds);
 
-                //// Trigger garbage collection periodically
-                //GC.Collect();
-                //GC.WaitForPendingFinalizers();
+                // Wait for all tasks to complete.
+                await Task.WhenAll(tasks);
 
-                foreach (var stock in _stocks)
-                {
-                    await _analyzer.Analyze1MinCandelAsync(stock.symboltoken, _httpClient, stoppingToken, authToken);
-                }
+                stopwatch.Stop();
+                iterationTimes.Add(stopwatch.Elapsed.TotalMilliseconds);
+
+                // Trigger garbage collection periodically
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+
+                //foreach (var stock in _stocks)
+                //{
+                //    await _analyzer.Analyze1MinCandelAsync(stock.symboltoken, _httpClient, stoppingToken, authToken);
+                //}
 
             }
 

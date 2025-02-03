@@ -15,8 +15,8 @@ builder.Services.AddDbContext<StockLoggerDbContext>(options =>
     sqlServerOptions => sqlServerOptions.EnableRetryOnFailure()));
 
 
-builder.Services.AddHttpClient<Uptrend_Service>();
-builder.Services.AddHostedService<Uptrend_Service>();
+//builder.Services.AddHttpClient<Uptrend_Service>();
+//builder.Services.AddHostedService<Uptrend_Service>();
 
 //builder.Services.AddHttpClient<DragonflyDojiService>();
 //builder.Services.AddHostedService<DragonflyDojiService>();

@@ -130,7 +130,9 @@ namespace StockLogger.Controllers.API_Controllers
         }
 
 
-        ////////////////////////////////////////
+        /////////////////////////////////////////////////////
+
+        // TO_CHECK_UPTREND
 
         public bool IsListInUptrendAdvanced(List<Candel> candles)
         {
