@@ -1136,114 +1136,114 @@ namespace StockLogger.Controllers.API_Controllers
 
                             //}
 
-                            foreach (Candel testCandel in CandelData)
-                            {
+                            //foreach (Candel testCandel in CandelData)
+                            //{
 
-                                if (testCandel.OpenTime.TimeOfDay > new TimeSpan(15, 00, 0))
-                                {
-                                    break;
-                                }
+                            //    if (testCandel.OpenTime.TimeOfDay > new TimeSpan(15, 00, 0))
+                            //    {
+                            //        break;
+                            //    }
 
-                                //// COMPLEX HAMMER
+                            //    //// COMPLEX HAMMER
 
-                                // Configuration parameters (adjust based on backtesting)
-                                const int trendPeriod = 3;          // Lookback period for trend analysis
-                                const decimal minTrendStrength = 0.6m; // 60% of previous candles should follow trend
-                                const decimal volatilityPeriod = 5; // Period for dynamic threshold calculations
+                            //    // Configuration parameters (adjust based on backtesting)
+                            //    const int trendPeriod = 3;          // Lookback period for trend analysis
+                            //    const decimal minTrendStrength = 0.6m; // 60% of previous candles should follow trend
+                            //    const decimal volatilityPeriod = 5; // Period for dynamic threshold calculations
 
 
-                                // Initialize historical context
-                                int currentIndex = CandelData.IndexOf(testCandel);
-                                if (currentIndex < Math.Max(trendPeriod, volatilityPeriod)) continue;
+                            //    // Initialize historical context
+                            //    int currentIndex = CandelData.IndexOf(testCandel);
+                            //    if (currentIndex < Math.Max(trendPeriod, volatilityPeriod)) continue;
 
-                                //Checks if the candel is Bullish
-                                if (testCandel.IsBullish != true) continue;
+                            //    //Checks if the candel is Bullish
+                            //    if (testCandel.IsBullish != true) continue;
 
-                                decimal bodySize = Math.Abs(testCandel.EndPrice - testCandel.StartPrice);
-                                decimal totalRange = testCandel.HighestPrice - testCandel.LowestPrice;
-                                if (totalRange <= 0) continue;
+                            //    decimal bodySize = Math.Abs(testCandel.EndPrice - testCandel.StartPrice);
+                            //    decimal totalRange = testCandel.HighestPrice - testCandel.LowestPrice;
+                            //    if (totalRange <= 0) continue;
 
-                                // 2. Trend analysis - verify preceding downtrend
-                                var previousCandles = CandelData
-                                    .Skip(currentIndex - trendPeriod)
-                                    .Take(trendPeriod)
-                                    .ToList();
+                            //    // 2. Trend analysis - verify preceding downtrend
+                            //    var previousCandles = CandelData
+                            //        .Skip(currentIndex - trendPeriod)
+                            //        .Take(trendPeriod)
+                            //        .ToList();
 
-                                decimal trendStrength = previousCandles
-                                    .Count(c => c.IsBearish == true) / (decimal)trendPeriod;
+                            //    decimal trendStrength = previousCandles
+                            //        .Count(c => c.IsBearish == true) / (decimal)trendPeriod;
 
-                                bool isValidDowntrend = previousCandles
-                                    .Zip(previousCandles.Skip(1), (a, b) => a.EndPrice > b.EndPrice)
-                                    .All(x => x) && trendStrength >= minTrendStrength;
+                            //    bool isValidDowntrend = previousCandles
+                            //        .Zip(previousCandles.Skip(1), (a, b) => a.EndPrice > b.EndPrice)
+                            //        .All(x => x) && trendStrength >= minTrendStrength;
 
-                                if (!isValidDowntrend) continue;
+                            //    if (!isValidDowntrend) continue;
 
-                                // 3. Volatility-adjusted calculations
-                                var volatilityCandles = CandelData
-                                    .Skip(currentIndex - (int)volatilityPeriod)
-                                    .Take((int)volatilityPeriod)
-                                    .ToList();
+                            //    // 3. Volatility-adjusted calculations
+                            //    var volatilityCandles = CandelData
+                            //        .Skip(currentIndex - (int)volatilityPeriod)
+                            //        .Take((int)volatilityPeriod)
+                            //        .ToList();
 
-                                decimal avgBodySize = volatilityCandles
-                                    .Average(c => Math.Abs(c.EndPrice - c.StartPrice));
+                            //    decimal avgBodySize = volatilityCandles
+                            //        .Average(c => Math.Abs(c.EndPrice - c.StartPrice));
 
-                                decimal avgTotalRange = volatilityCandles
-                                    .Average(c => c.HighestPrice - c.LowestPrice);
+                            //    decimal avgTotalRange = volatilityCandles
+                            //        .Average(c => c.HighestPrice - c.LowestPrice);
 
-                                // 4. Dynamic thresholds
-                                decimal bodySizeThreshold = Math.Max(avgBodySize * 0.3m, totalRange * 0.15m);
-                                decimal lowerShadowMultiplier = 2.5m - (avgTotalRange / totalRange);
-                                decimal upperShadowThreshold = bodySize * 0.05m + avgBodySize * 0.02m;
+                            //    // 4. Dynamic thresholds
+                            //    decimal bodySizeThreshold = Math.Max(avgBodySize * 0.3m, totalRange * 0.15m);
+                            //    decimal lowerShadowMultiplier = 2.5m - (avgTotalRange / totalRange);
+                            //    decimal upperShadowThreshold = bodySize * 0.05m + avgBodySize * 0.02m;
 
-                                // 5. Shadow calculations
-                                decimal lowerShadow = testCandel.StartPrice - testCandel.LowestPrice;
-                                decimal upperShadow = testCandel.HighestPrice - testCandel.EndPrice;
+                            //    // 5. Shadow calculations
+                            //    decimal lowerShadow = testCandel.StartPrice - testCandel.LowestPrice;
+                            //    decimal upperShadow = testCandel.HighestPrice - testCandel.EndPrice;
 
-                                // 6. Price position validation
-                                decimal bodyPosition = (testCandel.EndPrice - testCandel.LowestPrice) / totalRange;
-                                bool isUpperPosition = bodyPosition >= 0.7m;
+                            //    // 6. Price position validation
+                            //    decimal bodyPosition = (testCandel.EndPrice - testCandel.LowestPrice) / totalRange;
+                            //    bool isUpperPosition = bodyPosition >= 0.7m;
 
-                                // 7. Volume confirmation
-                                decimal avgVolume = volatilityCandles.Average(c => c.Volume);
-                                bool volumeConfirmed = testCandel.Volume > avgVolume * 1.3m;
+                            //    // 7. Volume confirmation
+                            //    decimal avgVolume = volatilityCandles.Average(c => c.Volume);
+                            //    bool volumeConfirmed = testCandel.Volume > avgVolume * 1.3m;
 
-                                // 8. Final pattern validation
-                                bool isHammer = bodySize <= bodySizeThreshold &&
-                                                lowerShadow >= bodySize * lowerShadowMultiplier &&
-                                                upperShadow <= upperShadowThreshold &&
-                                                isUpperPosition &&
-                                                volumeConfirmed;
+                            //    // 8. Final pattern validation
+                            //    bool isHammer = bodySize <= bodySizeThreshold &&
+                            //                    lowerShadow >= bodySize * lowerShadowMultiplier &&
+                            //                    upperShadow <= upperShadowThreshold &&
+                            //                    isUpperPosition &&
+                            //                    volumeConfirmed;
 
-                                //bool isHammer = bodySize <= bodySizeThreshold &&
-                                //                 lowerShadow >= bodySize * lowerShadowMultiplier &&
-                                //                 upperShadow <= upperShadowThreshold &&
-                                //                 isUpperPosition;
+                            //    //bool isHammer = bodySize <= bodySizeThreshold &&
+                            //    //                 lowerShadow >= bodySize * lowerShadowMultiplier &&
+                            //    //                 upperShadow <= upperShadowThreshold &&
+                            //    //                 isUpperPosition;
 
-                                Candel verificationCandel = CandelData
-                                                   .Where(c => c.OpenTime > testCandel.OpenTime)
-                                                   .OrderBy(c => c.OpenTime)
-                                                   .FirstOrDefault();
+                            //    Candel verificationCandel = CandelData
+                            //                       .Where(c => c.OpenTime > testCandel.OpenTime)
+                            //                       .OrderBy(c => c.OpenTime)
+                            //                       .FirstOrDefault();
 
-                                bool isVerificationCandelVerified = (verificationCandel != null)
-                                                                    && (verificationCandel.HighestPrice > testCandel.HighestPrice)
-                                                                    && (verificationCandel.EndPrice > verificationCandel.StartPrice);
+                            //    bool isVerificationCandelVerified = (verificationCandel != null)
+                            //                                        && (verificationCandel.HighestPrice > testCandel.HighestPrice)
+                            //                                        && (verificationCandel.EndPrice > verificationCandel.StartPrice);
 
-                                //if (
-                                //    isHammer
-                                //    && isVerificationCandelVerified
-                                //    )
-                                //{
-                                //    //dragonFlyDojiCandles.Add(testCandel);
-                                //    dragonFlyDojiCandles.Add(verificationCandel);
-                                //}
+                            //    //if (
+                            //    //    isHammer
+                            //    //    && isVerificationCandelVerified
+                            //    //    )
+                            //    //{
+                            //    //    //dragonFlyDojiCandles.Add(testCandel);
+                            //    //    dragonFlyDojiCandles.Add(verificationCandel);
+                            //    //}
 
-                                if (
-                                    isHammer
-                                    )
-                                {
-                                    dragonFlyDojiCandles.Add(testCandel);
-                                }
-                            }
+                            //    if (
+                            //        isHammer
+                            //        )
+                            //    {
+                            //        dragonFlyDojiCandles.Add(testCandel);
+                            //    }
+                            //}
 
 
                             //foreach (Candel testCandel in CandelData)
@@ -1410,11 +1410,11 @@ namespace StockLogger.Controllers.API_Controllers
 
 
                             //    if (
-                            //        isDoji 
-                            //        && longLowerWick 
-                            //        && minimalUpperWick 
-                            //        && openCloseNearHigh 
-                            //        && inDowntrend 
+                            //        isDoji
+                            //        && longLowerWick
+                            //        && minimalUpperWick
+                            //        && openCloseNearHigh
+                            //        && inDowntrend
                             //        && isVolumeGreater
                             //        //&& isVerificationCandelVerified
                             //        )
@@ -1560,13 +1560,15 @@ namespace StockLogger.Controllers.API_Controllers
                             //}
 
 
+                            //// INVERTED HAMMER WORKING ABOVE 90% accuracy 755 / 76  can take random 10 pred from it
+
                             //foreach (Candel testCandel in CandelData)
                             //{
 
-                            //    if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
-                            //    {
-                            //        break; // Skip the rest of this iteration and proceed to the next object
-                            //    }
+                            //    //if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
+                            //    //{
+                            //    //    break; // Skip the rest of this iteration and proceed to the next object
+                            //    //}
 
                             //    try
                             //    {
@@ -1600,8 +1602,8 @@ namespace StockLogger.Controllers.API_Controllers
                             //            longUpperWick
                             //            && smallLowerWick
                             //            && smallBody
-                            //            && (testCandel.IsBullish.HasValue && testCandel.IsBullish == true)
-                            //            && (testCandel.StartPrice == testCandel.LowestPrice)
+                            //            && (testCandel.EndPrice > testCandel.StartPrice)
+                            //            //&& (testCandel.StartPrice == testCandel.LowestPrice)
                             //            //&& isVerificationCandelBullish
                             //            //&& isVerificationCandelHighGreater
                             //            //&& isverificationCandelVolumeGreater
@@ -1627,10 +1629,6 @@ namespace StockLogger.Controllers.API_Controllers
                             //{
                             //    decimal wickToBodyRatio = 2.0m;
 
-                            //    //if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
-                            //    //{
-                            //    //    break; // Skip the rest of this iteration and proceed to the next object
-                            //    //}
 
                             //    // Calculate body size
                             //    decimal bodySize = Math.Abs(testCandel.EndPrice - testCandel.StartPrice);
@@ -1644,8 +1642,8 @@ namespace StockLogger.Controllers.API_Controllers
                             //    bool longLowerWick = lowerWickSize >= wickToBodyRatio * bodySize;
 
                             //    // Ensure the upper wick is very small
-                            //    //bool smallUpperWick = upperWickSize <= 0.25m * bodySize;
-                            //    bool smallUpperWick = upperWickSize <= 0.025m * bodySize;
+                            //    bool smallUpperWick = upperWickSize <= 0.25m * bodySize;
+                            //    //bool smallUpperWick = upperWickSize <= 0.025m * bodySize;
 
                             //    // Ensure the real body is relatively small
                             //    bool smallBody = bodySize <= (testCandel.HighestPrice - testCandel.LowestPrice) * 0.2m;
@@ -1672,7 +1670,7 @@ namespace StockLogger.Controllers.API_Controllers
 
                             //    bool isVerificationCandelBullish = (verificationCandel != null) && (verificationCandel.IsBullish.HasValue) && (verificationCandel.IsBullish == true);
 
-                            //    bool isVerificationCandelHighGreater = (verificationCandel != null) && (verificationCandel.EndPrice > testCandel.HighestPrice);
+                            //    bool isVerificationCandelHighGreater = (verificationCandel != null) && (verificationCandel.HighestPrice > testCandel.HighestPrice);
 
                             //    bool isverificationCandelVolumeGreater = (verificationCandel != null) && (verificationCandel.Volume > testCandel.Volume);
 
@@ -1680,11 +1678,10 @@ namespace StockLogger.Controllers.API_Controllers
                             //        longLowerWick
                             //        && smallUpperWick
                             //        && smallBody
-                            //        && isInDowntrend
-                            //        && isVerificationCandelBullish
-                            //        && isVerificationCandelHighGreater
-                            //        && testCandel.IsBullish.HasValue
-                            //        && testCandel.IsBullish == true
+                            //        && (testCandel.EndPrice > testCandel.StartPrice)
+                            //        //&& isInDowntrend
+                            //        //&& isVerificationCandelBullish
+                            //        //&& isVerificationCandelHighGreater
                             //        //&& isverificationCandelVolumeGreater
                             //        )
                             //    {
@@ -1990,71 +1987,61 @@ namespace StockLogger.Controllers.API_Controllers
 
                             //}
 
-                            //foreach (Candel c in CandelData)
-                            //{
+                            foreach (Candel c in CandelData)
+                            {
 
-                            //    // DRAGONFLY_DOJI
+                                // DRAGONFLY_DOJI
 
-                            //    Candel recentCandel = c;
+                                Candel recentCandel = c;
 
-                            //    Candel verificationCandel = CandelData
-                            //                       .Where(c => c.CloseTime > recentCandel.CloseTime)
-                            //                       .OrderBy(c => c.CloseTime)
-                            //                       .FirstOrDefault();
+                                Candel verificationCandel = CandelData
+                                                   .Where(c => c.CloseTime > recentCandel.CloseTime)
+                                                   .OrderBy(c => c.CloseTime)
+                                                   .FirstOrDefault();
 
-                            //    Candel previousCandel = CandelData
-                            //                .Where(c => c.CloseTime < recentCandel.CloseTime)
-                            //                .OrderByDescending(c => c.CloseTime)
-                            //                .FirstOrDefault();
-
-
-                            //    // Check if it is a Doji with a small body
-                            //    bool isDoji = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.1m;
-
-                            //    // Check for a long lower shadow (shadow size relative to the body)
-                            //    bool longLowerShadow = (recentCandel.StartPrice - recentCandel.LowestPrice) > 3 * (recentCandel.EndPrice - recentCandel.StartPrice);
-
-                            //    // The body of the candle should be small and at the top of the range
-                            //    bool smallBodyAtTop = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.3m;
+                                Candel previousCandel = CandelData
+                                            .Where(c => c.CloseTime < recentCandel.CloseTime)
+                                            .OrderByDescending(c => c.CloseTime)
+                                            .FirstOrDefault();
 
 
-                            //    ////The next candle should also be bullish for confirmation
+                                // Check if it is a Doji with a small body
+                                bool isDoji = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.1m;
 
-                            //    bool nextCandleBullish = false;
+                                // Check for a long lower shadow (shadow size relative to the body)
+                                bool longLowerShadow = (recentCandel.StartPrice - recentCandel.LowestPrice) > 3 * (recentCandel.EndPrice - recentCandel.StartPrice);
 
-                            //    if (verificationCandel != null)
-                            //    {
-                            //        if (verificationCandel.IsBullish == true)
-                            //        {
-                            //            nextCandleBullish = true;
-                            //        }
-                            //    }
+                                // The body of the candle should be small and at the top of the range
+                                bool smallBodyAtTop = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.3m;
 
-                            //    bool isVerificationCandelHighestPriceGreater = (verificationCandel != null) && (verificationCandel.HighestPrice > recentCandel.HighestPrice);
 
-                            //    bool previousCandelBearish = false;
+                                bool isVerificationCandelHighestPriceGreater = (verificationCandel != null) && (verificationCandel.HighestPrice > recentCandel.HighestPrice);
 
-                            //    if (previousCandel != null)
-                            //    {
-                            //        if (previousCandel.IsBearish == true)
-                            //        {
-                            //            previousCandelBearish = true;
-                            //        }
-                            //    }
 
-                            //    // If all conditions match, then it's a Dragonfly Doji with high probability of upward movement
-                            //    if (isDoji
-                            //        && longLowerShadow
-                            //        && smallBodyAtTop
-                            //        && isVerificationCandelHighestPriceGreater
-                            //        && nextCandleBullish
-                            //        //&& previousCandelBearish
-                            //        )
-                            //    {
-                            //        dragonFlyDojiCandles.Add(verificationCandel);
-                            //    }
+                                List<Candel> CandelDataBeforeTestCandel = CandelData
+                                                   .Where(candel => candel.OpenTime < c.OpenTime)
+                                                   .OrderBy(c => c.OpenTime)  // Reorder them back in ascending order
+                                                   .ToList();
 
-                            //}
+                                //var averageVolume = CandelDataBeforeTestCandel.Average(c => c.Volume);
+
+
+                                // If all conditions match, then it's a Dragonfly Doji with high probability of upward movement
+                                if (isDoji
+                                    && longLowerShadow
+                                    && smallBodyAtTop
+                                    //&& (c.Volume > averageVolume)
+                                    && (previousCandel != null && verificationCandel != null)
+                                    && (previousCandel.EndPrice < previousCandel.StartPrice)
+                                    && (verificationCandel.EndPrice > verificationCandel.StartPrice)
+                                    && (verificationCandel.EndPrice > c.HighestPrice)
+                                    )
+                                {
+                                    //dragonFlyDojiCandles.Add(verificationCandel);
+                                    dragonFlyDojiCandles.Add(c);
+                                }
+
+                            }
 
                             //foreach (Candel testCandel in CandelData)
                             //{
@@ -2175,10 +2162,10 @@ namespace StockLogger.Controllers.API_Controllers
                                 {
                                     //expectedPrice = firstCandel.EndPrice * 1.000595m;
                                     //expectedPrice = firstCandel.EndPrice * 1.00061m;
-                                    //expectedPrice = firstCandel.EndPrice * 1.00065m;
+                                    expectedPrice = firstCandel.EndPrice * 1.00065m;
                                     //expectedPrice = firstCandel.EndPrice * 1.01m; //  10 R profit on 1000 R //1995 on 2 lakh
                                     //expectedPrice = firstCandel.EndPrice * 1.005m; //  5 R profit on 1000 R //997 on 2lakh
-                                    expectedPrice = firstCandel.EndPrice * 1.0025m; // 2.5 R profit on 1000 R //450 on 2Lakh
+                                    //expectedPrice = firstCandel.EndPrice * 1.0025m; // 2.5 R profit on 1000 R //450 on 2Lakh
 
                                     //expectedPrice = firstCandel.EndPrice * 1.0004953m; // 4 LAKH
 
@@ -2249,16 +2236,11 @@ namespace StockLogger.Controllers.API_Controllers
 
 
 
-
-                                //List<Candel> CandelDataAfterFirstCandel = CandelData
-                                //         .Where(candel => candel.OpenTime > firstCandel.OpenTime)
-                                //         .OrderBy(c => c.OpenTime)
-                                //         .ToList();
-
                                 List<Candel> CandelDataAfterFirstCandel = CandelData
-                                          .Where(candel => candel.OpenTime > firstCandel.OpenTime)
+                                          .Where(candel => candel.OpenTime > firstCandel.OpenTime && candel.OpenTime <= EndCandel.OpenTime)
                                           .OrderBy(c => c.OpenTime)
                                           .ToList();
+
 
                                 Candel highestCandel = null;
 
@@ -2709,11 +2691,15 @@ namespace StockLogger.Controllers.API_Controllers
 
             //}
 
+            var accuracy = ((double)extractedListCorrectPredictions.Count /
+    (extractedListCorrectPredictions.Count + extractedListWrongPredictions.Count)) * 100;
+
             return Ok(new
             {
                 Net = MainProfit - MainLoss,
 
-                selectedObject,
+                //selectedObject,
+                accuracy,
                 isInCorrectPredictions,
                 //isInWrongPredictions,
 

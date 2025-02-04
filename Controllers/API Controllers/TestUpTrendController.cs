@@ -434,7 +434,7 @@ namespace StockLogger.Controllers.API_Controllers
 
                         if (CandelData != null)
                         {
-                          
+
 
                             foreach (Candel testCandel in CandelData)
                             {
@@ -502,6 +502,52 @@ namespace StockLogger.Controllers.API_Controllers
 
 
                             }
+
+
+
+
+                            //// INVERTED HAMMER WORKING ABOVE 90% accuracy 755 / 76  can take random 10 pred from it
+
+                            //foreach (Candel testCandel in CandelData)
+                            //{
+
+                            //    try
+                            //    {
+
+                            //        decimal wickToBodyRatio = 2.0m;
+
+                            //        decimal bodySize = Math.Abs(testCandel.EndPrice - testCandel.StartPrice);
+
+                            //        decimal upperWickSize = testCandel.HighestPrice - Math.Max(testCandel.StartPrice, testCandel.EndPrice);
+
+                            //        decimal lowerWickSize = Math.Min(testCandel.StartPrice, testCandel.EndPrice) - testCandel.LowestPrice;
+
+                            //        bool longUpperWick = upperWickSize >= wickToBodyRatio * bodySize;
+
+                            //        bool smallLowerWick = lowerWickSize <= 0.025m * bodySize;
+
+                            //        bool smallBody = bodySize <= (testCandel.HighestPrice - testCandel.LowestPrice) * 0.2m;
+
+
+                            //        if (
+                            //            longUpperWick
+                            //            && smallLowerWick
+                            //            && smallBody
+                            //            && (testCandel.EndPrice > testCandel.StartPrice)
+                            //            )
+                            //        {
+                            //            dragonFlyDojiCandles.Add(testCandel);
+                            //        }
+
+
+                            //    }
+                            //    catch (Exception ex)
+                            //    {
+                            //        Console.WriteLine($"An error occurred: {ex.Message}");
+                            //    }
+
+                            //}
+
 
 
                         }
@@ -600,14 +646,8 @@ namespace StockLogger.Controllers.API_Controllers
 
 
 
-
-                                //List<Candel> CandelDataAfterFirstCandel = CandelData
-                                //         .Where(candel => candel.OpenTime > firstCandel.OpenTime)
-                                //         .OrderBy(c => c.OpenTime)
-                                //         .ToList();
-
                                 List<Candel> CandelDataAfterFirstCandel = CandelData
-                                          .Where(candel => candel.OpenTime > firstCandel.OpenTime && candel.OpenTime < EndCandel.OpenTime)
+                                          .Where(candel => candel.OpenTime > firstCandel.OpenTime && candel.OpenTime <= EndCandel.OpenTime)
                                           .OrderBy(c => c.OpenTime)
                                           .ToList();
 
