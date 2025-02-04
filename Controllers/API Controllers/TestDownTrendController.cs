@@ -647,26 +647,36 @@ namespace StockLogger.Controllers.API_Controllers
                             foreach (Candel testCandel in CandelData)
                             {
 
+                                //List<Candel> CandelDataBeforeTestCandel = CandelData
+                                //                    .Where(candel => candel.OpenTime <= testCandel.OpenTime)
+                                //                    .OrderByDescending(c => c.OpenTime)
+                                //                    .Take(3)
+                                //                    .OrderBy(c => c.OpenTime)
+                                //                    .ToList();
+
+                                //Candel candel1 = CandelDataBeforeTestCandel[0];
+                                //Candel candel2 = CandelDataBeforeTestCandel[1];
+                                //Candel candel3 = CandelDataBeforeTestCandel[2];
+
+
                                 List<Candel> CandelDataBeforeTestCandel = CandelData
-                                                    .Where(candel => candel.OpenTime <= testCandel.OpenTime)
-                                                    .OrderByDescending(c => c.OpenTime)
-                                                    .Take(3)
-                                                    .OrderBy(c => c.OpenTime)
+                                                    .Where(candel => candel.OpenTime < testCandel.OpenTime)
+                                                    .OrderByDescending(c => c.OpenTime)  // Sort in descending order to get latest first
+                                                    .Take(5)  // Take the last 21 candles
+                                                    .OrderBy(c => c.OpenTime)  // Reorder them back in ascending order
                                                     .ToList();
 
-                                Candel candel1 = CandelDataBeforeTestCandel[0];
-                                Candel candel2 = CandelDataBeforeTestCandel[1];
-                                Candel candel3 = CandelDataBeforeTestCandel[2];
 
+                                bool isListinDowntrend = IsInDowntrend(CandelDataBeforeTestCandel);
 
-                                if (testCandel.EndPrice > testCandel.StartPrice) // Bullish Candel
+                                if ((testCandel.EndPrice > testCandel.StartPrice) && (isListinDowntrend == true)) // Bullish Candel
                                 {
                                     if ((testCandel.StartPrice == testCandel.LowestPrice))
                                     {
                                         dragonFlyDojiCandles.Add(testCandel);
                                     }
                                 }
-                                else if (testCandel.EndPrice < testCandel.StartPrice) // Bearish Candel
+                                else if (testCandel.EndPrice < testCandel.StartPrice && (isListinDowntrend == true)) // Bearish Candel
                                 {
                                     if ((testCandel.EndPrice == testCandel.LowestPrice))
                                     {
