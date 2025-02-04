@@ -669,36 +669,36 @@ namespace StockLogger.Controllers.API_Controllers
 
                                 bool isListinDowntrend = IsInDowntrend(CandelDataBeforeTestCandel);
 
-                                //if ((testCandel.EndPrice > testCandel.StartPrice) && (isListinDowntrend == true)) // Bullish Candel
-                                //{
-                                //    if ((testCandel.StartPrice == testCandel.LowestPrice))
-                                //    {
-                                //        dragonFlyDojiCandles.Add(testCandel);
-                                //    }
-                                //}
-                                //else if (testCandel.EndPrice < testCandel.StartPrice && (isListinDowntrend == true)) // Bearish Candel
-                                //{
-                                //    if ((testCandel.EndPrice == testCandel.LowestPrice))
-                                //    {
-                                //        dragonFlyDojiCandles.Add(testCandel);
-                                //    }
-                                //}
-
-
-                                if ((testCandel.EndPrice > testCandel.StartPrice)) // Bullish Candel
+                                if ((testCandel.EndPrice > testCandel.StartPrice) && (isListinDowntrend == true)) // Bullish Candel
                                 {
                                     if ((testCandel.StartPrice == testCandel.LowestPrice))
                                     {
                                         dragonFlyDojiCandles.Add(testCandel);
                                     }
                                 }
-                                else if (testCandel.EndPrice < testCandel.StartPrice) // Bearish Candel
+                                else if (testCandel.EndPrice < testCandel.StartPrice && (isListinDowntrend == true)) // Bearish Candel
                                 {
                                     if ((testCandel.EndPrice == testCandel.LowestPrice))
                                     {
                                         dragonFlyDojiCandles.Add(testCandel);
                                     }
                                 }
+
+
+                                //if ((testCandel.EndPrice > testCandel.StartPrice)) // Bullish Candel
+                                //{
+                                //    if ((testCandel.StartPrice == testCandel.LowestPrice))
+                                //    {
+                                //        dragonFlyDojiCandles.Add(testCandel);
+                                //    }
+                                //}
+                                //else if (testCandel.EndPrice < testCandel.StartPrice) // Bearish Candel
+                                //{
+                                //    if ((testCandel.EndPrice == testCandel.LowestPrice))
+                                //    {
+                                //        dragonFlyDojiCandles.Add(testCandel);
+                                //    }
+                                //}
 
                                 //if ((DetectThreeBlackCrows(CandelDataBeforeTestCandel)) == true)
                                 //{
