@@ -107,8 +107,8 @@ namespace StockLogger.Controllers.API_Controllers
         public bool IsListInUptrendAdvanced(List<Candel> candles)
         {
             const int minCandles = 10; // Minimum required candles for analysis
-            //const int smaPeriod = 20;  // Moving average period
-            const int smaPeriod = 10;  // Moving average period
+            const int smaPeriod = 20;  // Moving average period
+            //const int smaPeriod = 10;  // Moving average period
             const double bullishThreshold = 0.65; // 65% bullish candles
             const double volumeGrowthThreshold = 0.90; // 25% volume increase
 
@@ -673,79 +673,79 @@ namespace StockLogger.Controllers.API_Controllers
                         {
 
 
-                            foreach (Candel testCandel in CandelData)
-                            {
-
-                                //Candel candle2 = CandelData
-                                //                .Where(c => c.OpenTime < testCandel.OpenTime) // Get only previous candles
-                                //                .OrderByDescending(c => c.OpenTime) // Order in descending order
-                                //                .Skip(5) // Skip the first previous candle
-                                //                .FirstOrDefault(); // Get the second previous candle
-
-                                //if (candle2 != null)
-                                //{
-
-                                //    List<Candel> CandelDataBeforeTestCandel = CandelData
-                                //                       .Where(candel => candel.OpenTime < candle2.OpenTime)
-                                //                       .OrderByDescending(c => c.OpenTime)  // Sort in descending order to get latest first
-                                //                       .Take(10)  // Take the last 21 candles
-                                //                       .OrderBy(c => c.OpenTime)  // Reorder them back in ascending order
-                                //                       .ToList();
-
-                                //    //List<Candel> CandelDataBeforeTestCandel = CandelData
-                                //    //              .Where(candel => candel.OpenTime < testCandel.OpenTime)
-                                //    //              .OrderBy(c => c.OpenTime)
-                                //    //              .ToList();
-
-                                //    bool isListinUptrend = IsListInUptrendAdvanced(CandelDataBeforeTestCandel);
-
-                                //    bool exists = dragonFlyDojiCandles?.Any(c => c.Ticker == candle2.Ticker) ?? false;
-
-
-                                //    if (
-                                //       isListinUptrend
-                                //       && (exists == false)
-                                //       )
-                                //    {
-                                //        dragonFlyDojiCandles.Add(candle2);
-                                //    }
-
-                                //}
-
-
-
-                                List<Candel> CandelDataBeforeTestCandel = CandelData
-                                                   .Where(candel => candel.OpenTime < testCandel.OpenTime)
-                                                   .OrderByDescending(c => c.OpenTime)  // Sort in descending order to get latest first
-                                                   .Take(10)  // Take the last 21 candles
-                                                   .OrderBy(c => c.OpenTime)  // Reorder them back in ascending order
-                                                   .ToList();
-
-
-                                bool isListinUptrend = IsListInUptrendAdvanced(CandelDataBeforeTestCandel);
-
-                                bool exists = dragonFlyDojiCandles?.Any(c => c.Ticker == testCandel.Ticker) ?? false;
-
-
-                                if (
-                                   isListinUptrend
-                                   //&& (exists == false)
-                                   )
-                                {
-                                    dragonFlyDojiCandles.Add(testCandel);
-                                }
-
-
-
-
-                            }
-
-
-                            //foreach(Candel testCandel in CandelData)
+                            //foreach (Candel testCandel in CandelData)
                             //{
-                            //    if(
+
+                            //    //Candel candle2 = CandelData
+                            //    //                .Where(c => c.OpenTime < testCandel.OpenTime) // Get only previous candles
+                            //    //                .OrderByDescending(c => c.OpenTime) // Order in descending order
+                            //    //                .Skip(5) // Skip the first previous candle
+                            //    //                .FirstOrDefault(); // Get the second previous candle
+
+                            //    //if (candle2 != null)
+                            //    //{
+
+                            //    //    List<Candel> CandelDataBeforeTestCandel = CandelData
+                            //    //                       .Where(candel => candel.OpenTime < candle2.OpenTime)
+                            //    //                       .OrderByDescending(c => c.OpenTime)  // Sort in descending order to get latest first
+                            //    //                       .Take(10)  // Take the last 21 candles
+                            //    //                       .OrderBy(c => c.OpenTime)  // Reorder them back in ascending order
+                            //    //                       .ToList();
+
+                            //    //    //List<Candel> CandelDataBeforeTestCandel = CandelData
+                            //    //    //              .Where(candel => candel.OpenTime < testCandel.OpenTime)
+                            //    //    //              .OrderBy(c => c.OpenTime)
+                            //    //    //              .ToList();
+
+                            //    //    bool isListinUptrend = IsListInUptrendAdvanced(CandelDataBeforeTestCandel);
+
+                            //    //    bool exists = dragonFlyDojiCandles?.Any(c => c.Ticker == candle2.Ticker) ?? false;
+
+
+                            //    //    if (
+                            //    //       isListinUptrend
+                            //    //       && (exists == false)
+                            //    //       )
+                            //    //    {
+                            //    //        dragonFlyDojiCandles.Add(candle2);
+                            //    //    }
+
+                            //    //}
+
+
+
+                            //    List<Candel> CandelDataBeforeTestCandel = CandelData
+                            //                       .Where(candel => candel.OpenTime < testCandel.OpenTime)
+                            //                       .OrderByDescending(c => c.OpenTime)  // Sort in descending order to get latest first
+                            //                       .Take(20)  // Take the last 21 candles
+                            //                       .OrderBy(c => c.OpenTime)  // Reorder them back in ascending order
+                            //                       .ToList();
+
+
+                            //    bool isListinUptrend = IsListInUptrendAdvanced(CandelDataBeforeTestCandel);
+
+                            //    bool exists = dragonFlyDojiCandles?.Any(c => c.Ticker == testCandel.Ticker) ?? false;
+
+
+                            //    if (
+                            //       isListinUptrend
+                            //       //&& (exists == false)
+                            //       )
+                            //    {
+                            //        dragonFlyDojiCandles.Add(testCandel);
+                            //    }
+
+
+
+
+                            //}
+
+
+                            //foreach (Candel testCandel in CandelData)
+                            //{
+                            //    if (
                             //        (testCandel.EndPrice == testCandel.HighestPrice)
-                            //        && 
+                            //        &&
                             //        (testCandel.StartPrice == testCandel.LowestPrice)
                             //        //&&
                             //        //(testCandel.PriceChangePercentage >= 1.0m)
@@ -996,47 +996,47 @@ namespace StockLogger.Controllers.API_Controllers
 
 
 
-                            ////// INVERTED HAMMER WORKING ABOVE 90% accuracy 755 / 76  can take random 10 pred from it
+                            //// INVERTED HAMMER WORKING ABOVE 90% accuracy 755 / 76  can take random 10 pred from it
 
-                            //foreach (Candel testCandel in CandelData)
-                            //{
+                            foreach (Candel testCandel in CandelData)
+                            {
 
-                            //    try
-                            //    {
+                                try
+                                {
 
-                            //        decimal wickToBodyRatio = 2.0m;
+                                    decimal wickToBodyRatio = 2.0m;
 
-                            //        decimal bodySize = Math.Abs(testCandel.EndPrice - testCandel.StartPrice);
+                                    decimal bodySize = Math.Abs(testCandel.EndPrice - testCandel.StartPrice);
 
-                            //        decimal upperWickSize = testCandel.HighestPrice - Math.Max(testCandel.StartPrice, testCandel.EndPrice);
+                                    decimal upperWickSize = testCandel.HighestPrice - Math.Max(testCandel.StartPrice, testCandel.EndPrice);
 
-                            //        decimal lowerWickSize = Math.Min(testCandel.StartPrice, testCandel.EndPrice) - testCandel.LowestPrice;
+                                    decimal lowerWickSize = Math.Min(testCandel.StartPrice, testCandel.EndPrice) - testCandel.LowestPrice;
 
-                            //        bool longUpperWick = upperWickSize >= wickToBodyRatio * bodySize;
+                                    bool longUpperWick = upperWickSize >= wickToBodyRatio * bodySize;
 
-                            //        bool smallLowerWick = lowerWickSize <= 0.025m * bodySize;
+                                    bool smallLowerWick = lowerWickSize <= 0.025m * bodySize;
 
-                            //        bool smallBody = bodySize <= (testCandel.HighestPrice - testCandel.LowestPrice) * 0.2m;
-
-
-                            //        if (
-                            //            longUpperWick
-                            //            && smallLowerWick
-                            //            && smallBody
-                            //            && (testCandel.EndPrice > testCandel.StartPrice)
-                            //            )
-                            //        {
-                            //            dragonFlyDojiCandles.Add(testCandel);
-                            //        }
+                                    bool smallBody = bodySize <= (testCandel.HighestPrice - testCandel.LowestPrice) * 0.2m;
 
 
-                            //    }
-                            //    catch (Exception ex)
-                            //    {
-                            //        Console.WriteLine($"An error occurred: {ex.Message}");
-                            //    }
+                                    if (
+                                        longUpperWick
+                                        && smallLowerWick
+                                        && smallBody
+                                        && (testCandel.EndPrice > testCandel.StartPrice)
+                                        )
+                                    {
+                                        dragonFlyDojiCandles.Add(testCandel);
+                                    }
 
-                            //}
+
+                                }
+                                catch (Exception ex)
+                                {
+                                    Console.WriteLine($"An error occurred: {ex.Message}");
+                                }
+
+                            }
 
 
 

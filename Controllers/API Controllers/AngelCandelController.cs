@@ -199,8 +199,8 @@ namespace StockLogger.Controllers.API_Controllers
 
             // Create start date with time 9:15 AM
             //var startDateWithTime900 = startDateOnly.AddHours(9).AddMinutes(15);
-            //var startDateWithTime900 = startDateOnly.AddDays(-1000).AddHours(9).AddMinutes(15);
-            var startDateWithTime900 = DateTime.Now.AddDays(-10).AddHours(9).AddMinutes(15);
+            var startDateWithTime900 = startDateOnly.AddDays(-100).AddHours(9).AddMinutes(15);
+            //var startDateWithTime900 = DateTime.Now.AddDays(-20).AddHours(9).AddMinutes(15);
 
             // Create start date with time 3:30 PM
             //var startDateWithTime330 = EndDateOnly.AddHours(15).AddMinutes(20);
@@ -211,11 +211,13 @@ namespace StockLogger.Controllers.API_Controllers
                 exchange = "NSE",
                 symboltoken = stockRequest.SymbolToken,
                 //interval = "ONE_MINUTE",// COMPLEX HAMMER without stoploss working fine here
-                interval = "ONE_DAY",// COMPLEX HAMMER without stoploss working fine here
+                interval = "ONE_DAY",
                 //interval = "THREE_MINUTE", // DRAGON FLY DOJI
                 //interval = "FIVE_MINUTE",//--/// 3 white soilders worked at 100% accuracy prfit margin 0.0025 // COMPLEX HAMMER working at 0.0025% profit
                 //interval = "TEN_MINUTE",
                 //interval = "FIFTEEN_MINUTE",
+                //interval = "ONE_HOUR",
+                //interval = "THIRTY_MINUTE",
                 fromdate = startDateWithTime900.ToString("yyyy-MM-dd HH:mm"),
                 todate = startDateWithTime330.ToString("yyyy-MM-dd HH:mm")
                 ////fromdate = DateTime.Today.AddHours(9).AddMinutes(15).ToString("yyyy-MM-dd HH:mm"),
