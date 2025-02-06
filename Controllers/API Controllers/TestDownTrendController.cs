@@ -417,6 +417,24 @@ namespace StockLogger.Controllers.API_Controllers
             return true;
         }
 
+        public decimal CalculateAveragePrice(List<Candel> candels)
+        {
+            // Sum of average prices for each Candel
+            decimal totalAveragePrice = 0;
+
+            // Iterate through each Candel and calculate its average price
+            foreach (var candel in candels)
+            {
+                decimal averagePrice = (candel.StartPrice + candel.HighestPrice + candel.LowestPrice + candel.EndPrice) / 4;
+                totalAveragePrice += averagePrice;
+            }
+
+            // Calculate overall average price
+            decimal overallAveragePrice = totalAveragePrice / candels.Count;
+
+            return overallAveragePrice;
+        }
+
 
         //POST https://localhost:44364/api/TestDownTrend/BulkTestMasterAPI
         [HttpPost("BulkTestMasterAPI")]
@@ -768,12 +786,11 @@ namespace StockLogger.Controllers.API_Controllers
 
                                 ConstForProfit = profitMargin;
 
-
                                 List<Candel> CandelDataAfterFirstCandel = CandelData
-                                          .Where(candel => candel.OpenTime > firstCandel.OpenTime && candel.OpenTime <= EndCandel.OpenTime)
-                                          .OrderBy(c => c.OpenTime)
-                                          .ToList();
-
+                                           .Where(candel => candel.OpenTime >= firstCandel.OpenTime)
+                                           .OrderBy(c => c.OpenTime)
+                                           .ToList();
+                   
 
                                 /// RANGE LOGIC
                                 Candel RANGE_LOW = CandelDataAfterFirstCandel
