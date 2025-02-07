@@ -14,6 +14,7 @@ using System.Linq;
 using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading.Channels;
 
 namespace StockLogger.Controllers.API_Controllers
 {
@@ -1124,72 +1125,411 @@ namespace StockLogger.Controllers.API_Controllers
 
 
 
+                            //foreach (Candel testCandel in CandelData)
+                            //{
+                            //    //if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
+                            //    //{
+                            //    //    break; // Skip the rest of this iteration and proceed to the next object
+                            //    //}
+
+                            //    ////if (testCandel.OpenTime.TimeOfDay < new TimeSpan(9, 45, 0))
+                            //    ////{
+                            //    ////    continue; // Skip the rest of this iteration and proceed to the next object
+                            //    ////}
+                            //    ///
+
+                            //    /// BULLISH ENGULFING
+                            //    Candel BFfirst = testCandel;
+                            //    Candel BFSecond = CandelData
+                            //        .Where(c => c.OpenTime > BFfirst.OpenTime)
+                            //        .OrderBy(c => c.OpenTime)
+                            //        .FirstOrDefault();
+
+                            //    Candel BFVerification = null;
+
+                            //    if (BFSecond != null)
+                            //    {
+                            //        BFVerification = CandelData
+                            //            .Where(c => c.OpenTime > BFSecond.OpenTime)
+                            //            .OrderBy(c => c.OpenTime)
+                            //            .FirstOrDefault();
+                            //    }
+
+                            //    if (BFfirst != null && BFSecond != null)
+                            //    {
+                            //        // Check if the previous candle is bearish
+                            //        bool isFirstCandelBearish = BFfirst.EndPrice < BFfirst.StartPrice;
+
+                            //        // Check if the current candle is bullish
+                            //        bool isSecondCandelBullish = BFSecond.EndPrice > BFSecond.StartPrice;
+
+                            //        // Check if the current candle's body engulfs the previous candle's body
+                            //        bool isEngulfingBody =
+                            //            BFSecond.StartPrice < BFfirst.EndPrice && // Current start below previous end
+                            //            BFSecond.EndPrice > BFfirst.StartPrice;  // Current end above previous start
+
+                            //        // Check if the current candle is larger (stronger) than the previous one
+                            //        bool isSecondCandelLarge =
+                            //            (BFSecond.EndPrice - BFSecond.StartPrice) >= (2 * (BFfirst.EndPrice - BFfirst.StartPrice)); // Current body at least twice as large as the previous one
+
+
+                            //        if (
+                            //         isFirstCandelBearish
+                            //         && isSecondCandelBullish
+                            //         && isEngulfingBody
+                            //         && isSecondCandelLarge
+                            //         && (BFVerification != null)
+                            //         && (BFVerification.IsBullish.HasValue && BFVerification.IsBullish == true)
+                            //         && (BFVerification.EndPrice > BFSecond.HighestPrice)
+                            //         )
+                            //        {
+                            //            //dragonFlyDojiCandles.Add(BFSecond);
+                            //            dragonFlyDojiCandles.Add(BFVerification);
+                            //        }
+                            //    }
+
+
+                            //}
+
+
+
+                            //foreach (Candel testCandel in CandelData)
+                            //{
+
+                            //    Candel candel1 = testCandel;
+                            //    Candel candel2 = CandelData
+                            //        .Where(c => c.OpenTime > candel1.OpenTime)
+                            //        .OrderBy(c => c.OpenTime)
+                            //        .FirstOrDefault();
+
+                            //    Candel candel3 = null;
+
+                            //    if (candel2 != null)
+                            //    {
+                            //        candel3 = CandelData
+                            //            .Where(c => c.OpenTime > candel2.OpenTime)
+                            //            .OrderBy(c => c.OpenTime)
+                            //            .FirstOrDefault();
+                            //    }
+
+                            //    if (candel1 != null && candel2 != null && candel3 != null)
+                            //    {
+
+                            //        // 1. Check first candle is bearish
+                            //        if ((bool)!candel1.IsBearish)
+                            //            continue;
+
+                            //        // 2. Check third candle is bullish
+                            //        if ((bool)!candel3.IsBullish)
+                            //            continue;
+
+                            //        // 3. Check second candle has small body (body ≤ 20% of its total range)
+                            //        decimal bodySizeC2 = Math.Abs(candel2.EndPrice - candel2.StartPrice);
+                            //        decimal rangeC2 = candel2.HighestPrice - candel2.LowestPrice;
+                            //        if (rangeC2 == 0 || (bodySizeC2 / rangeC2) > 0.2M)
+                            //            continue;
+
+                            //        // 4. Check second candle's upper and lower shadows are each ≥20% of range
+                            //        decimal upperShadowC2 = candel2.HighestPrice - Math.Max(candel2.StartPrice, candel2.EndPrice);
+                            //        decimal lowerShadowC2 = Math.Min(candel2.StartPrice, candel2.EndPrice) - candel2.LowestPrice;
+                            //        if (upperShadowC2 / rangeC2 < 0.2M || lowerShadowC2 / rangeC2 < 0.2M)
+                            //            continue;
+
+                            //        // 5. Check gap down: Candle 2 opens below Candle 1's close with significant size (≥0.5% of C1's close)
+                            //        decimal gapDown = candel1.EndPrice - candel2.StartPrice;
+                            //        if (gapDown <= 0 || gapDown < candel1.EndPrice * 0.005M)
+                            //            continue;
+
+                            //        // 6. Check gap up: Candle 3 opens above Candle 2's close with significant size (≥0.5% of C2's close)
+                            //        decimal gapUp = candel3.StartPrice - candel2.EndPrice;
+                            //        if (gapUp <= 0 || gapUp < candel2.EndPrice * 0.005M)
+                            //            continue;
+
+                            //        // 7. Check Candle 3 closes above 75% of Candle 1's body
+                            //        decimal c1Body = candel1.StartPrice - candel1.EndPrice;
+                            //        decimal seventyFivePercentC1 = candel1.EndPrice + c1Body * 0.75M;
+                            //        if (candel3.EndPrice <= seventyFivePercentC1)
+                            //            continue;
+
+                            //        // 8. Check Candle 3 closes above Candle 1's low
+                            //        if (candel3.EndPrice <= candel1.LowestPrice)
+                            //            continue;
+
+                            //        // 9. Check Candle 1's body is ≥50% of its range and ≥2% of its start price
+                            //        decimal c1Range = candel1.HighestPrice - candel1.LowestPrice;
+                            //        if (c1Body < c1Range * 0.5M || c1Body < candel1.StartPrice * 0.02M)
+                            //            continue;
+
+                            //        // 10. Check Candle 3's body is ≥50% of its range and ≥1.5% of its start price
+                            //        decimal c3Body = candel3.EndPrice - candel3.StartPrice;
+                            //        decimal c3Range = candel3.HighestPrice - candel3.LowestPrice;
+                            //        if (c3Body < c3Range * 0.5M || c3Body < candel3.StartPrice * 0.015M)
+                            //            continue;
+
+                            //        // 11. Check Candle 3's upper shadow is ≤20% of its range
+                            //        decimal upperShadowC3 = candel3.HighestPrice - candel3.EndPrice;
+                            //        if (upperShadowC3 / c3Range > 0.2M)
+                            //            continue;
+
+                            //        // 12. Check that the first and third candles have significant bodies
+                            //        if (c1Body < candel1.StartPrice * 0.02M || c3Body < candel3.StartPrice * 0.015M)
+                            //            continue;
+
+                            //        dragonFlyDojiCandles.Add(candel3);
+
+
+
+
+
+                            //        //// 1. Check first candle is bearish
+                            //        //if (candel1.IsBearish != true)
+                            //        //    continue;
+
+                            //        //// 2. Check third candle is bullish
+                            //        //if (candel3.IsBullish != true)
+                            //        //    continue;
+
+                            //        //// 3. Check second candle has small body (body ≤ 30% of its total range)
+                            //        //decimal bodySizeC2 = Math.Abs(candel2.EndPrice - candel2.StartPrice);
+                            //        //decimal rangeC2 = candel2.HighestPrice - candel2.LowestPrice;
+                            //        //if (rangeC2 == 0 || (bodySizeC2 / rangeC2) > 0.3M)
+                            //        //    continue;
+
+                            //        //// 4. Check gap down: Candle 2 opens below Candle 1's close
+                            //        //if (candel2.StartPrice >= candel1.EndPrice)
+                            //        //    continue;
+
+                            //        //// 5. Check gap up: Candle 3 opens above Candle 2's close
+                            //        //if (candel3.StartPrice <= candel2.EndPrice)
+                            //        //    continue;
+
+                            //        //// 6. Check Candle 3 closes above midpoint of Candle 1's body
+                            //        //decimal midpointC1 = (candel1.StartPrice + candel1.EndPrice) / 2;
+                            //        //if (candel3.EndPrice <= midpointC1)
+                            //        //    continue;
+
+                            //        //// 7. Check significant bodies for Candle 1 and 3 (e.g., >1% of StartPrice)
+                            //        //decimal c1Body = candel1.StartPrice - candel1.EndPrice; // Bearish body
+                            //        //if (c1Body < candel1.StartPrice * 0.01M)
+                            //        //    continue;
+
+                            //        //decimal c3Body = candel3.EndPrice - candel3.StartPrice; // Bullish body
+                            //        //if (c3Body < candel3.StartPrice * 0.01M)
+                            //        //    continue;
+
+                            //        //dragonFlyDojiCandles.Add(candel3);
+                            //    }
+
+                            //}
+
+
+
+                            //foreach (Candel testCandel in CandelData)
+                            //{
+
+                            //    /// MORNING STAR
+
+                            //    Candel candel1 = testCandel;
+                            //    Candel candel2 = CandelData
+                            //        .Where(c => c.OpenTime > candel1.OpenTime)
+                            //        .OrderBy(c => c.OpenTime)
+                            //        .FirstOrDefault();
+
+                            //    Candel candel3 = null;
+
+                            //    if (candel2 != null)
+                            //    {
+                            //        candel3 = CandelData
+                            //            .Where(c => c.OpenTime > candel2.OpenTime)
+                            //            .OrderBy(c => c.OpenTime)
+                            //            .FirstOrDefault();
+                            //    }
+
+                            //    if (candel1 != null && candel2 != null && candel3 != null)
+                            //    {
+
+                            //        // Check wether the first candel is bearish
+                            //        bool isFirstCandelqualified = false;
+
+                            //        if (
+                            //            candel1.IsBearish.HasValue 
+                            //            && candel1.IsBearish == true
+                            //            )
+                            //        {
+                            //            isFirstCandelqualified = true;
+                            //        }
+
+
+
+
+                            //        // Check wether second Candel is doji
+                            //        bool isSecondCandelqualified = false;
+
+                            //        // Define a threshold percentage for determining if the candle is a Doji
+                            //        decimal thresholdPercentage = 0.1m; // Adjust this as needed (e.g., 0.1% of the range)
+
+                            //        // Calculate the absolute difference between the open and close prices
+                            //        decimal bodySize = Math.Abs(candel2.StartPrice - candel2.EndPrice);
+
+                            //        // Calculate the total range of the candle (from low to high)
+                            //        decimal totalRange = candel2.HighestPrice - candel2.LowestPrice;
+
+                            //        // Check if the body size is small compared to the total range
+                            //        if (totalRange == 0)
+                            //            continue;
+
+                            //        decimal bodySizePercentage = (bodySize / totalRange) * 100;
+
+                            //        bool arePricesBelowtheStart = (candel1.StartPrice > candel2.HighestPrice);
+
+                            //        // Return true if the body size percentage is smaller than the threshold, indicating a Doji candle
+                            //        if(
+                            //            bodySizePercentage <= thresholdPercentage
+                            //            && arePricesBelowtheStart == true
+                            //            )
+                            //        {
+                            //            isSecondCandelqualified = true;
+                            //        }
+
+
+
+                            //        // Check wether second Candel is doji
+                            //        bool isThirdCandelqualified = false;
+
+                            //        // A candle is bullish if the end price is higher than the start price
+                            //        bool isThirdCandelBullish = candel3.EndPrice > candel3.StartPrice;
+
+                            //        bool isThirdCandelEndPriceGreater = ((candel3.EndPrice >= candel2.HighestPrice));
+
+                            //        bool isThirdCandelBiggerThanFirstCandel = ((candel3.EndPrice >= candel1.StartPrice));
+
+                            //        if (
+                            //            isThirdCandelBullish
+                            //            && isThirdCandelEndPriceGreater
+                            //            && isThirdCandelBiggerThanFirstCandel
+                            //            )
+                            //        {
+                            //            isThirdCandelqualified = true;
+                            //        }
+
+
+
+                            //        if (
+                            //            (isFirstCandelqualified == true)
+                            //            && (isSecondCandelqualified == true)
+                            //            && (isThirdCandelqualified == true)
+                            //          )
+                            //        {
+                            //            dragonFlyDojiCandles.Add(candel3);
+                            //        }
+
+
+                            //    }
+
+
+                            //}
+
+
+
+
+                            //  THREE WHITE SOILDER WORKING GREAT 90% ACCURACY on 1000 days data  1622 / 168 
+
                             foreach (Candel testCandel in CandelData)
                             {
-                                //if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
-                                //{
-                                //    break; // Skip the rest of this iteration and proceed to the next object
-                                //}
 
-                                ////if (testCandel.OpenTime.TimeOfDay < new TimeSpan(9, 45, 0))
-                                ////{
-                                ////    continue; // Skip the rest of this iteration and proceed to the next object
-                                ////}
-                                ///
+                                /// Three White Soilders
 
-                                /// BULLISH ENGULFING
-                                Candel BFfirst = testCandel;
-                                Candel BFSecond = CandelData
-                                    .Where(c => c.OpenTime > BFfirst.OpenTime)
+                                Candel candel1 = testCandel;
+                                Candel candel2 = CandelData
+                                    .Where(c => c.OpenTime > candel1.OpenTime)
                                     .OrderBy(c => c.OpenTime)
                                     .FirstOrDefault();
 
-                                Candel BFVerification = null;
+                                Candel candel3 = null;
 
-                                if (BFSecond != null)
+                                if (candel2 != null)
                                 {
-                                    BFVerification = CandelData
-                                        .Where(c => c.OpenTime > BFSecond.OpenTime)
+                                    candel3 = CandelData
+                                        .Where(c => c.OpenTime > candel2.OpenTime)
                                         .OrderBy(c => c.OpenTime)
                                         .FirstOrDefault();
                                 }
 
-                                if (BFfirst != null && BFSecond != null)
+                                if (candel1 != null && candel2 != null && candel3 != null)
                                 {
-                                    // Check if the previous candle is bearish
-                                    bool isFirstCandelBearish = BFfirst.EndPrice < BFfirst.StartPrice;
+                                    decimal Range1 = 0;
+                                    decimal Range2 = 0;
+                                    decimal Range3 = 0;
 
-                                    // Check if the current candle is bullish
-                                    bool isSecondCandelBullish = BFSecond.EndPrice > BFSecond.StartPrice;
 
-                                    // Check if the current candle's body engulfs the previous candle's body
-                                    bool isEngulfingBody =
-                                        BFSecond.StartPrice < BFfirst.EndPrice && // Current start below previous end
-                                        BFSecond.EndPrice > BFfirst.StartPrice;  // Current end above previous start
+                                    // Check wether the first candel is bearish
+                                    bool isFirstCandelqualified = false;
 
-                                    // Check if the current candle is larger (stronger) than the previous one
-                                    bool isSecondCandelLarge =
-                                        (BFSecond.EndPrice - BFSecond.StartPrice) >= (2 * (BFfirst.EndPrice - BFfirst.StartPrice)); // Current body at least twice as large as the previous one
+                                    Range1 = candel1.EndPrice - candel1.StartPrice;
+
+                                    if (
+                                        candel1.IsBullish.HasValue
+                                        && candel1.IsBullish == true
+                                        )
+                                    {
+                                        isFirstCandelqualified = true;
+                                    }
+
+
+
+
+                                    // Check wether second Candel is doji
+                                    bool isSecondCandelqualified = false;
+
+                                    Range2 = candel2.EndPrice - candel2.StartPrice;
+
+                                    bool isAboveFirstCandel = candel2.StartPrice > candel1.StartPrice;
+
+                                    if (
+                                        candel2.IsBullish.HasValue
+                                        && candel2.IsBullish == true
+                                        && isAboveFirstCandel == true
+                                        )
+                                    {
+                                        isSecondCandelqualified = true;
+                                    }
+
+
+
+                                    // Check wether second Candel is doji
+                                    bool isThirdCandelqualified = false;
+
+                                    Range3 = candel3.EndPrice - candel3.StartPrice;
+
+                                    bool isAboveSecondCandel = candel3.StartPrice > candel2.StartPrice;
+
+                                    if (
+                                        candel3.IsBullish.HasValue
+                                        && candel3.IsBullish == true
+                                        && isAboveSecondCandel == true
+                                        && (candel3.LowestPrice == candel3.StartPrice)
+                                        )
+                                    {
+                                        isThirdCandelqualified = true;
+                                    }
+
 
 
                                     if (
-                                     isFirstCandelBearish
-                                     && isSecondCandelBullish
-                                     && isEngulfingBody
-                                     && isSecondCandelLarge
-                                     && (BFVerification != null)
-                                     && (BFVerification.IsBullish.HasValue && BFVerification.IsBullish == true)
-                                     && (BFVerification.EndPrice > BFSecond.HighestPrice)
-                                     )
+                                        (isFirstCandelqualified == true)
+                                        && (isSecondCandelqualified == true)
+                                        && (isThirdCandelqualified == true)
+                                        && ((Range2 > Range1) && (Range3 > Range2))
+                                      )
                                     {
-                                        //dragonFlyDojiCandles.Add(BFSecond);
-                                        dragonFlyDojiCandles.Add(BFVerification);
+                                        dragonFlyDojiCandles.Add(candel3);
                                     }
+
+
                                 }
 
 
                             }
-
 
 
 
@@ -1217,10 +1557,10 @@ namespace StockLogger.Controllers.API_Controllers
                                 {
                                     //expectedPrice = firstCandel.EndPrice * 1.000595m;
                                     //expectedPrice = firstCandel.EndPrice * 1.00061m;
-                                    //expectedPrice = firstCandel.EndPrice * 1.00065m;
+                                    expectedPrice = firstCandel.EndPrice * 1.00065m;
                                     //expectedPrice = firstCandel.EndPrice * 1.01m; //  10 R profit on 1000 R //1995 on 2 lakh
                                     //expectedPrice = firstCandel.EndPrice * 1.005m; //  5 R profit on 1000 R //997 on 2lakh
-                                    expectedPrice = firstCandel.EndPrice * 1.0025m; // 2.5 R profit on 1000 R //450 on 2Lakh
+                                    //expectedPrice = firstCandel.EndPrice * 1.0025m; // 2.5 R profit on 1000 R //450 on 2Lakh
 
                                     //expectedPrice = firstCandel.EndPrice * 1.0004953m; // 4 LAKH
 
