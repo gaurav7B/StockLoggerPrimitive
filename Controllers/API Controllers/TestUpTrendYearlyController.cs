@@ -19,12 +19,12 @@ namespace StockLogger.Controllers.API_Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TestUpTrendController : ControllerBase
+    public class TestUpTrendYearlyController : ControllerBase
     {
         private readonly StockLoggerDbContext _context;
         private readonly List<(string ticker, string exchange, string name, long id, string symboltoken)> _stocks;
 
-        public TestUpTrendController(StockLoggerDbContext context)
+        public TestUpTrendYearlyController(StockLoggerDbContext context)
         {
             _context = context;
 
@@ -1157,10 +1157,10 @@ namespace StockLogger.Controllers.API_Controllers
                                 if (BFfirst != null && BFSecond != null)
                                 {
                                     // Check if the previous candle is bearish
-                                    bool isFirstCandelBearish = BFfirst.EndPrice < BFfirst.StartPrice;
+                                    bool isPreviousBearish = BFfirst.EndPrice < BFfirst.StartPrice;
 
                                     // Check if the current candle is bullish
-                                    bool isSecondCandelBullish = BFSecond.EndPrice > BFSecond.StartPrice;
+                                    bool isCurrentBullish = BFSecond.EndPrice > BFSecond.StartPrice;
 
                                     // Check if the current candle's body engulfs the previous candle's body
                                     bool isEngulfingBody =
@@ -1168,22 +1168,22 @@ namespace StockLogger.Controllers.API_Controllers
                                         BFSecond.EndPrice > BFfirst.StartPrice;  // Current end above previous start
 
                                     // Check if the current candle is larger (stronger) than the previous one
-                                    bool isSecondCandelLarge =
+                                    bool isCurrentCandleLarge =
                                         (BFSecond.EndPrice - BFSecond.StartPrice) >= (2 * (BFfirst.EndPrice - BFfirst.StartPrice)); // Current body at least twice as large as the previous one
 
 
                                     if (
-                                     isFirstCandelBearish
-                                     && isSecondCandelBullish
+                                     isPreviousBearish
+                                     && isCurrentBullish
                                      && isEngulfingBody
-                                     && isSecondCandelLarge
-                                     && (BFVerification != null)
-                                     && (BFVerification.IsBullish.HasValue && BFVerification.IsBullish == true)
-                                     && (BFVerification.EndPrice > BFSecond.HighestPrice)
+                                     && isCurrentCandleLarge
+                                     //&& (BFVerification != null)
+                                     //&& (BFVerification.IsBullish.HasValue && BFVerification.IsBullish == true)
+                                     //&& (BFVerification.EndPrice > BFSecond.HighestPrice)
                                      )
                                     {
-                                        //dragonFlyDojiCandles.Add(BFSecond);
-                                        dragonFlyDojiCandles.Add(BFVerification);
+                                        dragonFlyDojiCandles.Add(BFSecond);
+                                        //dragonFlyDojiCandles.Add(BFVerification);
                                     }
                                 }
 
@@ -1303,41 +1303,21 @@ namespace StockLogger.Controllers.API_Controllers
                                                                   .FirstOrDefault();
 
 
-                                List<decimal> decList = new List<decimal>();
 
-                                foreach (Candel testCandel in CandelDataAfterFirstCandel)
-                                {
-                                    decList.Add(testCandel.HighestPrice);
-                                }
-
-
-                                bool isGreaterPriceFound = false;
-
-                                foreach (decimal price in decList)
-                                {
-                                    if (price >= expectedPrice)
-                                    {
-                                        isGreaterPriceFound = true;
-                                        break; // Exit the loop as we found a match
-                                    }
-                                }
-
-
-                                Candel RangeProfit = new Candel();
                                 bool isRangeProfitFound = false;
 
-                                foreach (Candel testCandel in CandelDataAfterFirstCandel)
-                                {
-                                    decimal High = testCandel.HighestPrice;
-                                    decimal Low = testCandel.LowestPrice;
+                                Candel verificationCandel = CandelData
+                                                   .Where(c => c.OpenTime > firstCandel.OpenTime)
+                                                   .OrderBy(c => c.OpenTime)
+                                                   .FirstOrDefault();
 
-                                    if (
-                                        expectedPrice <= High
-                                        )
+
+
+                                if (verificationCandel != null)
+                                {
+                                    if (verificationCandel.HighestPrice >= expectedPrice)
                                     {
-                                        RangeProfit = testCandel;
                                         isRangeProfitFound = true;
-                                        break;
                                     }
                                 }
 
@@ -1350,7 +1330,7 @@ namespace StockLogger.Controllers.API_Controllers
                                     List<Candel> CandelPair = new List<Candel>();
 
                                     CandelPair.Add(dojiCandle);
-                                    CandelPair.Add(RangeProfit);
+                                    CandelPair.Add(verificationCandel);
                                     CandelPair.Add(RANGE_HIGH);
 
                                     CorrectPredictionList.Add(CandelPair);
@@ -1360,7 +1340,7 @@ namespace StockLogger.Controllers.API_Controllers
                                 {
                                     List<Candel> CandelPair = new List<Candel>();
                                     CandelPair.Add(dojiCandle);
-                                    CandelPair.Add(EndCandel);
+                                    CandelPair.Add(verificationCandel);
                                     CandelPair.Add(RANGE_HIGH);
 
                                     WrongPredictionList.Add(CandelPair);
