@@ -21,12 +21,34 @@ namespace StockLogger.Controllers.API_Controllers
         }
 
         //POST https://localhost:44364/api/Candel
+        //[HttpPost]
+        //public async Task<ActionResult> CreateCandel(Candel candel)
+        //{
+        //    // If no duplicate, add the new candel
+        //    _context.Candel.Add(candel);
+        //    await _context.SaveChangesAsync();
+        //    return Ok();
+        //}
+
+        //POST https://localhost:44364/api/Candel
         [HttpPost]
         public async Task<ActionResult> CreateCandel(Candel candel)
         {
+            // Check if the same candel already exists in the database
+            var existingCandel = await _context.Candel
+                .Where(c => c.OpenTime == candel.OpenTime && c.EndPrice == candel.EndPrice)
+                .FirstOrDefaultAsync();
+
+            if (existingCandel != null)
+            {
+                // Return a response indicating the candel already exists
+                return Ok();
+            }
+
             // If no duplicate, add the new candel
             _context.Candel.Add(candel);
             await _context.SaveChangesAsync();
+
             return Ok();
         }
 

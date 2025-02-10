@@ -184,12 +184,28 @@ namespace StockLogger.Controllers.API_Controllers
             return authorizationToken;
         }
 
+        public int count;
+
         // POST https://localhost:44364/api/AngelCandel/getCandleDataForTest
         [HttpPost("getCandleDataForTest")]
         public async Task<IActionResult> GetCandleDataForTest([FromBody] StockRequest stockRequest)
         {
-            
-            string authtoken = await GetRefreshedAuthorizationTokenAsync();
+
+            //string authtoken = await GetRefreshedAuthorizationTokenAsync();
+
+            string authtoken = "";
+
+            if (count % 2 != 0)
+            {
+                authtoken = await GetRefreshedAuthorizationTokenAsync();
+                count++;
+            }
+            else
+            {
+                var token = await _context.Token.FirstOrDefaultAsync();
+                authtoken = token.AuthToken;
+                count++;
+            }
 
             // Extract only the date part from StartDate
             var startDateOnly = stockRequest.StartDate.Date;
@@ -197,21 +213,38 @@ namespace StockLogger.Controllers.API_Controllers
 
             var matchingStock = _stocks.FirstOrDefault(s => s.symboltoken == stockRequest.SymbolToken);
 
-            // Create start date with time 9:15 AM
+            //////// Create start date with time 9:15 AM
             //var startDateWithTime900 = startDateOnly.AddHours(9).AddMinutes(15);
-            var startDateWithTime900 = startDateOnly.AddDays(-1000).AddHours(9).AddMinutes(15);
-            //var startDateWithTime900 = DateTime.Now.AddDays(-10).AddHours(9).AddMinutes(15);
 
-            // Create start date with time 3:30 PM
+            //////// Create start date with time 3:30 PM
             //var startDateWithTime330 = EndDateOnly.AddHours(15).AddMinutes(20);
-            var startDateWithTime330 = DateTime.Now.AddHours(15).AddMinutes(20);
+
+            //var startDateWithTime900 = DateTime.Now.AddDays(-1).AddHours(9).AddMinutes(15);
+
+
+            //// FOR_DAY_TO_DAY_TESTING
+            //var startDateWithTime900 = startDateOnly.AddHours(9).AddMinutes(15);
+            //var startDateWithTime330 = EndDateOnly.AddHours(15).AddMinutes(20);
+
+            // FOR_DAY_TO_DAY_TESTING
+            var startDateWithTime900 = startDateOnly.AddHours(9).AddMinutes(15);
+            var startDateWithTime330 = EndDateOnly.AddHours(15).AddMinutes(30);
+
+
+            //var startDateWithTime900 = startDateOnly.AddDays(-1).AddHours(9).AddMinutes(15);
+            //var startDateWithTime330 = startDateOnly.AddHours(15).AddMinutes(20);
+
+            //// 3_YEARS_TESTING
+            //var startDateWithTime900 = startDateOnly.AddDays(-1000).AddHours(9).AddMinutes(15);
+            //var startDateWithTime330 = DateTime.Now.AddHours(15).AddMinutes(20);
+
 
             var data = new
             {
                 exchange = "NSE",
                 symboltoken = stockRequest.SymbolToken,
-                //interval = "ONE_MINUTE",// COMPLEX HAMMER without stoploss working fine here
-                interval = "ONE_DAY",
+                interval = "ONE_MINUTE",// COMPLEX HAMMER without stoploss working fine here
+                //interval = "ONE_DAY",
                 //interval = "THREE_MINUTE", // DRAGON FLY DOJI
                 //interval = "FIVE_MINUTE",//--/// 3 white soilders worked at 100% accuracy prfit margin 0.0025 // COMPLEX HAMMER working at 0.0025% profit
                 //interval = "TEN_MINUTE",

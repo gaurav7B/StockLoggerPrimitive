@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Azure.Core;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using StockLogger.Models.Candel;
 using System.Diagnostics;
 using System.Text;
@@ -19,32 +21,56 @@ namespace StockLogger.BackgroundServices
             _stocks = StockList.GetStocks();
         }
 
-        private async Task Post1MinCandelToDb(string ticker, CancellationToken stoppingToken)
+        private async Task Post1MinCandelToDb(string symboltoken, CancellationToken stoppingToken)
         {
             try
             {
-                HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:44364/api/StockPricePerSec/GetCandel?ticker={ticker}", stoppingToken);
-                response.EnsureSuccessStatusCode();
 
-                string responseData = await response.Content.ReadAsStringAsync(stoppingToken);
+                var adjustedStartDate = DateTime.Now.AddDays(-1);
+                if (adjustedStartDate.DayOfWeek == DayOfWeek.Saturday)
+                    adjustedStartDate = adjustedStartDate.AddDays(-1); // Move to Friday
+                else if (adjustedStartDate.DayOfWeek == DayOfWeek.Sunday)
+                    adjustedStartDate = adjustedStartDate.AddDays(-2); // Move to Friday
+
+                var adjustedEndDate = DateTime.Now.AddDays(-1);
+                if (adjustedEndDate.DayOfWeek == DayOfWeek.Saturday)
+                    adjustedEndDate = adjustedEndDate.AddDays(-1); // Move to Friday
+                else if (adjustedEndDate.DayOfWeek == DayOfWeek.Sunday)
+                    adjustedEndDate = adjustedEndDate.AddDays(-2); // Move to Friday
+
+                var requestBodyforPrevousDayData = new
+                {
+                    SymbolToken = symboltoken,
+                    AuthorizationToken = "",
+                    StartDate = adjustedStartDate.ToString("o"), // Final adjusted date
+                    EndDate = adjustedEndDate.ToString("o")     // Final adjusted date
+                };
+
+                var jsonRequestBodyForPreviousDaysData = JsonConvert.SerializeObject(requestBodyforPrevousDayData);
+                var contentForPreviousDaysData = new StringContent(jsonRequestBodyForPreviousDaysData, Encoding.UTF8, "application/json");
+
+
+                var responsePrevious = await _httpClient.PostAsync("https://localhost:44364/api/AngelCandel/getCandleDataForTest", contentForPreviousDaysData);
+
+                responsePrevious.EnsureSuccessStatusCode();
+
+                string responseData = await responsePrevious.Content.ReadAsStringAsync(stoppingToken);
 
                 List<Candel> candels = JsonConvert.DeserializeObject<List<Candel>>(responseData);
 
-                List<Candel> lastTwoCandels = candels.TakeLast(2).ToList();
+                Candel LastCandel = candels.LastOrDefault();
 
-                if(candels != null)
+                if(LastCandel != null)
                 {
-                    foreach (var candel in lastTwoCandels)
-                    {
-                        HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/Candel",
-                                                              new StringContent(JsonConvert.SerializeObject(candel), Encoding.UTF8, "application/json"),
-                                                              stoppingToken);
-                    }
+                    HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/Candel",
+                                          new StringContent(JsonConvert.SerializeObject(LastCandel), Encoding.UTF8, "application/json"),
+                                          stoppingToken);
                 }
+
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error analyzing ticker {ticker}: {ex.Message}");
+                Console.WriteLine($"Error analyzing ticker {ex.Message}");
             }
         }
 
@@ -148,33 +174,38 @@ namespace StockLogger.BackgroundServices
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                var stopwatch = Stopwatch.StartNew();
+                //var stopwatch = Stopwatch.StartNew();
 
-                var tasks = _stocks.Select(stock => Task.Run(async () =>
+                //var tasks = _stocks.Select(stock => Task.Run(async () =>
+                //{
+                //    try
+                //    {
+                //        await Post1MinCandelToDb(stock.symboltoken, stoppingToken);
+                //        //await Post5MinCandelToDb(stock.ticker, stoppingToken);
+                //        //await Post10MinCandelToDb(stock.ticker, stoppingToken);
+                //        //await Post15MinCandelToDb(stock.ticker, stoppingToken);
+                //    }
+                //    catch (Exception ex)
+                //    {
+                //    }
+                //}, stoppingToken));
+
+
+
+                //// Wait for all tasks to complete.
+                //await Task.WhenAll(tasks);
+
+                //stopwatch.Stop();
+                //iterationTimes.Add(stopwatch.Elapsed.TotalMilliseconds);
+
+                //// Trigger garbage collection periodically
+                //GC.Collect();
+                //GC.WaitForPendingFinalizers();
+
+                foreach (var stock in _stocks)
                 {
-                    try
-                    {
-                        await Post1MinCandelToDb(stock.ticker, stoppingToken);
-                        await Post5MinCandelToDb(stock.ticker, stoppingToken);
-                        await Post10MinCandelToDb(stock.ticker, stoppingToken);
-                        await Post15MinCandelToDb(stock.ticker, stoppingToken);
-                    }
-                    catch (Exception ex)
-                    {
-                    }
-                }, stoppingToken));
-
-
-
-                // Wait for all tasks to complete.
-                await Task.WhenAll(tasks);
-
-                stopwatch.Stop();
-                iterationTimes.Add(stopwatch.Elapsed.TotalMilliseconds);
-
-                // Trigger garbage collection periodically
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
+                    await Post1MinCandelToDb(stock.symboltoken, stoppingToken);
+                }
 
             }
 
