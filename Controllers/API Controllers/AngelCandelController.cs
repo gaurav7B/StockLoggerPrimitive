@@ -195,7 +195,7 @@ namespace StockLogger.Controllers.API_Controllers
 
             string authtoken = "";
 
-            if (count % 2 != 0)
+            if (count % 10 != 0)
             {
                 authtoken = await GetRefreshedAuthorizationTokenAsync();
                 count++;
@@ -222,17 +222,17 @@ namespace StockLogger.Controllers.API_Controllers
             //var startDateWithTime900 = DateTime.Now.AddDays(-1).AddHours(9).AddMinutes(15);
 
 
-            //// FOR_DAY_TO_DAY_TESTING
-            //var startDateWithTime900 = startDateOnly.AddHours(9).AddMinutes(15);
-            //var startDateWithTime330 = EndDateOnly.AddHours(15).AddMinutes(20);
+            // FOR_DAY_TO_DAY_TESTING
+            var startDateWithTime900 = startDateOnly.AddHours(9).AddMinutes(15);
+            var startDateWithTime330 = startDateOnly.AddHours(15).AddMinutes(20);
 
             //// FOR_DAY_TO_DAY_TESTING
             //var startDateWithTime900 = startDateOnly.AddHours(9).AddMinutes(15);
             //var startDateWithTime330 = startDateOnly.AddHours(15).AddMinutes(30);
 
             ////// FOR_DAY_TO_DAY_TESTING
-            var startDateWithTime900 = startDateOnly.AddHours(9).AddMinutes(15); // Previous days Candel
-            var startDateWithTime330 = DateTime.Now;   // CurrentDays candel LTP
+            //var startDateWithTime900 = startDateOnly.AddHours(9).AddMinutes(15); // Previous days Candel
+            //var startDateWithTime330 = DateTime.Now;   // CurrentDays candel LTP
 
             ////// FOR_DAY_TO_DAY_TESTING
             //var startDateWithTime900 = DateTime.Now.AddDays(-1); // Previous days Candel

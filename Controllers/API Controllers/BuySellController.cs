@@ -185,85 +185,89 @@ namespace StockLogger.Controllers.API_Controllers
         {
             public string tradingsymbol { get; set; }
             public string symboltoken { get; set; }
-            public int quantity { get; set; }
-            public decimal expectedPrice { get; set; }
+            public decimal CurrentPrice { get; set; }
         }
 
 
         //POST https://localhost:44364/api/BuySell/buy
         [HttpPost("buy")]
-        public async Task<IActionResult> BuyIntradayStock()
+        public async Task<IActionResult> BuyIntradayStock([FromBody] BuyData buyData)
         {
             // Fetch the authorization token (assuming this is a string)
             string authToken = await GetAuthorizationTokenAsync();
 
             var client = new HttpClient();
 
-            string LTP = "";
-            string ExpectedPrice = "";
+            //string LTP = "";
+            //string ExpectedPrice = "";
 
-            var LTPData = new
-            {
-                exchange = "NSE",
-                tradingsymbol = "IDEA-EQ",
-                symboltoken = "14366"
-            };
+            //var LTPData = new
+            //{
+            //    exchange = "NSE",
+            //    tradingsymbol = "IDEA-EQ",
+            //    symboltoken = "14366"
+            //};
 
-            var LTPjsonData = JsonConvert.SerializeObject(LTPData);
+            //var LTPjsonData = JsonConvert.SerializeObject(LTPData);
 
-            var LTPrequestMessage = new HttpRequestMessage(HttpMethod.Post, "https://apiconnect.angelone.in/rest/secure/angelbroking/order/v1/getLtpData")
-            {
-                Content = new StringContent(LTPjsonData, Encoding.UTF8, "application/json")
-            };
+            //var LTPrequestMessage = new HttpRequestMessage(HttpMethod.Post, "https://apiconnect.angelone.in/rest/secure/angelbroking/order/v1/getLtpData")
+            //{
+            //    Content = new StringContent(LTPjsonData, Encoding.UTF8, "application/json")
+            //};
 
-            LTPrequestMessage.Headers.Add("Accept", "application/json");
-            LTPrequestMessage.Headers.Add("X-SourceID", "WEB");
-            LTPrequestMessage.Headers.Add("X-ClientLocalIP", "192.168.56.177");
-            LTPrequestMessage.Headers.Add("X-ClientPublicIP", await GetPublicIPAsync());
-            LTPrequestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX");
-            LTPrequestMessage.Headers.Add("X-UserType", "USER");
-            LTPrequestMessage.Headers.Add("Authorization", "Bearer " + authToken);
-            LTPrequestMessage.Headers.Add("X-PrivateKey", "GmTkiYil");
-
-
-            try
-            {
-                HttpResponseMessage response = await client.SendAsync(LTPrequestMessage);
-
-                response.EnsureSuccessStatusCode();
-
-                string responseContent = await response.Content.ReadAsStringAsync();
-
-                // Deserialize into the custom ApiResponse class
-                var parsedContent = JsonConvert.DeserializeObject<LTPApiResponse>(responseContent);
-
-                LTP = parsedContent.Data.Ltp.ToString();
-
-                var expPrice = parsedContent.Data.Ltp + 1;
-
-                ExpectedPrice = expPrice.ToString();
+            //LTPrequestMessage.Headers.Add("Accept", "application/json");
+            //LTPrequestMessage.Headers.Add("X-SourceID", "WEB");
+            //LTPrequestMessage.Headers.Add("X-ClientLocalIP", "192.168.56.177");
+            //LTPrequestMessage.Headers.Add("X-ClientPublicIP", await GetPublicIPAsync());
+            //LTPrequestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX");
+            //LTPrequestMessage.Headers.Add("X-UserType", "USER");
+            //LTPrequestMessage.Headers.Add("Authorization", "Bearer " + authToken);
+            //LTPrequestMessage.Headers.Add("X-PrivateKey", "GmTkiYil");
 
 
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { ex.Message });
-            }
+            //try
+            //{
+            //    HttpResponseMessage response = await client.SendAsync(LTPrequestMessage);
+
+            //    response.EnsureSuccessStatusCode();
+
+            //    string responseContent = await response.Content.ReadAsStringAsync();
+
+            //    // Deserialize into the custom ApiResponse class
+            //    var parsedContent = JsonConvert.DeserializeObject<LTPApiResponse>(responseContent);
+
+            //    LTP = parsedContent.Data.Ltp.ToString();
+
+            //    decimal currentPrice = parsedContent.Data.Ltp;
+
+
+
+            //}
+            //catch (Exception ex)
+            //{
+            //    return BadRequest(new { ex.Message });
+            //}
+
+            decimal amount = 9000;
+
+            decimal Quantity = amount / buyData.CurrentPrice;
+
+            int ModifiedQuantity = (int)Quantity;
 
             var data = new
             {
                 variety = "NORMAL",
-                tradingsymbol = "IDEA-EQ",
-                symboltoken = "14366",
+                tradingsymbol = buyData.tradingsymbol,
+                symboltoken = buyData.symboltoken,
                 transactiontype = "BUY",
                 exchange = "NSE",
                 ordertype = "MARKET",
                 producttype = "INTRADAY",
                 duration = "DAY",
                 price = "0",
-                squareoff = ExpectedPrice,
-                stoploss = "-1%",
-                quantity = "1"
+                squareoff = "0",
+                stoploss = "0",
+                quantity = ModifiedQuantity.ToString(),
             };
 
             //var data = new

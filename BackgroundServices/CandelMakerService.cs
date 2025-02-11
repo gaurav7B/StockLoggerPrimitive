@@ -7,6 +7,7 @@ using StockLogger.Models.Candel;
 using System.Diagnostics;
 using System.Diagnostics.SymbolStore;
 using System.Text;
+using static StockLogger.Controllers.API_Controllers.BuySellController;
 
 namespace StockLogger.BackgroundServices
 {
@@ -263,9 +264,21 @@ namespace StockLogger.BackgroundServices
                         && LastCandel.EndPrice <= expectedPrice
                         )
                     {
+                        // BUY API HERE
+                        BuyData buyData = new BuyData
+                        {
+                            symboltoken = stock.symboltoken,
+                            tradingsymbol = stock.ticker,
+                            CurrentPrice = LastCandel.EndPrice
+                        };
+
+                        var jsonRequestBodyForbuyData = JsonConvert.SerializeObject(buyData);
+                        var contentForbuyData = new StringContent(jsonRequestBodyForbuyData, Encoding.UTF8, "application/json");
+
+                        var buyDataApiResponse = await _httpClient.PostAsync("https://localhost:44364/api/BuySell/buy", contentForbuyData);
+
                         ExtractedCandelData.Add(LastCandel);
 
-                        // IMPLEMENT THE BUY API HERE
                     }
 
 
