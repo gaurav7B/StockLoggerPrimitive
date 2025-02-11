@@ -1415,33 +1415,65 @@ namespace StockLogger.Controllers.API_Controllers
 
                             //}
 
-
-                            List<Candel> sortedCandleData = CandelData.OrderBy(c => c.OpenTime).ToList();
-
-                            List<Candel> firstTenCandles = CandelData.Take(10).ToList();
-
-                            Candel previousDayCandel = CandelDataPrevious.LastOrDefault();
-
-                            Candel currentDayCandel = CandelData.FirstOrDefault();
-
-                            if (previousDayCandel == null) continue;
-
-                            decimal previousdayPrice = previousDayCandel.EndPrice;
-
-                            decimal expectedPrice = previousDayCandel.EndPrice - (previousDayCandel.EndPrice * 0.02m);
-
-                            foreach(Candel test in firstTenCandles)
+                            foreach (Candel testCandel in CandelData)
                             {
-                                if (test.LowestPrice <= expectedPrice)
+                                if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
+                                {
+                                    break; // Skip the rest of this iteration and proceed to the next object
+                                }
+
+                                Candel previousDayCandel = CandelDataPrevious.LastOrDefault();
+
+                                Candel currentDataCandel = testCandel;
+
+                                if(previousDayCandel == null || currentDataCandel == null)
+                                {
+                                    continue;
+                                }
+
+                                decimal expectedPrice = previousDayCandel.EndPrice - (previousDayCandel.EndPrice * 0.03m);
+
+                                if (currentDataCandel.LowestPrice <= expectedPrice)
                                 {
                                     //dragonFlyDojiCandles.Add(test);
 
-                                    if (!dragonFlyDojiCandles.Any(candle => candle.Ticker == test.Ticker))
+                                    if (!dragonFlyDojiCandles.Any(candle => candle.Ticker == currentDataCandel.Ticker))
                                     {
-                                        dragonFlyDojiCandles.Add(test);
+                                        dragonFlyDojiCandles.Add(currentDataCandel);
                                     }
                                 }
+
                             }
+
+
+                            // INSTANT REDUCTION
+
+                            //List<Candel> sortedCandleData = CandelData.OrderBy(c => c.OpenTime).ToList();
+
+                            //List<Candel> firstTenCandles = CandelData.Take(10).ToList();
+
+                            //Candel previousDayCandel = CandelDataPrevious.LastOrDefault();
+
+                            //Candel currentDayCandel = CandelData.FirstOrDefault();
+
+                            //if (previousDayCandel == null) continue;
+
+                            //decimal previousdayPrice = previousDayCandel.EndPrice;
+
+                            //decimal expectedPrice = previousDayCandel.EndPrice - (previousDayCandel.EndPrice * 0.02m);
+
+                            //foreach(Candel test in firstTenCandles)
+                            //{
+                            //    if (test.LowestPrice <= expectedPrice)
+                            //    {
+                            //        //dragonFlyDojiCandles.Add(test);
+
+                            //        if (!dragonFlyDojiCandles.Any(candle => candle.Ticker == test.Ticker))
+                            //        {
+                            //            dragonFlyDojiCandles.Add(test);
+                            //        }
+                            //    }
+                            //}
 
 
 
@@ -1878,9 +1910,9 @@ namespace StockLogger.Controllers.API_Controllers
                                     //expectedPrice = firstCandel.EndPrice * 1.000595m;
                                     //expectedPrice = firstCandel.EndPrice * 1.00061m;
                                     //expectedPrice = firstCandel.EndPrice * 1.00065m;
-                                    //expectedPrice = firstCandel.EndPrice * 1.01m; //  10 R profit on 1000 R //1995 on 2 lakh
+                                    //expectedPrice = firstCandel.LowestPrice * 1.01m; //  10 R profit on 1000 R //1995 on 2 lakh
                                     //expectedPrice = firstCandel.EndPrice * 1.005m; //  5 R profit on 1000 R //997 on 2lakh
-                                    expectedPrice = firstCandel.EndPrice * 1.0025m; // 2.5 R profit on 1000 R //450 on 2Lakh
+                                    expectedPrice = firstCandel.LowestPrice * 1.0025m; // 2.5 R profit on 1000 R //450 on 2Lakh
 
                                     //expectedPrice = firstCandel.EndPrice * 1.0004953m; // 4 LAKH
 
@@ -1888,27 +1920,27 @@ namespace StockLogger.Controllers.API_Controllers
 
                                 decimal profitMargin = 0;
 
-                                if (expectedPrice == firstCandel.EndPrice * 1.00065m)
+                                if (expectedPrice == firstCandel.LowestPrice * 1.00065m)
                                 {
                                     profitMargin = 130 - 117;
                                 }
-                                else if (expectedPrice == firstCandel.EndPrice * 1.0008014m)
+                                else if (expectedPrice == firstCandel.LowestPrice * 1.0008014m)
                                 {
                                     profitMargin = 160 - 117;
                                 }
-                                else if (expectedPrice == firstCandel.EndPrice * 1.0025m)
+                                else if (expectedPrice == firstCandel.LowestPrice * 1.0025m)
                                 {
                                     profitMargin = 450 - 117;
                                 }
-                                else if (expectedPrice == firstCandel.EndPrice * 1.01m)
+                                else if (expectedPrice == firstCandel.LowestPrice * 1.01m)
                                 {
                                     profitMargin = 1995 - 117;
                                 }
-                                else if (expectedPrice == firstCandel.EndPrice * 1.005m)
+                                else if (expectedPrice == firstCandel.LowestPrice * 1.005m)
                                 {
                                     profitMargin = 997 - 117;
                                 }
-                                else if (expectedPrice == firstCandel.EndPrice * 1.001429m)
+                                else if (expectedPrice == firstCandel.LowestPrice * 1.001429m)
                                 {
                                     profitMargin = 285 - 117;
                                 }

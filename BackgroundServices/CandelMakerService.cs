@@ -2,8 +2,10 @@
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using StockLogger.Data;
 using StockLogger.Models.Candel;
 using System.Diagnostics;
+using System.Diagnostics.SymbolStore;
 using System.Text;
 
 namespace StockLogger.BackgroundServices
@@ -13,12 +15,17 @@ namespace StockLogger.BackgroundServices
         private readonly HttpClient _httpClient;
         private readonly List<(string ticker, string exchange, string name, long id, string symboltoken)> _stocks;
 
+
         public CandelMakerService(HttpClient httpClient)
         {
             _httpClient = httpClient;
 
             // Fetch stocks from StockList
-            _stocks = StockList.GetStocks();
+            //_stocks = StockList.GetStocks();
+
+            _stocks = StockList2.GetStocks()
+                     .Select(s => (s.Ticker, s.Exchange, s.Name, s.Id, s.SymbolToken))
+                     .ToList();
         }
 
         private async Task Post1MinCandelToDb(string symboltoken, CancellationToken stoppingToken)
@@ -170,44 +177,142 @@ namespace StockLogger.BackgroundServices
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
 
-            List<double> iterationTimes = new();
+            //// CODE TO POPULATE THE DB WITH END PRICES
 
+            //foreach (var stock in _stocks)
+            //{
+            //    await Post1MinCandelToDb(stock.symboltoken, stoppingToken);
+            //}
+
+            //while (!stoppingToken.IsCancellationRequested)
+            //{
+
+            //    foreach (var stock in _stocks)
+            //    {
+            //        HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:44364/api/candel", stoppingToken);
+            //        response.EnsureSuccessStatusCode();
+
+            //        string responseData = await response.Content.ReadAsStringAsync(stoppingToken);
+
+            //        List<Candel> CandelData = JsonConvert.DeserializeObject<List<Candel>>(responseData);
+
+            //        Candel selectedCandel = CandelData.FirstOrDefault(c => c.Ticker == stock.ticker);
+
+            //        if(selectedCandel == null)
+            //        {
+            //            await Post1MinCandelToDb(stock.symboltoken, stoppingToken);
+            //        }
+
+            //    }
+
+            //}
+
+
+
+            // CODE TO FIND THE STOCKS WHICH ARE BELOW 3% FROM PREVIOUS DAYS END PRICE
             while (!stoppingToken.IsCancellationRequested)
             {
-                //var stopwatch = Stopwatch.StartNew();
-
-                //var tasks = _stocks.Select(stock => Task.Run(async () =>
-                //{
-                //    try
-                //    {
-                //        await Post1MinCandelToDb(stock.symboltoken, stoppingToken);
-                //        //await Post5MinCandelToDb(stock.ticker, stoppingToken);
-                //        //await Post10MinCandelToDb(stock.ticker, stoppingToken);
-                //        //await Post15MinCandelToDb(stock.ticker, stoppingToken);
-                //    }
-                //    catch (Exception ex)
-                //    {
-                //    }
-                //}, stoppingToken));
-
-
-
-                //// Wait for all tasks to complete.
-                //await Task.WhenAll(tasks);
-
-                //stopwatch.Stop();
-                //iterationTimes.Add(stopwatch.Elapsed.TotalMilliseconds);
-
-                //// Trigger garbage collection periodically
-                //GC.Collect();
-                //GC.WaitForPendingFinalizers();
 
                 foreach (var stock in _stocks)
                 {
-                    await Post1MinCandelToDb(stock.symboltoken, stoppingToken);
+
+                    // THIS PART FETCEHES THE END PRICE OF THE PREVIOUS DAYS STOCK
+                    HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:44364/api/candel", stoppingToken);
+                    response.EnsureSuccessStatusCode();
+
+                    string responseData = await response.Content.ReadAsStringAsync(stoppingToken);
+
+                    List<Candel> CandelData = JsonConvert.DeserializeObject<List<Candel>>(responseData);
+
+                    Candel previousDayCandel = CandelData.FirstOrDefault(c => c.Ticker == stock.ticker);
+
+                    decimal expectedPrice = previousDayCandel.EndPrice - (previousDayCandel.EndPrice * 0.03m);
+
+
+
+                    // THIS PART FETCHES THE LATEST PRICE OF THE STOCK
+                    var requestBodyforCurrentDayData = new
+                    {
+                        SymbolToken = stock.symboltoken,
+                        AuthorizationToken = "",
+                        StartDate = DateTime.Now.AddHours(9).AddMinutes(15).ToString("o"), // Final adjusted date
+                        EndDate = DateTime.Now.ToString("o")     // Final adjusted date
+                    };
+
+                    var jsonRequestBodyForCurrentDaysData = JsonConvert.SerializeObject(requestBodyforCurrentDayData);
+                    var contentForCurrentDaysData = new StringContent(jsonRequestBodyForCurrentDaysData, Encoding.UTF8, "application/json");
+
+
+                    var responseCurrent = await _httpClient.PostAsync("https://localhost:44364/api/AngelCandel/getCandleDataForTest", contentForCurrentDaysData);
+
+                    responseCurrent.EnsureSuccessStatusCode();
+
+                    string responseCurrentData = await responseCurrent.Content.ReadAsStringAsync(stoppingToken);
+
+                    List<Candel> candels = JsonConvert.DeserializeObject<List<Candel>>(responseCurrentData);
+
+                    Candel LastCandel = candels.LastOrDefault();
+
+
+                    List<Candel> ExtractedCandelData = new List<Candel>();
+
+
+                    //  THIS PART COMPARES THE LATEST PRICE WITH THE EXPECTED PRICE
+                    if(
+                        LastCandel != null
+                        && LastCandel.EndPrice <= expectedPrice
+                        )
+                    {
+                        ExtractedCandelData.Add(LastCandel);
+
+                        // IMPLEMENT THE BUY API HERE
+                    }
+
+
                 }
 
             }
+
+
+
+            //List<double> iterationTimes = new();
+
+            //while (!stoppingToken.IsCancellationRequested)
+            //{
+            //    var stopwatch = Stopwatch.StartNew();
+
+            //    var tasks = _stocks.Select(stock => Task.Run(async () =>
+            //    {
+            //        try
+            //        {
+            //            await Post1MinCandelToDb(stock.symboltoken, stoppingToken);
+            //            //await Post5MinCandelToDb(stock.ticker, stoppingToken);
+            //            //await Post10MinCandelToDb(stock.ticker, stoppingToken);
+            //            //await Post15MinCandelToDb(stock.ticker, stoppingToken);
+            //        }
+            //        catch (Exception ex)
+            //        {
+            //        }
+            //    }, stoppingToken));
+
+
+
+            //    // Wait for all tasks to complete.
+            //    await Task.WhenAll(tasks);
+
+            //    stopwatch.Stop();
+            //    iterationTimes.Add(stopwatch.Elapsed.TotalMilliseconds);
+
+            //    // Trigger garbage collection periodically
+            //    GC.Collect();
+            //    GC.WaitForPendingFinalizers();
+
+            //    //foreach (var stock in _stocks)
+            //    //{
+            //    //    await Post1MinCandelToDb(stock.symboltoken, stoppingToken);
+            //    //}
+
+            //}
 
         }
 

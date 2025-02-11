@@ -226,9 +226,21 @@ namespace StockLogger.Controllers.API_Controllers
             //var startDateWithTime900 = startDateOnly.AddHours(9).AddMinutes(15);
             //var startDateWithTime330 = EndDateOnly.AddHours(15).AddMinutes(20);
 
-            // FOR_DAY_TO_DAY_TESTING
-            var startDateWithTime900 = startDateOnly.AddHours(9).AddMinutes(15);
-            var startDateWithTime330 = EndDateOnly.AddHours(15).AddMinutes(30);
+            //// FOR_DAY_TO_DAY_TESTING
+            //var startDateWithTime900 = startDateOnly.AddHours(9).AddMinutes(15);
+            //var startDateWithTime330 = startDateOnly.AddHours(15).AddMinutes(30);
+
+            ////// FOR_DAY_TO_DAY_TESTING
+            var startDateWithTime900 = startDateOnly.AddHours(9).AddMinutes(15); // Previous days Candel
+            var startDateWithTime330 = DateTime.Now;   // CurrentDays candel LTP
+
+            ////// FOR_DAY_TO_DAY_TESTING
+            //var startDateWithTime900 = DateTime.Now.AddDays(-1); // Previous days Candel
+            //var startDateWithTime330 = DateTime.Now;   // CurrentDays candel LTP
+
+            ////// CODE TO POPULATE THE DB WITH END PRICES
+            //var startDateWithTime900 = DateTime.Now.AddDays(-1).AddHours(9).AddMinutes(15); // Previous days Candel
+            //var startDateWithTime330 = DateTime.Now.AddDays(-1).AddHours(15).AddMinutes(30);   // CurrentDays candel LTP
 
 
             //var startDateWithTime900 = startDateOnly.AddDays(-1).AddHours(9).AddMinutes(15);
