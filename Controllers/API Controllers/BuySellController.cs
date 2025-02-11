@@ -186,6 +186,7 @@ namespace StockLogger.Controllers.API_Controllers
             public string tradingsymbol { get; set; }
             public string symboltoken { get; set; }
             public decimal CurrentPrice { get; set; }
+            public decimal PreviousDaayEndPrice { get; set; }
         }
 
 
@@ -200,6 +201,7 @@ namespace StockLogger.Controllers.API_Controllers
 
             //string LTP = "";
             //string ExpectedPrice = "";
+            //string ProfitPrice = "";
 
             //var LTPData = new
             //{
@@ -240,6 +242,17 @@ namespace StockLogger.Controllers.API_Controllers
 
             //    decimal currentPrice = parsedContent.Data.Ltp;
 
+            //    decimal expectedPrice = currentPrice - (currentPrice * 0.03m);
+
+            //    ExpectedPrice = expectedPrice.ToString();
+
+
+
+            //    decimal amount = 10000;
+
+            //    decimal Quntity = amount / currentPrice;
+
+
 
 
             //}
@@ -248,11 +261,15 @@ namespace StockLogger.Controllers.API_Controllers
             //    return BadRequest(new { ex.Message });
             //}
 
-            decimal amount = 9000;
+
+            decimal amount = 10000;
 
             decimal Quantity = amount / buyData.CurrentPrice;
 
             int ModifiedQuantity = (int)Quantity;
+
+            decimal expectedprice = buyData.CurrentPrice * 0.025m;
+
 
             var data = new
             {

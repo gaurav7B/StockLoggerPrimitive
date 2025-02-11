@@ -199,7 +199,7 @@ namespace StockLogger.BackgroundServices
 
             //        Candel selectedCandel = CandelData.FirstOrDefault(c => c.Ticker == stock.ticker);
 
-            //        if(selectedCandel == null)
+            //        if (selectedCandel == null)
             //        {
             //            await Post1MinCandelToDb(stock.symboltoken, stoppingToken);
             //        }
@@ -259,7 +259,7 @@ namespace StockLogger.BackgroundServices
 
 
                     //  THIS PART COMPARES THE LATEST PRICE WITH THE EXPECTED PRICE
-                    if(
+                    if (
                         LastCandel != null
                         && LastCandel.EndPrice <= expectedPrice
                         )
@@ -269,7 +269,8 @@ namespace StockLogger.BackgroundServices
                         {
                             symboltoken = stock.symboltoken,
                             tradingsymbol = stock.ticker,
-                            CurrentPrice = LastCandel.EndPrice
+                            CurrentPrice = LastCandel.EndPrice,
+                            PreviousDaayEndPrice = previousDayCandel.EndPrice,
                         };
 
                         var jsonRequestBodyForbuyData = JsonConvert.SerializeObject(buyData);
@@ -285,6 +286,69 @@ namespace StockLogger.BackgroundServices
                 }
 
             }
+
+
+
+            //// CODE TO POPULATE THE DB WITH END PRICES
+
+            //foreach (var stock in _stocks)
+            //{
+            //    await Post5MinCandelToDb(stock.symboltoken, stoppingToken);
+
+            //    BuyData buyData = new BuyData
+            //    {
+            //        symboltoken = stock.symboltoken,
+            //        tradingsymbol = stock.ticker,
+            //        CurrentPrice = 0
+            //    };
+
+            //    var jsonRequestBodyForbuyData = JsonConvert.SerializeObject(buyData);
+            //    var contentForbuyData = new StringContent(jsonRequestBodyForbuyData, Encoding.UTF8, "application/json");
+
+            //    var buyDataApiResponse = await _httpClient.PostAsync("https://localhost:44364/api/BuySell/buy", contentForbuyData);
+
+
+            //}
+
+            //while (!stoppingToken.IsCancellationRequested)
+            //{
+
+            //    foreach (var stock in _stocks)
+            //    {
+            //        HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:44364/api/candel", stoppingToken);
+            //        response.EnsureSuccessStatusCode();
+
+            //        string responseData = await response.Content.ReadAsStringAsync(stoppingToken);
+
+            //        List<Candel> CandelData = JsonConvert.DeserializeObject<List<Candel>>(responseData);
+
+            //        if(CandelData.Count == 162)
+            //        {
+            //            break;
+            //        }
+
+            //        Candel selectedCandel = CandelData.FirstOrDefault(c => c.Ticker == stock.ticker);
+
+            //        if (selectedCandel == null)
+            //        {
+            //            await Post1MinCandelToDb(stock.symboltoken, stoppingToken);
+
+            //            BuyData buyData = new BuyData
+            //            {
+            //                symboltoken = stock.symboltoken,
+            //                tradingsymbol = stock.ticker,
+            //                CurrentPrice = 0,
+            //            };
+
+            //            var jsonRequestBodyForbuyData = JsonConvert.SerializeObject(buyData);
+            //            var contentForbuyData = new StringContent(jsonRequestBodyForbuyData, Encoding.UTF8, "application/json");
+
+            //            var buyDataApiResponse = await _httpClient.PostAsync("https://localhost:44364/api/BuySell/buy", contentForbuyData);
+            //        }
+
+            //    }
+
+            //}
 
 
 
