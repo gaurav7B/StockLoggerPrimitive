@@ -262,7 +262,7 @@ namespace StockLogger.Controllers.API_Controllers
             //}
 
 
-            decimal amount = 10000;
+            decimal amount = 10000 * 5;
 
             decimal Quantity = amount / buyData.CurrentPrice;
 
@@ -319,6 +319,87 @@ namespace StockLogger.Controllers.API_Controllers
             requestMessage.Headers.Add("X-UserType", "USER");
             requestMessage.Headers.Add("Authorization", "Bearer " + authToken);
             requestMessage.Headers.Add("X-PrivateKey", "GmTkiYil"); // Your actual API Key
+
+
+            try
+            {
+                HttpResponseMessage response = await client.SendAsync(requestMessage);
+
+                response.EnsureSuccessStatusCode();
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+
+
+                return Ok(responseContent);
+
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { ex.Message });
+            }
+
+        }
+
+
+        public class SellData
+        {
+            public string tradingsymbol { get; set; }
+            public string symboltoken { get; set; }
+            public decimal CurrentPrice { get; set; }
+        }
+
+        //POST https://localhost:44364/api/BuySell/sell
+        [HttpPost("sell")]
+        public async Task<IActionResult> SellIntradayStock([FromBody] SellData sellData)
+        {
+            // Fetch the authorization token (assuming this is a string)
+            string authToken = await GetAuthorizationTokenAsync();
+
+            var client = new HttpClient();
+
+            decimal amount = 10000 * 5;
+
+            decimal Quantity = amount / sellData.CurrentPrice;
+
+            int ModifiedQuantity = (int)Quantity;
+
+            decimal expectedprice = sellData.CurrentPrice * 0.025m;
+
+
+            var data = new
+            {
+                variety = "NORMAL",
+                tradingsymbol = sellData.tradingsymbol,
+                symboltoken = sellData.symboltoken,
+                transactiontype = "SELL",
+                exchange = "NSE",
+                ordertype = "LIMIT",
+                producttype = "INTRADAY",
+                duration = "DAY",
+                price = expectedprice.ToString(),
+                squareoff = "0",
+                stoploss = "0",
+                quantity = ModifiedQuantity.ToString(),
+            };
+
+
+            var jsonData = JsonConvert.SerializeObject(data);
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "https://apiconnect.angelone.in/rest/secure/angelbroking/order/v1/placeOrder")
+            {
+                Content = new StringContent(jsonData, Encoding.UTF8, "application/json")
+            };
+
+            // Set the headers
+            requestMessage.Headers.Add("Accept", "application/json");
+            requestMessage.Headers.Add("X-SourceID", "WEB");
+            requestMessage.Headers.Add("X-ClientLocalIP", "192.168.56.177");
+            requestMessage.Headers.Add("X-ClientPublicIP", await GetPublicIPAsync());
+            requestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX");
+            requestMessage.Headers.Add("X-UserType", "USER");
+            requestMessage.Headers.Add("Authorization", "Bearer " + authToken);
+            requestMessage.Headers.Add("X-PrivateKey", "GmTkiYil");
 
 
             try

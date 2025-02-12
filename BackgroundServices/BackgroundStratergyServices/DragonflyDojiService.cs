@@ -20,7 +20,11 @@ namespace StockLogger.BackgroundServices.BackgroundStratergyServices
             _analyzer = new DragonFlyDojiAnalyzer();
 
             // Fetch stocks from StockList
-            _stocks = StockList.GetStocks();
+            //_stocks = StockList.GetStocks();
+
+            _stocks = StockList2.GetStocks()
+                     .Select(s => (s.Ticker, s.Exchange, s.Name, s.Id, s.SymbolToken))
+                     .ToList();
         }
 
 

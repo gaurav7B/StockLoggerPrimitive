@@ -191,21 +191,21 @@ namespace StockLogger.Controllers.API_Controllers
         public async Task<IActionResult> GetCandleDataForTest([FromBody] StockRequest stockRequest)
         {
 
-            //string authtoken = await GetRefreshedAuthorizationTokenAsync();
+            string authtoken = await GetRefreshedAuthorizationTokenAsync();
 
-            string authtoken = "";
+            //string authtoken = "";
 
-            if (count % 2 != 0)
-            {
-                authtoken = await GetRefreshedAuthorizationTokenAsync();
-                count++;
-            }
-            else
-            {
-                var token = await _context.Token.FirstOrDefaultAsync();
-                authtoken = token.AuthToken;
-                count++;
-            }
+            //if (count % 2 != 0)
+            //{
+            //    authtoken = await GetRefreshedAuthorizationTokenAsync();
+            //    count++;
+            //}
+            //else
+            //{
+            //    var token = await _context.Token.FirstOrDefaultAsync();
+            //    authtoken = token.AuthToken;
+            //    count++;
+            //}
 
             // Extract only the date part from StartDate
             var startDateOnly = stockRequest.StartDate.Date;
@@ -213,21 +213,21 @@ namespace StockLogger.Controllers.API_Controllers
 
             var matchingStock = _stocks.FirstOrDefault(s => s.symboltoken == stockRequest.SymbolToken);
 
-            //////// Create start date with time 9:15 AM
-            //var startDateWithTime900 = startDateOnly.AddHours(9).AddMinutes(15);
 
-            //////// Create start date with time 3:30 PM
-            //var startDateWithTime330 = EndDateOnly.AddHours(15).AddMinutes(20);
-
-            //var startDateWithTime900 = DateTime.Now.AddDays(-1).AddHours(9).AddMinutes(15);
+            ////// FOR_SPECIFIC_DAY_TESTING
+            //var startDateWithTime900 = startDateOnly.Date.AddHours(9).AddMinutes(15);
+            //var startDateWithTime330 = startDateOnly.Date.AddHours(15).AddMinutes(20);
 
 
-            // FOR_SPECIFIC_DAY_TESTING
-            var startDateWithTime900 = startDateOnly.AddHours(9).AddMinutes(15);
-            var startDateWithTime330 = startDateOnly.AddHours(15).AddMinutes(20);
 
-            //var startDateWithTime900 = DateTime.Now.AddHours(9).AddMinutes(15); // Previous days Candel
-            //var startDateWithTime330 = DateTime.Now;   // CurrentDays candel LTP
+            ////// CODE TO POPULATE THE DB WITH END PRICES
+            //var startDateWithTime900 = DateTime.Now.AddDays(-1).Date.AddHours(9).AddMinutes(15); // Previous days Candel
+            //var startDateWithTime330 = DateTime.Now.AddDays(-1).Date.AddHours(15).AddMinutes(30);   // CurrentDays candel LTP
+
+            //// CODE TO TEST THE POPULATED DATA
+            var startDateWithTime900 = DateTime.Now.Date.AddHours(9).AddMinutes(15); // Previous days Candel
+            var startDateWithTime330 = DateTime.Now.Date.AddHours(15).AddMinutes(20);   // CurrentDays candel LTP
+
 
             ////// FOR_DAY_TO_DAY_TESTING
             //var startDateWithTime900 = startDateOnly.AddHours(9).AddMinutes(15); // Previous days Candel
@@ -237,13 +237,8 @@ namespace StockLogger.Controllers.API_Controllers
             //var startDateWithTime900 = DateTime.Now.AddDays(-1); // Previous days Candel
             //var startDateWithTime330 = DateTime.Now;   // CurrentDays candel LTP
 
-            ////// CODE TO POPULATE THE DB WITH END PRICES
-            //var startDateWithTime900 = DateTime.Now.AddDays(-1).AddHours(9).AddMinutes(15); // Previous days Candel
-            //var startDateWithTime330 = DateTime.Now.AddDays(-1).AddHours(15).AddMinutes(30);   // CurrentDays candel LTP
-
-
-            //var startDateWithTime900 = startDateOnly.AddDays(-1).AddHours(9).AddMinutes(15);
-            //var startDateWithTime330 = startDateOnly.AddHours(15).AddMinutes(20);
+            //var startDateWithTime900 = startDateOnly.AddDays(-1).Date.AddHours(9).AddMinutes(15);
+            //var startDateWithTime330 = startDateOnly.Date.AddHours(15).AddMinutes(20);
 
             //// 3_YEARS_TESTING
             //var startDateWithTime900 = startDateOnly.AddDays(-1000).AddHours(9).AddMinutes(15);
@@ -264,8 +259,6 @@ namespace StockLogger.Controllers.API_Controllers
                 //interval = "THIRTY_MINUTE",
                 fromdate = startDateWithTime900.ToString("yyyy-MM-dd HH:mm"),
                 todate = startDateWithTime330.ToString("yyyy-MM-dd HH:mm")
-                ////fromdate = DateTime.Today.AddHours(9).AddMinutes(15).ToString("yyyy-MM-dd HH:mm"),
-                ////todate = DateTime.Now.ToString("yyyy-MM-dd HH:mm")
             };
 
             var jsonData = JsonConvert.SerializeObject(data);

@@ -687,19 +687,25 @@ namespace StockLogger.Controllers.API_Controllers
 
                                 bool isListinDowntrend = IsInDowntrend(CandelDataBeforeTestCandel);
 
-                                if ((testCandel.EndPrice > testCandel.StartPrice) && (isListinDowntrend == true)) // Bullish Candel
+                                //if ((testCandel.EndPrice > testCandel.StartPrice) && (isListinDowntrend == true)) // Bullish Candel
+                                //{
+                                //    if ((testCandel.StartPrice == testCandel.LowestPrice))
+                                //    {
+                                //        dragonFlyDojiCandles.Add(testCandel);
+                                //    }
+                                //}
+                                //else if (testCandel.EndPrice < testCandel.StartPrice && (isListinDowntrend == true)) // Bearish Candel
+                                //{
+                                //    if ((testCandel.EndPrice == testCandel.LowestPrice))
+                                //    {
+                                //        dragonFlyDojiCandles.Add(testCandel);
+                                //    }
+                                //}
+
+
+                                if(isListinDowntrend)
                                 {
-                                    if ((testCandel.StartPrice == testCandel.LowestPrice))
-                                    {
-                                        dragonFlyDojiCandles.Add(testCandel);
-                                    }
-                                }
-                                else if (testCandel.EndPrice < testCandel.StartPrice && (isListinDowntrend == true)) // Bearish Candel
-                                {
-                                    if ((testCandel.EndPrice == testCandel.LowestPrice))
-                                    {
-                                        dragonFlyDojiCandles.Add(testCandel);
-                                    }
+                                    dragonFlyDojiCandles.Add(testCandel);
                                 }
 
 
