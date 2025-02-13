@@ -230,83 +230,208 @@ namespace StockLogger.BackgroundServices
 
                     decimal expectedPrice = previousDayCandel.EndPrice - (previousDayCandel.EndPrice * 0.03m);
 
-
-
-                    // THIS PART FETCHES THE LATEST PRICE OF THE STOCK
-                    var requestBodyforCurrentDayData = new
+                    try
                     {
-                        SymbolToken = stock.symboltoken,
-                        AuthorizationToken = "",
-                        StartDate = DateTime.Now.AddHours(9).AddMinutes(15).ToString("o"), // Final adjusted date
-                        EndDate = DateTime.Now.ToString("o")     // Final adjusted date
-                    };
 
-                    var jsonRequestBodyForCurrentDaysData = JsonConvert.SerializeObject(requestBodyforCurrentDayData);
-                    var contentForCurrentDaysData = new StringContent(jsonRequestBodyForCurrentDaysData, Encoding.UTF8, "application/json");
-
-
-                    var responseCurrent = await _httpClient.PostAsync("https://localhost:44364/api/AngelCandel/getCandleDataForTest", contentForCurrentDaysData);
-
-                    responseCurrent.EnsureSuccessStatusCode();
-
-                    string responseCurrentData = await responseCurrent.Content.ReadAsStringAsync(stoppingToken);
-
-                    List<Candel> candels = JsonConvert.DeserializeObject<List<Candel>>(responseCurrentData);
-
-                    Candel LastCandel = candels.LastOrDefault();
-
-
-                    List<Candel> ExtractedCandelData = new List<Candel>();
-
-
-                    //  THIS PART COMPARES THE LATEST PRICE WITH THE EXPECTED PRICE
-                    if (
-                        LastCandel != null
-                        && LastCandel.EndPrice <= expectedPrice
-                        )
-                    {
-                        // BUY API HERE
-                        BuyData buyData = new BuyData
+                        // THIS PART FETCHES THE LATEST PRICE OF THE STOCK
+                        var requestBodyforCurrentDayData = new
                         {
-                            symboltoken = stock.symboltoken,
-                            tradingsymbol = stock.ticker,
-                            CurrentPrice = LastCandel.EndPrice,
-                            PreviousDaayEndPrice = previousDayCandel.EndPrice,
+                            SymbolToken = stock.symboltoken,
+                            AuthorizationToken = "",
+                            StartDate = DateTime.Now.AddHours(9).AddMinutes(15).ToString("o"), // Final adjusted date
+                            EndDate = DateTime.Now.ToString("o")     // Final adjusted date
                         };
 
-                        var jsonRequestBodyForbuyData = JsonConvert.SerializeObject(buyData);
-                        var contentForbuyData = new StringContent(jsonRequestBodyForbuyData, Encoding.UTF8, "application/json");
+                        var jsonRequestBodyForCurrentDaysData = JsonConvert.SerializeObject(requestBodyforCurrentDayData);
+                        var contentForCurrentDaysData = new StringContent(jsonRequestBodyForCurrentDaysData, Encoding.UTF8, "application/json");
 
-                        var buyDataApiResponse = await _httpClient.PostAsync("https://localhost:44364/api/BuySell/buy", contentForbuyData);
 
-                        buyDataApiResponse.EnsureSuccessStatusCode();
+                        var responseCurrent = await _httpClient.PostAsync("https://localhost:44364/api/AngelCandel/getCandleDataForTest", contentForCurrentDaysData);
 
-                        // WHEN THE BUY API RUNS SUCCESSFULLY
-                        // CALL THE SELL API
-                        // SELL API HERE
-                        if (buyDataApiResponse.IsSuccessStatusCode) // Ensures status is 200
+                        //responseCurrent.EnsureSuccessStatusCode();
+
+                        string responseCurrentData = await responseCurrent.Content.ReadAsStringAsync(stoppingToken);
+
+                        List<Candel> candels = JsonConvert.DeserializeObject<List<Candel>>(responseCurrentData);
+
+                        Candel LastCandel = candels.LastOrDefault();
+
+                        List<Candel> ExtractedCandelData = new List<Candel>();
+
+
+                        //  THIS PART COMPARES THE LATEST PRICE WITH THE EXPECTED PRICE
+                        if (
+                            LastCandel != null
+                            && previousDayCandel != null
+                            && LastCandel.EndPrice <= expectedPrice
+                            )
                         {
-                            SellData sellData = new SellData
+                            // BUY API HERE
+                            BuyData buyData = new BuyData
                             {
                                 symboltoken = stock.symboltoken,
                                 tradingsymbol = stock.ticker,
-                                CurrentPrice = LastCandel.EndPrice
+                                CurrentPrice = LastCandel.EndPrice,
+                                PreviousDaayEndPrice = previousDayCandel.EndPrice,
                             };
 
-                            var jsonRequestBodyForsellData = JsonConvert.SerializeObject(sellData);
-                            var contentForsellData = new StringContent(jsonRequestBodyForsellData, Encoding.UTF8, "application/json");
+                            var jsonRequestBodyForbuyData = JsonConvert.SerializeObject(buyData);
+                            var contentForbuyData = new StringContent(jsonRequestBodyForbuyData, Encoding.UTF8, "application/json");
 
-                            var sellDataApiResponse = await _httpClient.PostAsync("https://localhost:44364/api/BuySell/sell", contentForsellData);
+                            var buyDataApiResponse = await _httpClient.PostAsync("https://localhost:44364/api/BuySell/buy", contentForbuyData);
+
+                            buyDataApiResponse.EnsureSuccessStatusCode();
+
+                            // WHEN THE BUY API RUNS SUCCESSFULLY
+                            // CALL THE SELL API
+                            // SELL API HERE
+                            if (buyDataApiResponse.IsSuccessStatusCode) // Ensures status is 200
+                            {
+                                SellData sellData = new SellData
+                                {
+                                    symboltoken = stock.symboltoken,
+                                    tradingsymbol = stock.ticker,
+                                    CurrentPrice = LastCandel.EndPrice
+                                };
+
+                                var jsonRequestBodyForsellData = JsonConvert.SerializeObject(sellData);
+                                var contentForsellData = new StringContent(jsonRequestBodyForsellData, Encoding.UTF8, "application/json");
+
+                                var sellDataApiResponse = await _httpClient.PostAsync("https://localhost:44364/api/BuySell/sell", contentForsellData);
+                            }
+
+                            ExtractedCandelData.Add(LastCandel);
+
                         }
 
-                        ExtractedCandelData.Add(LastCandel);
-
                     }
-
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex);
+                    }
 
                 }
 
             }
+
+
+            ////// DRAGONFLYDOJI
+
+            //// CODE TO FIND THE STOCKS WHICH ARE BELOW 3% FROM PREVIOUS DAYS END PRICE
+            //while (!stoppingToken.IsCancellationRequested)
+            //{
+
+            //    foreach (var stock in _stocks)
+            //    {
+
+            //        try
+            //        {
+
+            //            // THIS PART FETCHES THE LATEST PRICE OF THE STOCK
+            //            var requestBodyforCurrentDayData = new
+            //            {
+            //                SymbolToken = stock.symboltoken,
+            //                AuthorizationToken = "",
+            //                StartDate = DateTime.Now.AddHours(9).AddMinutes(15).ToString("o"), // Final adjusted date
+            //                EndDate = DateTime.Now.ToString("o")     // Final adjusted date
+            //            };
+
+            //            var jsonRequestBodyForCurrentDaysData = JsonConvert.SerializeObject(requestBodyforCurrentDayData);
+            //            var contentForCurrentDaysData = new StringContent(jsonRequestBodyForCurrentDaysData, Encoding.UTF8, "application/json");
+
+
+            //            var responseCurrent = await _httpClient.PostAsync("https://localhost:44364/api/AngelCandel/getCandleDataForTest", contentForCurrentDaysData);
+
+            //            //responseCurrent.EnsureSuccessStatusCode();
+
+            //            string responseCurrentData = await responseCurrent.Content.ReadAsStringAsync(stoppingToken);
+
+            //            List<Candel> candels = JsonConvert.DeserializeObject<List<Candel>>(responseCurrentData);
+
+            //            Candel LastCandel = candels.LastOrDefault();
+
+            //            Candel secondLastCandel = candels.SkipLast(1).LastOrDefault();
+
+
+            //            /// CHECK THE SECONDLAST CANDEL FOR DRAGONFLY DOJI
+
+            //            bool isDoji = Math.Abs(secondLastCandel.StartPrice - secondLastCandel.EndPrice) < (secondLastCandel.HighestPrice - secondLastCandel.LowestPrice) * 0.1m;
+
+            //            // Check for a long lower shadow (shadow size relative to the body)
+            //            bool longLowerShadow = (secondLastCandel.StartPrice - secondLastCandel.LowestPrice) > 3 * (secondLastCandel.EndPrice - secondLastCandel.StartPrice);
+
+            //            // The body of the candle should be small and at the top of the range
+            //            bool smallBodyAtTop = Math.Abs(secondLastCandel.StartPrice - secondLastCandel.EndPrice) < (secondLastCandel.HighestPrice - secondLastCandel.LowestPrice) * 0.3m;
+
+
+            //            bool isVerificationCandelHighestPriceGreater = (secondLastCandel != null) && (secondLastCandel.HighestPrice > secondLastCandel.HighestPrice);
+
+            //            bool shortUpperShadow = (secondLastCandel.HighestPrice - Math.Max(secondLastCandel.StartPrice, secondLastCandel.EndPrice)) < (secondLastCandel.HighestPrice - secondLastCandel.LowestPrice) * 0.1m;
+
+
+
+            //            List<Candel> ExtractedCandelData = new List<Candel>();
+
+
+            //            //  THIS PART COMPARES THE LATEST PRICE WITH THE EXPECTED PRICE
+            //            if (isDoji
+            //                && longLowerShadow
+            //                && smallBodyAtTop
+            //                && shortUpperShadow
+            //                && (secondLastCandel.EndPrice > secondLastCandel.StartPrice)
+
+            //                && (LastCandel != null)
+            //                && (LastCandel.EndPrice > LastCandel.StartPrice)
+            //                && (LastCandel.HighestPrice > secondLastCandel.HighestPrice)
+            //                )
+            //            {
+            //                // BUY API HERE
+            //                BuyData buyData = new BuyData
+            //                {
+            //                    symboltoken = stock.symboltoken,
+            //                    tradingsymbol = stock.ticker,
+            //                    CurrentPrice = LastCandel.EndPrice,
+            //                    PreviousDaayEndPrice = 0,
+            //                };
+
+            //                var jsonRequestBodyForbuyData = JsonConvert.SerializeObject(buyData);
+            //                var contentForbuyData = new StringContent(jsonRequestBodyForbuyData, Encoding.UTF8, "application/json");
+
+            //                var buyDataApiResponse = await _httpClient.PostAsync("https://localhost:44364/api/BuySell/buy", contentForbuyData);
+
+            //                buyDataApiResponse.EnsureSuccessStatusCode();
+
+            //                // WHEN THE BUY API RUNS SUCCESSFULLY
+            //                // CALL THE SELL API
+            //                // SELL API HERE
+            //                if (buyDataApiResponse.IsSuccessStatusCode) // Ensures status is 200
+            //                {
+            //                    SellData sellData = new SellData
+            //                    {
+            //                        symboltoken = stock.symboltoken,
+            //                        tradingsymbol = stock.ticker,
+            //                        CurrentPrice = LastCandel.EndPrice
+            //                    };
+
+            //                    var jsonRequestBodyForsellData = JsonConvert.SerializeObject(sellData);
+            //                    var contentForsellData = new StringContent(jsonRequestBodyForsellData, Encoding.UTF8, "application/json");
+
+            //                    var sellDataApiResponse = await _httpClient.PostAsync("https://localhost:44364/api/BuySell/sell", contentForsellData);
+            //                }
+
+            //                ExtractedCandelData.Add(LastCandel);
+
+            //            }
+
+            //        }
+            //        catch (Exception ex)
+            //        {
+            //            Console.WriteLine(ex);
+            //        }
+
+            //    }
+
+            //}
 
 
 

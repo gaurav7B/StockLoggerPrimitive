@@ -262,13 +262,11 @@ namespace StockLogger.Controllers.API_Controllers
             //}
 
 
-            decimal amount = 10000 * 5;
+            decimal amount = 45000;
 
             decimal Quantity = amount / buyData.CurrentPrice;
 
             int ModifiedQuantity = (int)Quantity;
-
-            decimal expectedprice = buyData.CurrentPrice * 0.025m;
 
 
             var data = new
@@ -358,13 +356,17 @@ namespace StockLogger.Controllers.API_Controllers
 
             var client = new HttpClient();
 
-            decimal amount = 10000 * 5;
+            decimal amount = 45000;
 
             decimal Quantity = amount / sellData.CurrentPrice;
 
             int ModifiedQuantity = (int)Quantity;
 
-            decimal expectedprice = sellData.CurrentPrice * 0.025m;
+            //decimal expectedprice = sellData.CurrentPrice * 1.0025m;
+            decimal expectedprice = sellData.CurrentPrice * 1.00065m;
+
+            decimal ModifiedExpectedPrice = Math.Round(expectedprice, 2);
+
 
 
             var data = new
@@ -377,7 +379,7 @@ namespace StockLogger.Controllers.API_Controllers
                 ordertype = "LIMIT",
                 producttype = "INTRADAY",
                 duration = "DAY",
-                price = expectedprice.ToString(),
+                price = ModifiedExpectedPrice.ToString(),
                 squareoff = "0",
                 stoploss = "0",
                 quantity = ModifiedQuantity.ToString(),
@@ -421,123 +423,6 @@ namespace StockLogger.Controllers.API_Controllers
             }
 
         }
-
-
-        //POST https://localhost:44364/api/BuySell/buySell
-        [HttpPost("buySell")]
-        public async Task<IActionResult> BuySellIntradayStock()
-        {
-            // Fetch the authorization token (assuming this is a string)
-            string authToken = await GetAuthorizationTokenAsync();
-
-            var client = new HttpClient();
-
-            string LTP = "";
-            string ExpectedPrice = "";
-
-            var LTPData = new
-            {
-                exchange = "NSE",
-                tradingsymbol = "IDEA-EQ",
-                symboltoken = "14366"
-            };
-
-            var LTPjsonData = JsonConvert.SerializeObject(LTPData);
-
-            var LTPrequestMessage = new HttpRequestMessage(HttpMethod.Post, "https://apiconnect.angelone.in/rest/secure/angelbroking/order/v1/getLtpData")
-            {
-                Content = new StringContent(LTPjsonData, Encoding.UTF8, "application/json")
-            };
-
-            LTPrequestMessage.Headers.Add("Accept", "application/json");
-            LTPrequestMessage.Headers.Add("X-SourceID", "WEB");
-            LTPrequestMessage.Headers.Add("X-ClientLocalIP", "192.168.56.177");
-            LTPrequestMessage.Headers.Add("X-ClientPublicIP", await GetPublicIPAsync());
-            LTPrequestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX");
-            LTPrequestMessage.Headers.Add("X-UserType", "USER");
-            LTPrequestMessage.Headers.Add("Authorization", "Bearer " + authToken);
-            LTPrequestMessage.Headers.Add("X-PrivateKey", "GmTkiYil");
-
-
-            try
-            {
-                HttpResponseMessage response = await client.SendAsync(LTPrequestMessage);
-
-                response.EnsureSuccessStatusCode();
-
-                string responseContent = await response.Content.ReadAsStringAsync();
-
-                // Deserialize into the custom ApiResponse class
-                var parsedContent = JsonConvert.DeserializeObject<LTPApiResponse>(responseContent);
-
-                LTP = parsedContent.Data.Ltp.ToString();
-
-                var expPrice = parsedContent.Data.Ltp + 1;
-
-                ExpectedPrice = expPrice.ToString();
-
-
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { ex.Message });
-            }
-
-            var data = new
-            {
-                variety = "NORMAL",
-                tradingsymbol = "IDEA-EQ",
-                symboltoken = "14366",
-                transactiontype = "BUY",
-                exchange = "NSE",
-                ordertype = "MARKET",
-                producttype = "INTRADAY",
-                duration = "DAY",
-                price = "0",
-                squareoff = "0",
-                stoploss = "0",
-                quantity = "1"
-            };
-
-
-            var jsonData = JsonConvert.SerializeObject(data);
-
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "https://apiconnect.angelone.in/rest/secure/angelbroking/order/v1/placeOrder")
-            {
-                Content = new StringContent(jsonData, Encoding.UTF8, "application/json")
-            };
-
-            // Set the headers
-            requestMessage.Headers.Add("Accept", "application/json");
-            requestMessage.Headers.Add("X-SourceID", "WEB");
-            requestMessage.Headers.Add("X-ClientLocalIP", "192.168.56.177");  // Your local IP from ipconfig
-            requestMessage.Headers.Add("X-ClientPublicIP", await GetPublicIPAsync());  // Fetching the public IP dynamically
-            requestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX"); // Replace with your actual MAC address
-            requestMessage.Headers.Add("X-UserType", "USER");
-            requestMessage.Headers.Add("Authorization", "Bearer " + authToken);
-            requestMessage.Headers.Add("X-PrivateKey", "GmTkiYil"); // Your actual API Key
-
-
-            try
-            {
-                HttpResponseMessage response = await client.SendAsync(requestMessage);
-
-                response.EnsureSuccessStatusCode();
-
-                var responseContent = await response.Content.ReadAsStringAsync();
-
-
-
-                return Ok(responseContent);
-
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { ex.Message });
-            }
-
-        }
-
 
 
         // Helper method to fetch the JWT token

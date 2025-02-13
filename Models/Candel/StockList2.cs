@@ -80,10 +80,10 @@ namespace StockLogger.Models.Candel
                 new Stock { Ticker = "NESTLEIND-EQ", Exchange = "NSE", Name = "Nestlé India", Id = 50, SymbolToken = "17963" },
 
 
-                new Stock { Ticker = "ADANIGAS-EQ", Exchange = "NSE", Name = "ADANI GAS", Id = 51, SymbolToken = "6066" },
-                new Stock { Ticker = "ADANIGREEN-EQ", Exchange = "NSE", Name = "ADANI GREEN", Id = 52, SymbolToken = "3563" },
-                new Stock { Ticker = "ADANIPOWER-EQ", Exchange = "NSE", Name = "ADANI POWER", Id = 53, SymbolToken = "17388" },
-                new Stock { Ticker = "ADANITRANS-EQ", Exchange = "NSE", Name = "ADANI TRANS", Id = 54, SymbolToken = "10217" },
+                //new Stock { Ticker = "ADANIGAS-EQ", Exchange = "NSE", Name = "ADANI GAS", Id = 51, SymbolToken = "6066" },
+                //new Stock { Ticker = "ADANIGREEN-EQ", Exchange = "NSE", Name = "ADANI GREEN", Id = 52, SymbolToken = "3563" },
+                //new Stock { Ticker = "ADANIPOWER-EQ", Exchange = "NSE", Name = "ADANI POWER", Id = 53, SymbolToken = "17388" },
+                //new Stock { Ticker = "ADANITRANS-EQ", Exchange = "NSE", Name = "ADANI TRANS", Id = 54, SymbolToken = "10217" },
 
 
 
@@ -217,7 +217,7 @@ namespace StockLogger.Models.Candel
                 new Stock { Ticker = "PRESTIGE-EQ", Exchange = "NSE", Name = "PRESTIGE-EQ", Id = 160, SymbolToken = "20302" },
                 new Stock { Ticker = "RECLTD-EQ", Exchange = "NSE", Name = "RECLTD-EQ", Id = 161, SymbolToken = "15355" },
                 new Stock { Ticker = "RVNL-EQ", Exchange = "NSE", Name = "RVNL-EQ", Id = 162, SymbolToken = "9552" },
-
+                new Stock { Ticker = "ZOMATO-EQ", Exchange = "NSE", Name = "ZOMATO-EQ", Id = 163, SymbolToken = "5097" },
 
                 ////new Stock { Ticker = "", Exchange = "NSE", Name = "", Id = 163, SymbolToken = "" },
                 ////new Stock { Ticker = "", Exchange = "NSE", Name = "", Id = 164, SymbolToken = "" },

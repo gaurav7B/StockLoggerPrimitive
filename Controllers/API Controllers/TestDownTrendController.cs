@@ -135,7 +135,7 @@ namespace StockLogger.Controllers.API_Controllers
         // TO_CHECK_UPTREND
 
 
-        // FOR_10_CANDELS
+        //////FOR_10_CANDELS
 
         //public bool IsInDowntrend(List<Candel> candelData, int confirmationCount = 2)
         //{
@@ -436,6 +436,215 @@ namespace StockLogger.Controllers.API_Controllers
         }
 
 
+        /// SUPPORT CALCULATION
+        public decimal CalculateSupportLevel(List<Candel> candelDataBeforeTestCandel)
+        {
+            // Ensure that the list is not null or empty
+            if (candelDataBeforeTestCandel == null || !candelDataBeforeTestCandel.Any())
+            {
+                throw new ArgumentException("The candlestick data is empty or null.");
+            }
+
+            // Find the lowest price (support) from the list of candels
+            decimal supportLevel = candelDataBeforeTestCandel.Min(candel => candel.LowestPrice);
+
+            return supportLevel;
+        }
+
+
+
+        public decimal? CalculateLatestRSI(List<Candel> CandelBeforeTestCandel)
+        {
+            // Check for valid input
+            if (CandelBeforeTestCandel == null || CandelBeforeTestCandel.Count < 15)
+                return null;
+
+            List<decimal> closes = CandelBeforeTestCandel.Select(c => c.EndPrice).ToList();
+            List<decimal> deltas = new List<decimal>();
+
+            for (int i = 1; i < closes.Count; i++)
+            {
+                deltas.Add(closes[i] - closes[i - 1]);
+            }
+
+            List<decimal> gains = new List<decimal>();
+            List<decimal> losses = new List<decimal>();
+
+            foreach (decimal delta in deltas)
+            {
+                if (delta > 0)
+                {
+                    gains.Add(delta);
+                    losses.Add(0);
+                }
+                else if (delta < 0)
+                {
+                    gains.Add(0);
+                    losses.Add(-delta);
+                }
+                else
+                {
+                    gains.Add(0);
+                    losses.Add(0);
+                }
+            }
+
+            decimal avgGain = gains.Take(14).Average();
+            decimal avgLoss = losses.Take(14).Average();
+
+            decimal latestRSI = 0m;
+
+            if (avgLoss == 0)
+            {
+                latestRSI = 100m;
+            }
+            else
+            {
+                decimal rs = avgGain / avgLoss;
+                latestRSI = 100 - (100 / (1 + rs));
+            }
+
+            for (int i = 14; i < deltas.Count; i++)
+            {
+                decimal currentGain = gains[i];
+                decimal currentLoss = losses[i];
+
+                avgGain = (avgGain * 13 + currentGain) / 14;
+                avgLoss = (avgLoss * 13 + currentLoss) / 14;
+
+                if (avgLoss == 0)
+                {
+                    latestRSI = 100m;
+                }
+                else
+                {
+                    decimal rs = avgGain / avgLoss;
+                    latestRSI = 100 - (100 / (1 + rs));
+                }
+            }
+
+            return latestRSI;
+        }
+
+
+        ///// MFI
+        public decimal? CalculateMFI(List<Candel> InputList, int period = 14)
+        {
+            // Check for valid input
+            if (InputList == null || InputList.Count < period)
+                return null;
+
+            List<decimal> positiveFlow = new List<decimal>();
+            List<decimal> negativeFlow = new List<decimal>();
+
+            for (int i = 1; i < InputList.Count; i++)
+            {
+                var typicalPrice = (InputList[i].HighestPrice + InputList[i].LowestPrice + InputList[i].EndPrice) / 3;
+                var moneyFlow = typicalPrice * InputList[i].Volume;
+
+                var prevTypicalPrice = (InputList[i - 1].HighestPrice + InputList[i - 1].LowestPrice + InputList[i - 1].EndPrice) / 3;
+
+                if (typicalPrice > prevTypicalPrice)
+                    positiveFlow.Add(moneyFlow);
+                else if (typicalPrice < prevTypicalPrice)
+                    negativeFlow.Add(moneyFlow);
+                else
+                {
+                    positiveFlow.Add(0);
+                    negativeFlow.Add(0);
+                }
+            }
+
+            int startIndex = Math.Max(0, positiveFlow.Count - period);
+            decimal positiveSum = positiveFlow.Skip(startIndex).Take(period).Sum();
+            decimal negativeSum = negativeFlow.Skip(startIndex).Take(period).Sum();
+
+            if (negativeSum == 0)
+                return 100; // If no negative money flow, MFI is 100
+
+            decimal moneyFlowRatio = positiveSum / negativeSum;
+            decimal MFI = 100 - (100 / (1 + moneyFlowRatio));
+
+            return MFI;
+        }
+
+
+        ///// WILLIAMSR
+
+        public static decimal? CalculateWilliamsR(List<Candel> inputList)
+        {
+            int period = 14;
+
+            // Check for valid input
+            if (inputList == null || inputList.Count < period)
+                return null;
+
+            // Extract the last 'period' candles from the input list
+            var window = inputList.Skip(inputList.Count - period).Take(period).ToList();
+
+            // Calculate highest high and lowest low in the window
+            decimal maxHigh = window.Max(c => c.HighestPrice);
+            decimal minLow = window.Min(c => c.LowestPrice);
+            decimal close = inputList.Last().EndPrice; // Closing price of the latest candle
+
+            // Handle division by zero case (flat line)
+            decimal denominator = maxHigh - minLow;
+            if (denominator == 0)
+                return 0;
+
+            // Compute Williams %R
+            decimal williamsR = ((maxHigh - close) / denominator) * -100;
+            return williamsR;
+        }
+
+
+        //// CCI Commodity Channel Index
+
+        public static decimal? CalculateCCI(List<Candel> inputList, int period = 20)
+        {
+            if (inputList == null || inputList.Count < period)
+                return null;
+
+            List<decimal> typicalPrices = inputList
+                .Skip(inputList.Count - period)
+                .Select(c => (c.HighestPrice + c.LowestPrice + c.EndPrice) / 3)
+                .ToList();
+
+            decimal sma = typicalPrices.Average();
+
+            decimal meanDeviation = typicalPrices.Average(tp => Math.Abs(tp - sma));
+
+            if (meanDeviation == 0)
+                return 0;
+
+            decimal currentTp = typicalPrices.Last();
+            decimal cciValue = (currentTp - sma) / (0.015m * meanDeviation);
+
+            return cciValue;
+        }
+
+        public static decimal? CalculateStochasticOscillator(List<Candel> inputList, int period = 14)
+        {
+            if (inputList == null || inputList.Count < period)
+                return null;
+
+            // Get the last 'period' candles
+            var recentCandles = inputList.TakeLast(period).ToList();
+
+            // Calculate the Highest High and Lowest Low over the period
+            decimal highestHigh = recentCandles.Max(c => c.HighestPrice);
+            decimal lowestLow = recentCandles.Min(c => c.LowestPrice);
+
+            // Get the closing price of the most recent candle
+            decimal currentClose = recentCandles.Last().EndPrice;
+
+            // Calculate Stochastic Oscillator (%K)
+            decimal stochastic = ((currentClose - lowestLow) / (highestHigh - lowestLow)) * 100;
+
+            return stochastic;
+        }
+
+
         //POST https://localhost:44364/api/TestDownTrend/BulkTestMasterAPI
         [HttpPost("BulkTestMasterAPI")]
         public async Task<IActionResult> BulkTestMasterAPI([FromBody] BulkTestRequestModel request)
@@ -662,75 +871,246 @@ namespace StockLogger.Controllers.API_Controllers
 
 
 
+                            //foreach (Candel testCandel in CandelData)
+                            //{
+
+                            //    //List<Candel> CandelDataBeforeTestCandel = CandelData
+                            //    //                    .Where(candel => candel.OpenTime <= testCandel.OpenTime)
+                            //    //                    .OrderByDescending(c => c.OpenTime)
+                            //    //                    .Take(3)
+                            //    //                    .OrderBy(c => c.OpenTime)
+                            //    //                    .ToList();
+
+                            //    //Candel candel1 = CandelDataBeforeTestCandel[0];
+                            //    //Candel candel2 = CandelDataBeforeTestCandel[1];
+                            //    //Candel candel3 = CandelDataBeforeTestCandel[2];
+
+
+                            //    List<Candel> CandelDataBeforeTestCandel = CandelData
+                            //                        .Where(candel => candel.OpenTime < testCandel.OpenTime)
+                            //                        .OrderByDescending(c => c.OpenTime)  // Sort in descending order to get latest first
+                            //                        .Take(10)  // Take the last 21 candles
+                            //                        .OrderBy(c => c.OpenTime)  // Reorder them back in ascending order
+                            //                        .ToList();
+
+
+                            //    bool isListinDowntrend = IsInDowntrend(CandelDataBeforeTestCandel);
+
+                            //    //if ((testCandel.EndPrice > testCandel.StartPrice) && (isListinDowntrend == true)) // Bullish Candel
+                            //    //{
+                            //    //    if ((testCandel.StartPrice == testCandel.LowestPrice))
+                            //    //    {
+                            //    //        dragonFlyDojiCandles.Add(testCandel);
+                            //    //    }
+                            //    //}
+                            //    //else if (testCandel.EndPrice < testCandel.StartPrice && (isListinDowntrend == true)) // Bearish Candel
+                            //    //{
+                            //    //    if ((testCandel.EndPrice == testCandel.LowestPrice))
+                            //    //    {
+                            //    //        dragonFlyDojiCandles.Add(testCandel);
+                            //    //    }
+                            //    //}
+
+
+                            //    if(isListinDowntrend)
+                            //    {
+                            //        //dragonFlyDojiCandles.Add(testCandel);
+
+                            //        if (!dragonFlyDojiCandles.Any(candle => candle.Ticker == testCandel.Ticker))
+                            //        {
+                            //            dragonFlyDojiCandles.Add(testCandel);
+                            //        }
+                            //    }
+
+
+                            //    //if ((testCandel.EndPrice > testCandel.StartPrice)) // Bullish Candel
+                            //    //{
+                            //    //    if ((testCandel.StartPrice == testCandel.LowestPrice))
+                            //    //    {
+                            //    //        dragonFlyDojiCandles.Add(testCandel);
+                            //    //    }
+                            //    //}
+                            //    //else if (testCandel.EndPrice < testCandel.StartPrice) // Bearish Candel
+                            //    //{
+                            //    //    if ((testCandel.EndPrice == testCandel.LowestPrice))
+                            //    //    {
+                            //    //        dragonFlyDojiCandles.Add(testCandel);
+                            //    //    }
+                            //    //}
+
+                            //    //if ((DetectThreeBlackCrows(CandelDataBeforeTestCandel)) == true)
+                            //    //{
+                            //    //    dragonFlyDojiCandles.Add(testCandel);
+                            //    //}
+
+
+                            //}
+
+                            //foreach (Candel testCandel in CandelData)
+                            //{
+
+                            //    List<Candel> ListForDowntrend = CandelData
+                            //                        .Where(candel => candel.OpenTime < testCandel.OpenTime)
+                            //                        .OrderByDescending(c => c.OpenTime)  
+                            //                        .Take(5)  
+                            //                        .OrderBy(c => c.OpenTime)  
+                            //                        .ToList();
+
+                            //    bool isListinDowntrend = IsInDowntrend(ListForDowntrend);
+
+
+                            //    List<Candel> ListForSupportLevel = CandelData
+                            //                        .Where(candel => candel.OpenTime <= testCandel.OpenTime)
+                            //                        .OrderBy(c => c.OpenTime)
+                            //                        .ToList();
+
+
+                            //    List<Candel> ListForRSI = CandelData
+                            //                        .Where(candel => candel.OpenTime <= testCandel.OpenTime)
+                            //                        .OrderByDescending(c => c.OpenTime)
+                            //                        .Take(15)
+                            //                        .OrderBy(c => c.OpenTime)
+                            //                        .ToList();
+
+                            //    decimal RSI = CalculateLatestRSI(ListForRSI);
+
+                            //    // CHECK IF THE DOJI IS NEAR SUPPORT
+                            //    bool isNearSupport = false;
+
+                            //    decimal tolerancePercentageForSupportLevel = 0.5m;
+
+                            //    decimal supportLevel = CalculateSupportLevel(ListForSupportLevel);
+
+                            //    // Calculate the absolute difference between the support level and the recent candel's lowest price
+                            //    decimal priceDifference = Math.Abs(testCandel.LowestPrice - supportLevel);
+
+                            //    // If the price difference is within the tolerance (percentage of the support level)
+                            //    decimal tolerance = (tolerancePercentageForSupportLevel / 100) * supportLevel;
+
+
+                            //    if (priceDifference <= tolerance)
+                            //    {
+                            //        isNearSupport = true;
+                            //    }
+
+
+
+                            //    if (
+                            //        isListinDowntrend
+                            //        //&& (isNearSupport == false)
+                            //        && (RSI > 80) // RSI > 70 STOCK IS OVERBOUGHT HIGH SELLING PRESSURE
+                            //        )
+                            //    {
+                            //        dragonFlyDojiCandles.Add(testCandel);
+
+                            //        //if (!dragonFlyDojiCandles.Any(candle => candle.Ticker == testCandel.Ticker))
+                            //        //{
+                            //        //    dragonFlyDojiCandles.Add(testCandel);
+                            //        //}
+                            //    }
+
+                            //}
+
+
+                            //// PURE RSI BASED STRATERGY
+
+                            //foreach(Candel testCandel in CandelData)
+                            //{
+
+                            //    if (testCandel.OpenTime.TimeOfDay > new TimeSpan(15, 00, 0))
+                            //    {
+                            //        break;
+                            //    }
+
+                            //    List<Candel> ListForRSI = CandelData
+                            //                        .Where(candel => candel.OpenTime <= testCandel.OpenTime)
+                            //                        .OrderByDescending(c => c.OpenTime)
+                            //                        .Take(15)
+                            //                        .OrderBy(c => c.OpenTime)
+                            //                        .ToList();
+
+                            //    decimal RSI = CalculateLatestRSI(ListForRSI);
+
+
+
+                            //    if (
+                            //        (RSI > 95) // RSI > 70 STOCK IS OVERBOUGHT HIGH SELLING PRESSURE
+                            //        )
+                            //    {
+                            //        dragonFlyDojiCandles.Add(testCandel);
+
+                            //        //if (!dragonFlyDojiCandles.Any(candle => candle.Ticker == testCandel.Ticker))
+                            //        //{
+                            //        //    dragonFlyDojiCandles.Add(testCandel);
+                            //        //}
+                            //    }
+
+                            //}
+
                             foreach (Candel testCandel in CandelData)
                             {
 
-                                //List<Candel> CandelDataBeforeTestCandel = CandelData
-                                //                    .Where(candel => candel.OpenTime <= testCandel.OpenTime)
-                                //                    .OrderByDescending(c => c.OpenTime)
-                                //                    .Take(3)
-                                //                    .OrderBy(c => c.OpenTime)
-                                //                    .ToList();
-
-                                //Candel candel1 = CandelDataBeforeTestCandel[0];
-                                //Candel candel2 = CandelDataBeforeTestCandel[1];
-                                //Candel candel3 = CandelDataBeforeTestCandel[2];
-
-
-                                List<Candel> CandelDataBeforeTestCandel = CandelData
-                                                    .Where(candel => candel.OpenTime < testCandel.OpenTime)
-                                                    .OrderByDescending(c => c.OpenTime)  // Sort in descending order to get latest first
-                                                    .Take(5)  // Take the last 21 candles
-                                                    .OrderBy(c => c.OpenTime)  // Reorder them back in ascending order
-                                                    .ToList();
-
-
-                                bool isListinDowntrend = IsInDowntrend(CandelDataBeforeTestCandel);
-
-                                //if ((testCandel.EndPrice > testCandel.StartPrice) && (isListinDowntrend == true)) // Bullish Candel
-                                //{
-                                //    if ((testCandel.StartPrice == testCandel.LowestPrice))
-                                //    {
-                                //        dragonFlyDojiCandles.Add(testCandel);
-                                //    }
-                                //}
-                                //else if (testCandel.EndPrice < testCandel.StartPrice && (isListinDowntrend == true)) // Bearish Candel
-                                //{
-                                //    if ((testCandel.EndPrice == testCandel.LowestPrice))
-                                //    {
-                                //        dragonFlyDojiCandles.Add(testCandel);
-                                //    }
-                                //}
-
-
-                                if(isListinDowntrend)
+                                if (testCandel.OpenTime.TimeOfDay > new TimeSpan(15, 00, 0))
                                 {
-                                    dragonFlyDojiCandles.Add(testCandel);
+                                    break;
                                 }
 
+                                List<Candel> ListForRSI = CandelData
+                                                    .Where(candel => candel.OpenTime <= testCandel.OpenTime)
+                                                    .OrderByDescending(c => c.OpenTime)
+                                                    .Take(15)
+                                                    .OrderBy(c => c.OpenTime)
+                                                    .ToList();
 
-                                //if ((testCandel.EndPrice > testCandel.StartPrice)) // Bullish Candel
-                                //{
-                                //    if ((testCandel.StartPrice == testCandel.LowestPrice))
-                                //    {
-                                //        dragonFlyDojiCandles.Add(testCandel);
-                                //    }
-                                //}
-                                //else if (testCandel.EndPrice < testCandel.StartPrice) // Bearish Candel
-                                //{
-                                //    if ((testCandel.EndPrice == testCandel.LowestPrice))
-                                //    {
-                                //        dragonFlyDojiCandles.Add(testCandel);
-                                //    }
-                                //}
+                                List<Candel> ListForMFI = CandelData
+                                                    .Where(candel => candel.OpenTime <= testCandel.OpenTime)
+                                                    .OrderByDescending(c => c.OpenTime)
+                                                    .Take(14)
+                                                    .OrderBy(c => c.OpenTime)
+                                                    .ToList();
 
-                                //if ((DetectThreeBlackCrows(CandelDataBeforeTestCandel)) == true)
-                                //{
-                                //    dragonFlyDojiCandles.Add(testCandel);
-                                //}
+                                List<Candel> ListForCCI = CandelData
+                                                    .Where(candel => candel.OpenTime <= testCandel.OpenTime)
+                                                    .OrderByDescending(c => c.OpenTime)
+                                                    .Take(20)
+                                                    .OrderBy(c => c.OpenTime)
+                                                    .ToList();
 
+                                decimal? RSI = CalculateLatestRSI(ListForRSI);
+
+                                decimal? MFI = CalculateMFI(ListForMFI);
+
+                                decimal? WILLIAMSR = CalculateWilliamsR(ListForMFI);
+
+                                decimal? CCI = CalculateCCI(ListForCCI);
+
+                                decimal? SO = CalculateStochasticOscillator(ListForMFI);
+
+
+
+
+                                if (
+                                    (
+                                    ((RSI != null) && (RSI > 70))
+                                    && ((SO != null) && (SO > 80))
+                                    && ((MFI != null) && (MFI > 80))
+
+                                    && ((WILLIAMSR != null) && (WILLIAMSR > -20) && (WILLIAMSR <= 0) )
+                                    && ((CCI != null) && (CCI > 100) )
+
+                                    ) // RSI > 70 STOCK IS OVERBOUGHT HIGH SELLING PRESSURE
+                                   )
+                                {
+                                    dragonFlyDojiCandles.Add(testCandel);
+
+                                    //if (!dragonFlyDojiCandles.Any(candle => candle.Ticker == testCandel.Ticker))
+                                    //{
+                                    //    dragonFlyDojiCandles.Add(testCandel);
+                                    //}
+                                }
 
                             }
+
 
 
 
@@ -764,7 +1144,7 @@ namespace StockLogger.Controllers.API_Controllers
 
                                 decimal profitMargin = 0;
 
-                                if (expectedPrice == firstCandel.EndPrice * 1.00065m)
+                                if (expectedPrice == firstCandel.EndPrice - (firstCandel.EndPrice * 0.00065m))
                                 {
                                     profitMargin = 130 - 117;
                                 }
@@ -772,7 +1152,7 @@ namespace StockLogger.Controllers.API_Controllers
                                 {
                                     profitMargin = 160 - 117;
                                 }
-                                else if (expectedPrice == firstCandel.EndPrice * 1.0025m)
+                                else if (expectedPrice == firstCandel.EndPrice - (firstCandel.EndPrice * 0.0025m))
                                 {
                                     profitMargin = 450 - 117;
                                 }

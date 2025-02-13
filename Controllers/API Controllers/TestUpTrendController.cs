@@ -1626,6 +1626,7 @@ namespace StockLogger.Controllers.API_Controllers
                             //        && longLowerShadow
                             //        && smallBodyAtTop
                             //        && shortUpperShadow
+                            //        //&& (recentCandel.HighestPrice == recentCandel.EndPrice)
                             //        && (isNearSupport == true)
                             //        && (recentCandel.EndPrice > recentCandel.StartPrice)
                             //        //&& (isInRelativeToleranceofFibonaci == true)
