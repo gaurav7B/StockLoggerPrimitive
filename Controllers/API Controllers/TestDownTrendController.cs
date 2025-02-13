@@ -645,6 +645,10 @@ namespace StockLogger.Controllers.API_Controllers
         }
 
 
+
+        ///// IS STOCK OVERBOUGHT BASED ON PE RATIO
+        
+
         //POST https://localhost:44364/api/TestDownTrend/BulkTestMasterAPI
         [HttpPost("BulkTestMasterAPI")]
         public async Task<IActionResult> BulkTestMasterAPI([FromBody] BulkTestRequestModel request)
@@ -1087,16 +1091,22 @@ namespace StockLogger.Controllers.API_Controllers
                                 decimal? SO = CalculateStochasticOscillator(ListForMFI);
 
 
-
-
                                 if (
                                     (
-                                    ((RSI != null) && (RSI > 70))
-                                    && ((SO != null) && (SO > 80))
-                                    && ((MFI != null) && (MFI > 80))
+                                            //((RSI != null) && (RSI > 70))
+                                            //&& ((SO != null) && (SO > 80))
+                                            //&& ((MFI != null) && (MFI > 80))
 
-                                    && ((WILLIAMSR != null) && (WILLIAMSR > -20) && (WILLIAMSR <= 0) )
-                                    && ((CCI != null) && (CCI > 100) )
+                                            //&& ((WILLIAMSR != null) && (WILLIAMSR > -20) && (WILLIAMSR <= 0) )
+                                            //&& ((CCI != null) && (CCI > 100) )
+
+
+                                            ((RSI != null) && (RSI == 100)) // RSI at maximum value indicates extreme overbought
+                                            && ((SO != null) && (SO == 100)) // Stochastic Oscillator at maximum value indicates extreme overbought
+                                            && ((MFI != null) && (MFI == 100)) // MFI at maximum value indicates extreme overbought
+                                            && ((WILLIAMSR != null) && (WILLIAMSR > -20) && (WILLIAMSR < 0)) // Williams %R close to 0 indicates extreme overbought
+                                            && ((CCI != null) && (CCI >= 200)) // CCI at very high values indicates extreme overbought
+
 
                                     ) // RSI > 70 STOCK IS OVERBOUGHT HIGH SELLING PRESSURE
                                    )
