@@ -191,21 +191,21 @@ namespace StockLogger.Controllers.API_Controllers
         public async Task<IActionResult> GetCandleDataForTest([FromBody] StockRequest stockRequest)
         {
 
-            string authtoken = await GetRefreshedAuthorizationTokenAsync();
+            //string authtoken = await GetRefreshedAuthorizationTokenAsync();
 
-            //string authtoken = "";
+            string authtoken = "";
 
-            //if (count % 2 != 0)
-            //{
-            //    authtoken = await GetRefreshedAuthorizationTokenAsync();
-            //    count++;
-            //}
-            //else
-            //{
-            //    var token = await _context.Token.FirstOrDefaultAsync();
-            //    authtoken = token.AuthToken;
-            //    count++;
-            //}
+            if (count % 2 != 0)
+            {
+                authtoken = await GetRefreshedAuthorizationTokenAsync();
+                count++;
+            }
+            else
+            {
+                var token = await _context.Token.FirstOrDefaultAsync();
+                authtoken = token.AuthToken;
+                count++;
+            }
 
             // Extract only the date part from StartDate
             var startDateOnly = stockRequest.StartDate.Date;
@@ -242,7 +242,7 @@ namespace StockLogger.Controllers.API_Controllers
 
             //// 3_YEARS_TESTING
             //var startDateWithTime900 = startDateOnly.AddDays(-1000).AddHours(9).AddMinutes(15);
-            //var startDateWithTime330 = DateTime.Now.AddHours(15).AddMinutes(20);
+            //var startDateWithTime330 = DateTime.Now;
 
 
             var data = new
@@ -252,7 +252,7 @@ namespace StockLogger.Controllers.API_Controllers
                 interval = "ONE_MINUTE",// COMPLEX HAMMER without stoploss working fine here
                 //interval = "ONE_DAY",
                 //interval = "THREE_MINUTE", // DRAGON FLY DOJI
-                //interval = "FIVE_MINUTE",//--/// 3 white soilders worked at 100% accuracy prfit margin 0.0025 // COMPLEX HAMMER working at 0.0025% profit
+                //interval = "FIVE_MINUTE",//--/// 3 white soilders worked at 100% accuracy profit margin 0.0025 // COMPLEX HAMMER working at 0.0025% profit
                 //interval = "TEN_MINUTE",
                 //interval = "FIFTEEN_MINUTE",
                 //interval = "ONE_HOUR",

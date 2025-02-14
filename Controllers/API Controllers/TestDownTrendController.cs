@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace StockLogger.Controllers.API_Controllers
@@ -644,9 +645,34 @@ namespace StockLogger.Controllers.API_Controllers
             return stochastic;
         }
 
+        public static decimal? CalculateVWPA(List<Candel> inputList)
+        {
+            if (inputList == null || inputList.Count == 0)
+                return null;
+
+            decimal totalVolumeWeightedPrice = 0;
+            decimal totalVolume = 0;
+
+            foreach (var candel in inputList)
+            {
+                decimal typicalPrice = (candel.HighestPrice + candel.LowestPrice + candel.EndPrice) / 3;
+                totalVolumeWeightedPrice += typicalPrice * candel.Volume;
+                totalVolume += candel.Volume;
+            }
+
+            return totalVolume != 0 ? totalVolumeWeightedPrice / totalVolume : 0;
+        }
 
 
-        ///// IS STOCK OVERBOUGHT BASED ON PE RATIO
+        public class dataRSI
+        {
+            public decimal? mainRSI { get; set; }
+            public decimal? mainMFI { get; set; }
+            public decimal? mainCCI { get; set; }
+            public decimal? mainSO { get; set; }
+            public DateTime ExecutedDate { get; set; }
+        }
+
         
 
         //POST https://localhost:44364/api/TestDownTrend/BulkTestMasterAPI
@@ -662,6 +688,9 @@ namespace StockLogger.Controllers.API_Controllers
 
             List<List<List<Candel>>> MainCorrectPredictionList = new List<List<List<Candel>>>();
             List<List<List<Candel>>> MainWrongPredictionList = new List<List<List<Candel>>>();
+
+            List<dataRSI> ListCorrectDataRSIs = new List<dataRSI>();
+            List<dataRSI> ListWorngDataRSIs = new List<dataRSI>();
 
             List<List<Candel>> MainMasterList = new List<List<Candel>>();
 
@@ -695,6 +724,13 @@ namespace StockLogger.Controllers.API_Controllers
                 List<List<Candel>> WrongPredictionList = new List<List<Candel>>();
 
                 List<Candel> CandelData = new List<Candel>();
+
+                decimal? mainRSI = 0;
+                decimal? mainMFI = 0;
+                decimal? mainWILLIAMSR = 0;
+                decimal? mainCCI = 0;
+                decimal? mainSO = 0;
+                DateTime? ExecutedDate = null;
 
                 // Variables for profit and loss tracking
                 decimal TotalProfit = 0;
@@ -1051,6 +1087,7 @@ namespace StockLogger.Controllers.API_Controllers
 
                             //}
 
+
                             foreach (Candel testCandel in CandelData)
                             {
 
@@ -1058,6 +1095,11 @@ namespace StockLogger.Controllers.API_Controllers
                                 {
                                     break;
                                 }
+
+                                List<Candel> TotalList = CandelData
+                                                    .Where(candel => candel.OpenTime <= testCandel.OpenTime)
+                                                    .OrderBy(c => c.OpenTime)
+                                                    .ToList();
 
                                 List<Candel> ListForRSI = CandelData
                                                     .Where(candel => candel.OpenTime <= testCandel.OpenTime)
@@ -1090,34 +1132,60 @@ namespace StockLogger.Controllers.API_Controllers
 
                                 decimal? SO = CalculateStochasticOscillator(ListForMFI);
 
+                                decimal? VWPA = CalculateVWPA(TotalList);
+
+
+                                //if (
+                                //   //((RSI != null) && (RSI > 70))
+                                //   //&& ((SO != null) && (SO > 80))
+                                //   //&& ((MFI != null) && (MFI > 80))
+
+                                //   //&& ((WILLIAMSR != null) && (WILLIAMSR > -20) && (WILLIAMSR <= 0))
+                                //   //&& ((CCI != null) && (CCI > 100))
+
+
+
+                                //   ((RSI != null) && (RSI > 93))
+                                //   && ((SO != null) && (SO > 80))
+                                //   && ((MFI != null) && (MFI > 80))
+
+                                //   && ((WILLIAMSR != null) && (WILLIAMSR > -20) && (WILLIAMSR <= 0))
+                                //   && ((CCI != null) && (CCI > 250))
+
+
+
+                                //   //((RSI != null) && (RSI > 93))
+                                //   //&& ((SO != null) && (SO > 80))
+                                //   //&& ((MFI != null) && (MFI > 80))
+
+                                //   //&& ((WILLIAMSR != null) && (WILLIAMSR > -20) && (WILLIAMSR <= 0))
+                                //   //&& ((CCI != null) && (CCI > 100))
+
+
+                                //   //((RSI != null) && (RSI == 100)) // RSI at maximum value indicates extreme overbought
+                                //   //&& ((SO != null) && (SO == 100)) // Stochastic Oscillator at maximum value indicates extreme overbought
+                                //   //&& ((MFI != null) && (MFI == 100)) // MFI at maximum value indicates extreme overbought
+                                //   //&& ((WILLIAMSR != null) && (WILLIAMSR >= -1) && (WILLIAMSR < 0)) // Williams %R close to 0 indicates extreme overbought
+                                //   //&& ((CCI != null) && (CCI >= 200)) // CCI at very high values indicates extreme overbought
+                                //   )
+                                //{
+                                //    dragonFlyDojiCandles.Add(testCandel);
+
+                                //    //if (!dragonFlyDojiCandles.Any(candle => candle.Ticker == testCandel.Ticker))
+                                //    //{
+                                //    //    dragonFlyDojiCandles.Add(testCandel);
+                                //    //}
+                                //}
 
                                 if (
-                                    (
-                                            //((RSI != null) && (RSI > 70))
-                                            //&& ((SO != null) && (SO > 80))
-                                            //&& ((MFI != null) && (MFI > 80))
-
-                                            //&& ((WILLIAMSR != null) && (WILLIAMSR > -20) && (WILLIAMSR <= 0) )
-                                            //&& ((CCI != null) && (CCI > 100) )
-
-
-                                            ((RSI != null) && (RSI == 100)) // RSI at maximum value indicates extreme overbought
-                                            && ((SO != null) && (SO == 100)) // Stochastic Oscillator at maximum value indicates extreme overbought
-                                            && ((MFI != null) && (MFI == 100)) // MFI at maximum value indicates extreme overbought
-                                            && ((WILLIAMSR != null) && (WILLIAMSR > -20) && (WILLIAMSR < 0)) // Williams %R close to 0 indicates extreme overbought
-                                            && ((CCI != null) && (CCI >= 200)) // CCI at very high values indicates extreme overbought
-
-
-                                    ) // RSI > 70 STOCK IS OVERBOUGHT HIGH SELLING PRESSURE
-                                   )
+                                    ((RSI != null) && (RSI > 93))
+                                    && (CCI != null) && (CCI > 250)
+                                    )
                                 {
                                     dragonFlyDojiCandles.Add(testCandel);
-
-                                    //if (!dragonFlyDojiCandles.Any(candle => candle.Ticker == testCandel.Ticker))
-                                    //{
-                                    //    dragonFlyDojiCandles.Add(testCandel);
-                                    //}
                                 }
+
+
 
                             }
 
@@ -1143,10 +1211,10 @@ namespace StockLogger.Controllers.API_Controllers
                                 {
                                     //expectedPrice = firstCandel.EndPrice * 1.000595m;
                                     //expectedPrice = firstCandel.EndPrice * 1.00061m;
-                                    expectedPrice = firstCandel.EndPrice - (firstCandel.EndPrice * 0.00065m);
+                                    //expectedPrice = firstCandel.EndPrice - (firstCandel.EndPrice * 0.00065m);
                                     //firstCandel.EndPrice - (firstCandel.EndPrice * 0.01m); //  10 R profit on 1000 R //1995 on 2 lakh
                                     //expectedPrice = firstCandel.EndPrice - (firstCandel.EndPrice * 0.005m); //  5 R profit on 1000 R //997 on 2lakh
-                                    //expectedPrice = firstCandel.EndPrice - (firstCandel.EndPrice * 0.0025m); // 2.5 R profit on 1000 R //450 on 2Lakh
+                                    expectedPrice = firstCandel.EndPrice - (firstCandel.EndPrice * 0.0025m); // 2.5 R profit on 1000 R //450 on 2Lakh
 
                                     //expectedPrice = firstCandel.EndPrice * 1.0004953m; // 4 LAKH
 
@@ -1183,7 +1251,7 @@ namespace StockLogger.Controllers.API_Controllers
                                 ConstForProfit = profitMargin;
 
                                 List<Candel> CandelDataAfterFirstCandel = CandelData
-                                           .Where(candel => candel.OpenTime >= firstCandel.OpenTime)
+                                           .Where(candel => candel.OpenTime > firstCandel.OpenTime)
                                            .OrderBy(c => c.OpenTime)
                                            .ToList();
                    
@@ -1243,6 +1311,49 @@ namespace StockLogger.Controllers.API_Controllers
                                     CandelPair.Add(RangeProfit);
                                     CandelPair.Add(RANGE_LOW);
 
+                                    List<Candel> ListForRSI = CandelData
+                                                        .Where(candel => candel.OpenTime <= dojiCandle.OpenTime)
+                                                        .OrderByDescending(c => c.OpenTime)
+                                                        .Take(15)
+                                                        .OrderBy(c => c.OpenTime)
+                                                        .ToList();
+
+                                    List<Candel> ListForMFI = CandelData
+                                                        .Where(candel => candel.OpenTime <= dojiCandle.OpenTime)
+                                                        .OrderByDescending(c => c.OpenTime)
+                                                        .Take(14)
+                                                        .OrderBy(c => c.OpenTime)
+                                                        .ToList();
+
+                                    List<Candel> ListForCCI = CandelData
+                                                        .Where(candel => candel.OpenTime <= dojiCandle.OpenTime)
+                                                        .OrderByDescending(c => c.OpenTime)
+                                                        .Take(20)
+                                                        .OrderBy(c => c.OpenTime)
+                                                        .ToList();
+
+                                    decimal? RSI = CalculateLatestRSI(ListForRSI);
+
+                                    decimal? MFI = CalculateMFI(ListForMFI);
+
+                                    decimal? CCI = CalculateCCI(ListForCCI);
+
+                                    decimal? SO = CalculateStochasticOscillator(ListForMFI);
+
+
+
+                                    dataRSI dataRSI = new dataRSI
+                                    {
+                                        mainRSI = RSI,
+                                        mainMFI = MFI,
+                                        mainCCI = CCI,
+                                        mainSO = SO,
+                                        ExecutedDate = dojiCandle.OpenTime
+                                    };
+
+                                    ListCorrectDataRSIs.Add(dataRSI);
+
+
                                     CorrectPredictionList.Add(CandelPair);
                                     MainCorrectPredictionList.Add(CorrectPredictionList);
                                 }
@@ -1252,6 +1363,48 @@ namespace StockLogger.Controllers.API_Controllers
                                     CandelPair.Add(dojiCandle);
                                     CandelPair.Add(EndCandel);
                                     CandelPair.Add(RANGE_LOW);
+
+                                    List<Candel> ListForRSI = CandelData
+                                                        .Where(candel => candel.OpenTime <= dojiCandle.OpenTime)
+                                                        .OrderByDescending(c => c.OpenTime)
+                                                        .Take(15)
+                                                        .OrderBy(c => c.OpenTime)
+                                                        .ToList();
+
+                                    List<Candel> ListForMFI = CandelData
+                                                        .Where(candel => candel.OpenTime <= dojiCandle.OpenTime)
+                                                        .OrderByDescending(c => c.OpenTime)
+                                                        .Take(14)
+                                                        .OrderBy(c => c.OpenTime)
+                                                        .ToList();
+
+                                    List<Candel> ListForCCI = CandelData
+                                                        .Where(candel => candel.OpenTime <= dojiCandle.OpenTime)
+                                                        .OrderByDescending(c => c.OpenTime)
+                                                        .Take(20)
+                                                        .OrderBy(c => c.OpenTime)
+                                                        .ToList();
+
+                                    decimal? RSI = CalculateLatestRSI(ListForRSI);
+
+                                    decimal? MFI = CalculateMFI(ListForMFI);
+
+                                    decimal? CCI = CalculateCCI(ListForCCI);
+
+                                    decimal? SO = CalculateStochasticOscillator(ListForMFI);
+
+
+
+                                    dataRSI dataRSI = new dataRSI
+                                    {
+                                        mainRSI = RSI,
+                                        mainMFI = MFI,
+                                        mainCCI = CCI,
+                                        mainSO = SO,
+                                        ExecutedDate = dojiCandle.OpenTime
+                                    };
+
+                                    ListWorngDataRSIs.Add(dataRSI);
 
                                     WrongPredictionList.Add(CandelPair);
                                     MainWrongPredictionList.Add(WrongPredictionList);
@@ -1371,6 +1524,11 @@ namespace StockLogger.Controllers.API_Controllers
             var accuracy = ((double)extractedListCorrectPredictions.Count /
                 (extractedListCorrectPredictions.Count + extractedListWrongPredictions.Count)) * 100;
 
+            //dynamic? maxRSIObject = ListDataRSIs.OrderByDescending(x => x.mainRSI).FirstOrDefault();
+            //dynamic? maxMFIObject = ListDataRSIs.OrderByDescending(x => x.mainMFI).FirstOrDefault();
+            //dynamic? maxCCIObject = ListDataRSIs.OrderByDescending(x => x.mainCCI).FirstOrDefault();
+            //dynamic? maxSOObject = ListDataRSIs.OrderByDescending(x => x.mainSO).FirstOrDefault();
+
             return Ok(new
             {
                 Net = MainProfit - MainLoss,
@@ -1386,6 +1544,14 @@ namespace StockLogger.Controllers.API_Controllers
                 //WrongPred,
                 extractedListCorrectPredictions,
                 extractedListWrongPredictions,
+                ListCorrectDataRSIs,
+                ListWorngDataRSIs,
+
+                //maxRSIObject.mainRSI,
+                //maxMFIObject.mainMFI,
+                //maxCCIObject.mainCCI,
+                //maxSOObject.mainSO,
+
                 MainMasterList
             });
 

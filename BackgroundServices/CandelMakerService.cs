@@ -175,6 +175,200 @@ namespace StockLogger.BackgroundServices
             }
         }
 
+
+        public decimal? CalculateLatestRSI(List<Candel> CandelBeforeTestCandel)
+        {
+            // Check for valid input
+            if (CandelBeforeTestCandel == null || CandelBeforeTestCandel.Count < 15)
+                return null;
+
+            List<decimal> closes = CandelBeforeTestCandel.Select(c => c.EndPrice).ToList();
+            List<decimal> deltas = new List<decimal>();
+
+            for (int i = 1; i < closes.Count; i++)
+            {
+                deltas.Add(closes[i] - closes[i - 1]);
+            }
+
+            List<decimal> gains = new List<decimal>();
+            List<decimal> losses = new List<decimal>();
+
+            foreach (decimal delta in deltas)
+            {
+                if (delta > 0)
+                {
+                    gains.Add(delta);
+                    losses.Add(0);
+                }
+                else if (delta < 0)
+                {
+                    gains.Add(0);
+                    losses.Add(-delta);
+                }
+                else
+                {
+                    gains.Add(0);
+                    losses.Add(0);
+                }
+            }
+
+            decimal avgGain = gains.Take(14).Average();
+            decimal avgLoss = losses.Take(14).Average();
+
+            decimal latestRSI = 0m;
+
+            if (avgLoss == 0)
+            {
+                latestRSI = 100m;
+            }
+            else
+            {
+                decimal rs = avgGain / avgLoss;
+                latestRSI = 100 - (100 / (1 + rs));
+            }
+
+            for (int i = 14; i < deltas.Count; i++)
+            {
+                decimal currentGain = gains[i];
+                decimal currentLoss = losses[i];
+
+                avgGain = (avgGain * 13 + currentGain) / 14;
+                avgLoss = (avgLoss * 13 + currentLoss) / 14;
+
+                if (avgLoss == 0)
+                {
+                    latestRSI = 100m;
+                }
+                else
+                {
+                    decimal rs = avgGain / avgLoss;
+                    latestRSI = 100 - (100 / (1 + rs));
+                }
+            }
+
+            return latestRSI;
+        }
+
+
+        ///// MFI
+        public decimal? CalculateMFI(List<Candel> InputList, int period = 14)
+        {
+            // Check for valid input
+            if (InputList == null || InputList.Count < period)
+                return null;
+
+            List<decimal> positiveFlow = new List<decimal>();
+            List<decimal> negativeFlow = new List<decimal>();
+
+            for (int i = 1; i < InputList.Count; i++)
+            {
+                var typicalPrice = (InputList[i].HighestPrice + InputList[i].LowestPrice + InputList[i].EndPrice) / 3;
+                var moneyFlow = typicalPrice * InputList[i].Volume;
+
+                var prevTypicalPrice = (InputList[i - 1].HighestPrice + InputList[i - 1].LowestPrice + InputList[i - 1].EndPrice) / 3;
+
+                if (typicalPrice > prevTypicalPrice)
+                    positiveFlow.Add(moneyFlow);
+                else if (typicalPrice < prevTypicalPrice)
+                    negativeFlow.Add(moneyFlow);
+                else
+                {
+                    positiveFlow.Add(0);
+                    negativeFlow.Add(0);
+                }
+            }
+
+            int startIndex = Math.Max(0, positiveFlow.Count - period);
+            decimal positiveSum = positiveFlow.Skip(startIndex).Take(period).Sum();
+            decimal negativeSum = negativeFlow.Skip(startIndex).Take(period).Sum();
+
+            if (negativeSum == 0)
+                return 100; // If no negative money flow, MFI is 100
+
+            decimal moneyFlowRatio = positiveSum / negativeSum;
+            decimal MFI = 100 - (100 / (1 + moneyFlowRatio));
+
+            return MFI;
+        }
+
+
+        ///// WILLIAMSR
+
+        public static decimal? CalculateWilliamsR(List<Candel> inputList)
+        {
+            int period = 14;
+
+            // Check for valid input
+            if (inputList == null || inputList.Count < period)
+                return null;
+
+            // Extract the last 'period' candles from the input list
+            var window = inputList.Skip(inputList.Count - period).Take(period).ToList();
+
+            // Calculate highest high and lowest low in the window
+            decimal maxHigh = window.Max(c => c.HighestPrice);
+            decimal minLow = window.Min(c => c.LowestPrice);
+            decimal close = inputList.Last().EndPrice; // Closing price of the latest candle
+
+            // Handle division by zero case (flat line)
+            decimal denominator = maxHigh - minLow;
+            if (denominator == 0)
+                return 0;
+
+            // Compute Williams %R
+            decimal williamsR = ((maxHigh - close) / denominator) * -100;
+            return williamsR;
+        }
+
+
+        //// CCI Commodity Channel Index
+
+        public static decimal? CalculateCCI(List<Candel> inputList, int period = 20)
+        {
+            if (inputList == null || inputList.Count < period)
+                return null;
+
+            List<decimal> typicalPrices = inputList
+                .Skip(inputList.Count - period)
+                .Select(c => (c.HighestPrice + c.LowestPrice + c.EndPrice) / 3)
+                .ToList();
+
+            decimal sma = typicalPrices.Average();
+
+            decimal meanDeviation = typicalPrices.Average(tp => Math.Abs(tp - sma));
+
+            if (meanDeviation == 0)
+                return 0;
+
+            decimal currentTp = typicalPrices.Last();
+            decimal cciValue = (currentTp - sma) / (0.015m * meanDeviation);
+
+            return cciValue;
+        }
+
+        public static decimal? CalculateStochasticOscillator(List<Candel> inputList, int period = 14)
+        {
+            if (inputList == null || inputList.Count < period)
+                return null;
+
+            // Get the last 'period' candles
+            var recentCandles = inputList.TakeLast(period).ToList();
+
+            // Calculate the Highest High and Lowest Low over the period
+            decimal highestHigh = recentCandles.Max(c => c.HighestPrice);
+            decimal lowestLow = recentCandles.Min(c => c.LowestPrice);
+
+            // Get the closing price of the most recent candle
+            decimal currentClose = recentCandles.Last().EndPrice;
+
+            // Calculate Stochastic Oscillator (%K)
+            decimal stochastic = ((currentClose - lowestLow) / (highestHigh - lowestLow)) * 100;
+
+            return stochastic;
+        }
+
+
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
 
@@ -209,113 +403,7 @@ namespace StockLogger.BackgroundServices
             //}
 
 
-            //// 3% REDUCTION
-
-            // CODE TO FIND THE STOCKS WHICH ARE BELOW 3% FROM PREVIOUS DAYS END PRICE
-            while (!stoppingToken.IsCancellationRequested)
-            {
-
-                foreach (var stock in _stocks)
-                {
-
-                    // THIS PART FETCEHES THE END PRICE OF THE PREVIOUS DAYS STOCK
-                    HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:44364/api/candel", stoppingToken);
-                    response.EnsureSuccessStatusCode();
-
-                    string responseData = await response.Content.ReadAsStringAsync(stoppingToken);
-
-                    List<Candel> CandelData = JsonConvert.DeserializeObject<List<Candel>>(responseData);
-
-                    Candel previousDayCandel = CandelData.FirstOrDefault(c => c.Ticker == stock.ticker);
-
-                    decimal expectedPrice = previousDayCandel.EndPrice - (previousDayCandel.EndPrice * 0.03m);
-
-                    try
-                    {
-
-                        // THIS PART FETCHES THE LATEST PRICE OF THE STOCK
-                        var requestBodyforCurrentDayData = new
-                        {
-                            SymbolToken = stock.symboltoken,
-                            AuthorizationToken = "",
-                            StartDate = DateTime.Now.AddHours(9).AddMinutes(15).ToString("o"), // Final adjusted date
-                            EndDate = DateTime.Now.ToString("o")     // Final adjusted date
-                        };
-
-                        var jsonRequestBodyForCurrentDaysData = JsonConvert.SerializeObject(requestBodyforCurrentDayData);
-                        var contentForCurrentDaysData = new StringContent(jsonRequestBodyForCurrentDaysData, Encoding.UTF8, "application/json");
-
-
-                        var responseCurrent = await _httpClient.PostAsync("https://localhost:44364/api/AngelCandel/getCandleDataForTest", contentForCurrentDaysData);
-
-                        //responseCurrent.EnsureSuccessStatusCode();
-
-                        string responseCurrentData = await responseCurrent.Content.ReadAsStringAsync(stoppingToken);
-
-                        List<Candel> candels = JsonConvert.DeserializeObject<List<Candel>>(responseCurrentData);
-
-                        Candel LastCandel = candels.LastOrDefault();
-
-                        List<Candel> ExtractedCandelData = new List<Candel>();
-
-
-                        //  THIS PART COMPARES THE LATEST PRICE WITH THE EXPECTED PRICE
-                        if (
-                            LastCandel != null
-                            && previousDayCandel != null
-                            && LastCandel.EndPrice <= expectedPrice
-                            )
-                        {
-                            // BUY API HERE
-                            BuyData buyData = new BuyData
-                            {
-                                symboltoken = stock.symboltoken,
-                                tradingsymbol = stock.ticker,
-                                CurrentPrice = LastCandel.EndPrice,
-                                PreviousDaayEndPrice = previousDayCandel.EndPrice,
-                            };
-
-                            var jsonRequestBodyForbuyData = JsonConvert.SerializeObject(buyData);
-                            var contentForbuyData = new StringContent(jsonRequestBodyForbuyData, Encoding.UTF8, "application/json");
-
-                            var buyDataApiResponse = await _httpClient.PostAsync("https://localhost:44364/api/BuySell/buy", contentForbuyData);
-
-                            buyDataApiResponse.EnsureSuccessStatusCode();
-
-                            // WHEN THE BUY API RUNS SUCCESSFULLY
-                            // CALL THE SELL API
-                            // SELL API HERE
-                            if (buyDataApiResponse.IsSuccessStatusCode) // Ensures status is 200
-                            {
-                                SellData sellData = new SellData
-                                {
-                                    symboltoken = stock.symboltoken,
-                                    tradingsymbol = stock.ticker,
-                                    CurrentPrice = LastCandel.EndPrice
-                                };
-
-                                var jsonRequestBodyForsellData = JsonConvert.SerializeObject(sellData);
-                                var contentForsellData = new StringContent(jsonRequestBodyForsellData, Encoding.UTF8, "application/json");
-
-                                var sellDataApiResponse = await _httpClient.PostAsync("https://localhost:44364/api/BuySell/sell", contentForsellData);
-                            }
-
-                            ExtractedCandelData.Add(LastCandel);
-
-                        }
-
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex);
-                    }
-
-                }
-
-            }
-
-
-            ////// DRAGONFLYDOJI
+            ////// 3% REDUCTION
 
             //// CODE TO FIND THE STOCKS WHICH ARE BELOW 3% FROM PREVIOUS DAYS END PRICE
             //while (!stoppingToken.IsCancellationRequested)
@@ -323,6 +411,18 @@ namespace StockLogger.BackgroundServices
 
             //    foreach (var stock in _stocks)
             //    {
+
+            //        // THIS PART FETCEHES THE END PRICE OF THE PREVIOUS DAYS STOCK
+            //        HttpResponseMessage response = await _httpClient.GetAsync($"https://localhost:44364/api/candel", stoppingToken);
+            //        response.EnsureSuccessStatusCode();
+
+            //        string responseData = await response.Content.ReadAsStringAsync(stoppingToken);
+
+            //        List<Candel> CandelData = JsonConvert.DeserializeObject<List<Candel>>(responseData);
+
+            //        Candel previousDayCandel = CandelData.FirstOrDefault(c => c.Ticker == stock.ticker);
+
+            //        decimal expectedPrice = previousDayCandel.EndPrice - (previousDayCandel.EndPrice * 0.03m);
 
             //        try
             //        {
@@ -350,39 +450,14 @@ namespace StockLogger.BackgroundServices
 
             //            Candel LastCandel = candels.LastOrDefault();
 
-            //            Candel secondLastCandel = candels.SkipLast(1).LastOrDefault();
-
-
-            //            /// CHECK THE SECONDLAST CANDEL FOR DRAGONFLY DOJI
-
-            //            bool isDoji = Math.Abs(secondLastCandel.StartPrice - secondLastCandel.EndPrice) < (secondLastCandel.HighestPrice - secondLastCandel.LowestPrice) * 0.1m;
-
-            //            // Check for a long lower shadow (shadow size relative to the body)
-            //            bool longLowerShadow = (secondLastCandel.StartPrice - secondLastCandel.LowestPrice) > 3 * (secondLastCandel.EndPrice - secondLastCandel.StartPrice);
-
-            //            // The body of the candle should be small and at the top of the range
-            //            bool smallBodyAtTop = Math.Abs(secondLastCandel.StartPrice - secondLastCandel.EndPrice) < (secondLastCandel.HighestPrice - secondLastCandel.LowestPrice) * 0.3m;
-
-
-            //            bool isVerificationCandelHighestPriceGreater = (secondLastCandel != null) && (secondLastCandel.HighestPrice > secondLastCandel.HighestPrice);
-
-            //            bool shortUpperShadow = (secondLastCandel.HighestPrice - Math.Max(secondLastCandel.StartPrice, secondLastCandel.EndPrice)) < (secondLastCandel.HighestPrice - secondLastCandel.LowestPrice) * 0.1m;
-
-
-
             //            List<Candel> ExtractedCandelData = new List<Candel>();
 
 
             //            //  THIS PART COMPARES THE LATEST PRICE WITH THE EXPECTED PRICE
-            //            if (isDoji
-            //                && longLowerShadow
-            //                && smallBodyAtTop
-            //                && shortUpperShadow
-            //                && (secondLastCandel.EndPrice > secondLastCandel.StartPrice)
-
-            //                && (LastCandel != null)
-            //                && (LastCandel.EndPrice > LastCandel.StartPrice)
-            //                && (LastCandel.HighestPrice > secondLastCandel.HighestPrice)
+            //            if (
+            //                LastCandel != null
+            //                && previousDayCandel != null
+            //                && LastCandel.EndPrice <= expectedPrice
             //                )
             //            {
             //                // BUY API HERE
@@ -391,7 +466,7 @@ namespace StockLogger.BackgroundServices
             //                    symboltoken = stock.symboltoken,
             //                    tradingsymbol = stock.ticker,
             //                    CurrentPrice = LastCandel.EndPrice,
-            //                    PreviousDaayEndPrice = 0,
+            //                    PreviousDaayEndPrice = previousDayCandel.EndPrice,
             //                };
 
             //                var jsonRequestBodyForbuyData = JsonConvert.SerializeObject(buyData);
@@ -432,6 +507,141 @@ namespace StockLogger.BackgroundServices
             //    }
 
             //}
+
+
+            //// DRAGONFLYDOJI
+
+            // CODE TO FIND THE STOCKS WHICH ARE BELOW 3% FROM PREVIOUS DAYS END PRICE
+            while (!stoppingToken.IsCancellationRequested)
+            {
+
+                foreach (var stock in _stocks)
+                {
+
+                    try
+                    {
+
+                        // THIS PART FETCHES THE LATEST PRICE OF THE STOCK
+                        var requestBodyforCurrentDayData = new
+                        {
+                            SymbolToken = stock.symboltoken,
+                            AuthorizationToken = "",
+                            StartDate = DateTime.Now.AddHours(9).AddMinutes(15).ToString("o"), // Final adjusted date
+                            EndDate = DateTime.Now.ToString("o")     // Final adjusted date
+                        };
+
+                        var jsonRequestBodyForCurrentDaysData = JsonConvert.SerializeObject(requestBodyforCurrentDayData);
+                        var contentForCurrentDaysData = new StringContent(jsonRequestBodyForCurrentDaysData, Encoding.UTF8, "application/json");
+
+
+                        var responseCurrent = await _httpClient.PostAsync("https://localhost:44364/api/AngelCandel/getCandleDataForTest", contentForCurrentDaysData);
+
+                        //responseCurrent.EnsureSuccessStatusCode();
+
+                        string responseCurrentData = await responseCurrent.Content.ReadAsStringAsync(stoppingToken);
+
+                        List<Candel> Candels = JsonConvert.DeserializeObject<List<Candel>>(responseCurrentData);
+
+                        List<Candel> CandelData = Candels.OrderBy(c => c.OpenTime).ToList();
+
+                        Candel testCandel = CandelData.LastOrDefault();
+
+
+                        List<Candel> ListForRSI = CandelData
+                                            .Where(candel => candel.OpenTime <= testCandel.OpenTime)
+                                            .OrderByDescending(c => c.OpenTime)
+                                            .Take(15)
+                                            .OrderBy(c => c.OpenTime)
+                                            .ToList();
+
+                        List<Candel> ListForMFI = CandelData
+                                            .Where(candel => candel.OpenTime <= testCandel.OpenTime)
+                                            .OrderByDescending(c => c.OpenTime)
+                                            .Take(14)
+                                            .OrderBy(c => c.OpenTime)
+                                            .ToList();
+
+                        List<Candel> ListForCCI = CandelData
+                                            .Where(candel => candel.OpenTime <= testCandel.OpenTime)
+                                            .OrderByDescending(c => c.OpenTime)
+                                            .Take(20)
+                                            .OrderBy(c => c.OpenTime)
+                                            .ToList();
+
+                        decimal? RSI = CalculateLatestRSI(ListForRSI);
+
+                        decimal? MFI = CalculateMFI(ListForMFI);
+
+                        decimal? WILLIAMSR = CalculateWilliamsR(ListForMFI);
+
+                        decimal? CCI = CalculateCCI(ListForCCI);
+
+                        decimal? SO = CalculateStochasticOscillator(ListForMFI);
+
+
+                        List<Candel> ExtractedCandelData = new List<Candel>();
+
+
+                        //  THIS PART COMPARES THE LATEST PRICE WITH THE EXPECTED PRICE
+                        if (
+                            (
+                                    ((RSI != null) && (RSI > 70))
+                                    && ((SO != null) && (SO > 80))
+                                    && ((MFI != null) && (MFI > 80))
+
+                                    && ((WILLIAMSR != null) && (WILLIAMSR > -20) && (WILLIAMSR <= 0))
+                                    && ((CCI != null) && (CCI > 100))
+
+                            ) // RSI > 70 STOCK IS OVERBOUGHT HIGH SELLING PRESSURE
+                           )
+                        {
+                            // BUY API HERE
+                            BuyData buyData = new BuyData
+                            {
+                                symboltoken = stock.symboltoken,
+                                tradingsymbol = stock.ticker,
+                                CurrentPrice = testCandel.EndPrice,
+                                PreviousDaayEndPrice = 0,
+                            };
+
+                            var jsonRequestBodyForbuyData = JsonConvert.SerializeObject(buyData);
+                            var contentForbuyData = new StringContent(jsonRequestBodyForbuyData, Encoding.UTF8, "application/json");
+
+                            var buyDataApiResponse = await _httpClient.PostAsync("https://localhost:44364/api/BuySell/buy", contentForbuyData);
+
+                            buyDataApiResponse.EnsureSuccessStatusCode();
+
+                            // WHEN THE BUY API RUNS SUCCESSFULLY
+                            // CALL THE SELL API
+                            // SELL API HERE
+                            if (buyDataApiResponse.IsSuccessStatusCode) // Ensures status is 200
+                            {
+                                SellData sellData = new SellData
+                                {
+                                    symboltoken = stock.symboltoken,
+                                    tradingsymbol = stock.ticker,
+                                    CurrentPrice = testCandel.EndPrice
+                                };
+
+                                var jsonRequestBodyForsellData = JsonConvert.SerializeObject(sellData);
+                                var contentForsellData = new StringContent(jsonRequestBodyForsellData, Encoding.UTF8, "application/json");
+
+                                var sellDataApiResponse = await _httpClient.PostAsync("https://localhost:44364/api/BuySell/sell", contentForsellData);
+                            }
+
+                            ExtractedCandelData.Add(testCandel);
+
+                        }
+
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(ex);
+                    }
+
+                }
+
+            }
 
 
 

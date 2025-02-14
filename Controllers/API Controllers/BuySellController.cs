@@ -262,7 +262,7 @@ namespace StockLogger.Controllers.API_Controllers
             //}
 
 
-            decimal amount = 45000;
+            decimal amount = 50000;
 
             decimal Quantity = amount / buyData.CurrentPrice;
 
@@ -274,7 +274,7 @@ namespace StockLogger.Controllers.API_Controllers
                 variety = "NORMAL",
                 tradingsymbol = buyData.tradingsymbol,
                 symboltoken = buyData.symboltoken,
-                transactiontype = "BUY",
+                transactiontype = "SELL",
                 exchange = "NSE",
                 ordertype = "MARKET",
                 producttype = "INTRADAY",
@@ -284,22 +284,6 @@ namespace StockLogger.Controllers.API_Controllers
                 stoploss = "0",
                 quantity = ModifiedQuantity.ToString(),
             };
-
-            //var data = new
-            //{
-            //    variety = "ROBO", // Bracket Order for Robo
-            //    tradingsymbol = "IDEA-EQ",
-            //    symboltoken = "14366",
-            //    transactiontype = "BUY",
-            //    exchange = "NSE",
-            //    ordertype = "LIMIT", // Bracket Orders only allow LIMIT or STOPLOSS
-            //    producttype = "INTRADAY",
-            //    duration = "DAY",
-            //    price = LTP, // Replace with your desired entry price
-            //    squareoff = ExpectedPrice, // Set your target price for profit
-            //    stoploss = "0.1", // Set your stop-loss price
-            //    quantity = "1"
-            //};
 
             var jsonData = JsonConvert.SerializeObject(data);
 
@@ -356,17 +340,16 @@ namespace StockLogger.Controllers.API_Controllers
 
             var client = new HttpClient();
 
-            decimal amount = 45000;
+            decimal amount = 50000;
 
             decimal Quantity = amount / sellData.CurrentPrice;
 
             int ModifiedQuantity = (int)Quantity;
 
             //decimal expectedprice = sellData.CurrentPrice * 1.0025m;
-            decimal expectedprice = sellData.CurrentPrice * 1.00065m;
+            decimal expectedprice = sellData.CurrentPrice - (sellData.CurrentPrice * 0.00065m);
 
-            decimal ModifiedExpectedPrice = Math.Round(expectedprice, 2);
-
+            int ModifiedExpectedPrice = (int)expectedprice;
 
 
             var data = new
@@ -374,7 +357,7 @@ namespace StockLogger.Controllers.API_Controllers
                 variety = "NORMAL",
                 tradingsymbol = sellData.tradingsymbol,
                 symboltoken = sellData.symboltoken,
-                transactiontype = "SELL",
+                transactiontype = "BUY",
                 exchange = "NSE",
                 ordertype = "LIMIT",
                 producttype = "INTRADAY",
