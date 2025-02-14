@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Newtonsoft.Json;
 using OtpNet;
 using StockLogger.BackgroundServices.BackgroundStratergyServices;
@@ -11,8 +12,10 @@ using StockLogger.Models.Stratergic_Models.Dragonfly_Doji;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
+using System.Runtime.Intrinsics.X86;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -1178,12 +1181,21 @@ namespace StockLogger.Controllers.API_Controllers
                                 //}
 
                                 if (
-                                    ((RSI != null) && (RSI > 93))
-                                    && (CCI != null) && (CCI > 250)
+                                    //((RSI != null) && (RSI > 93))
+                                    //&& (CCI != null) && (CCI > 250)
+                                    //((WILLIAMSR != null) && (WILLIAMSR >= -1) && (WILLIAMSR <= 0))
+                                    ((WILLIAMSR != null) && (WILLIAMSR == 0))
+                                    && (MFI > 90)
                                     )
                                 {
                                     dragonFlyDojiCandles.Add(testCandel);
                                 }
+
+                                //Best Strategy
+                                //Combine indicators: Use RSI +MFI + Bollinger Bands for strong signals.
+                                //Watch divergences: If price makes higher highs but RSI / MFI does not, expect a reversal.
+                                //Check volume: Weakening volume with rising price confirms saturation.
+
 
 
 
