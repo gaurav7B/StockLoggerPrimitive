@@ -178,7 +178,7 @@ namespace StockLogger.BackgroundServices
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
 
-            //// CODE TO POPULATE THE DB WITH END PRICES
+            ////// CODE TO POPULATE THE DB WITH END PRICES
 
             //foreach (var stock in _stocks)
             //{
@@ -209,11 +209,24 @@ namespace StockLogger.BackgroundServices
             //}
 
 
-            //// 3% REDUCTION
+            ////// 3% REDUCTION
 
-            // CODE TO FIND THE STOCKS WHICH ARE BELOW 3% FROM PREVIOUS DAYS END PRICE
+            //////CODE TO FIND THE STOCKS WHICH ARE BELOW 3 % FROM PREVIOUS DAYS END PRICE
             while (!stoppingToken.IsCancellationRequested)
             {
+
+                // Check if the current time is before 9:15 AM
+                if (DateTime.Now.TimeOfDay < new TimeSpan(9, 15, 0))
+                {
+                    continue; // Skip to the next iteration
+                }
+
+
+                // Check if the current time is after 11:00 AM
+                if (DateTime.Now.TimeOfDay > new TimeSpan(11, 00, 0))
+                {
+                    break; // break iteration
+                }
 
                 foreach (var stock in _stocks)
                 {
@@ -228,7 +241,8 @@ namespace StockLogger.BackgroundServices
 
                     Candel previousDayCandel = CandelData.FirstOrDefault(c => c.Ticker == stock.ticker);
 
-                    decimal expectedPrice = previousDayCandel.EndPrice - (previousDayCandel.EndPrice * 0.03m);
+                    decimal expectedPrice = previousDayCandel.EndPrice - (previousDayCandel.EndPrice * 0.02m);
+                    //decimal expectedPrice = previousDayCandel.EndPrice - (previousDayCandel.EndPrice * 0.03m);
 
 
 
@@ -247,7 +261,7 @@ namespace StockLogger.BackgroundServices
 
                     var responseCurrent = await _httpClient.PostAsync("https://localhost:44364/api/AngelCandel/getCandleDataForTest", contentForCurrentDaysData);
 
-                    responseCurrent.EnsureSuccessStatusCode();
+                    //responseCurrent.EnsureSuccessStatusCode();
 
                     string responseCurrentData = await responseCurrent.Content.ReadAsStringAsync(stoppingToken);
 
@@ -262,6 +276,7 @@ namespace StockLogger.BackgroundServices
                     //  THIS PART COMPARES THE LATEST PRICE WITH THE EXPECTED PRICE
                     if (
                         LastCandel != null
+                        && previousDayCandel != null
                         && LastCandel.EndPrice <= expectedPrice
                         )
                     {

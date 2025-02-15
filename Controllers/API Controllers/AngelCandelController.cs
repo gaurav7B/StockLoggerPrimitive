@@ -224,9 +224,9 @@ namespace StockLogger.Controllers.API_Controllers
             //var startDateWithTime900 = DateTime.Now.AddDays(-1).Date.AddHours(9).AddMinutes(15); // Previous days Candel
             //var startDateWithTime330 = DateTime.Now.AddDays(-1).Date.AddHours(15).AddMinutes(30);   // CurrentDays candel LTP
 
-            //// CODE TO TEST THE POPULATED DATA
+            // CODE TO TEST THE POPULATED DATA
             var startDateWithTime900 = DateTime.Now.Date.AddHours(9).AddMinutes(15); // Previous days Candel
-            var startDateWithTime330 = DateTime.Now.Date.AddHours(15).AddMinutes(20);   // CurrentDays candel LTP
+            var startDateWithTime330 = DateTime.Now;   // CurrentDays candel LTP
 
 
             ////// FOR_DAY_TO_DAY_TESTING

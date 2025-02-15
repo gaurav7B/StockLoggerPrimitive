@@ -80,10 +80,10 @@ namespace StockLogger.Models.Candel
                 new Stock { Ticker = "NESTLEIND-EQ", Exchange = "NSE", Name = "Nestlé India", Id = 50, SymbolToken = "17963" },
 
 
-                new Stock { Ticker = "ADANIGAS-EQ", Exchange = "NSE", Name = "ADANI GAS", Id = 51, SymbolToken = "6066" },
-                new Stock { Ticker = "ADANIGREEN-EQ", Exchange = "NSE", Name = "ADANI GREEN", Id = 52, SymbolToken = "3563" },
-                new Stock { Ticker = "ADANIPOWER-EQ", Exchange = "NSE", Name = "ADANI POWER", Id = 53, SymbolToken = "17388" },
-                new Stock { Ticker = "ADANITRANS-EQ", Exchange = "NSE", Name = "ADANI TRANS", Id = 54, SymbolToken = "10217" },
+                //new Stock { Ticker = "ADANIGAS-EQ", Exchange = "NSE", Name = "ADANI GAS", Id = 51, SymbolToken = "6066" },
+                //new Stock { Ticker = "ADANIGREEN-EQ", Exchange = "NSE", Name = "ADANI GREEN", Id = 52, SymbolToken = "3563" },
+                //new Stock { Ticker = "ADANIPOWER-EQ", Exchange = "NSE", Name = "ADANI POWER", Id = 53, SymbolToken = "17388" },
+                //new Stock { Ticker = "ADANITRANS-EQ", Exchange = "NSE", Name = "ADANI TRANS", Id = 54, SymbolToken = "10217" },
 
 
 
