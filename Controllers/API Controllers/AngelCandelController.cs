@@ -184,6 +184,48 @@ namespace StockLogger.Controllers.API_Controllers
             return authorizationToken;
         }
 
+        public class StockOrder
+        {
+            public string Variety { get; set; }
+            public string OrderType { get; set; }
+            public string ProductType { get; set; }
+            public string Duration { get; set; }
+            public double Price { get; set; }
+            public double TriggerPrice { get; set; }
+            public int Quantity { get; set; }
+            public int DisclosedQuantity { get; set; }
+            public double SquareOff { get; set; }
+            public double StopLoss { get; set; }
+            public double TrailingStopLoss { get; set; }
+            public string TradingSymbol { get; set; }
+            public string TransactionType { get; set; }
+            public string Exchange { get; set; }
+            public string SymbolToken { get; set; }
+            public string OrderTag { get; set; }
+            public string InstrumentType { get; set; }
+            public double StrikePrice { get; set; }
+            public string OptionType { get; set; }
+            public string ExpiryDate { get; set; }
+            public int LotSize { get; set; }
+            public int CancelSize { get; set; }
+            public double AveragePrice { get; set; }
+            public int FilledShares { get; set; }
+            public int UnfilledShares { get; set; }
+            public string OrderId { get; set; }
+            public string Text { get; set; }
+            public string Status { get; set; }
+            public string OrderStatus { get; set; }
+            public string UpdateTime { get; set; }
+            public string ExchangeTime { get; set; }
+            public string ExchangeOrderUpdateTime { get; set; }
+            public string FillId { get; set; }
+            public string FillTime { get; set; }
+            public string ParentOrderId { get; set; }
+            public string UniqueOrderId { get; set; }
+            public string ExchangeOrderId { get; set; }
+        }
+
+
         public int count;
 
         // POST https://localhost:44364/api/AngelCandel/getCandleDataForTest
@@ -193,19 +235,22 @@ namespace StockLogger.Controllers.API_Controllers
 
             //string authtoken = await GetRefreshedAuthorizationTokenAsync();
 
-            string authtoken = "";
+            var token = await _context.Token.FirstOrDefaultAsync();
+            string authtoken = token.AuthToken;
 
-            if (count % 2 != 0)
-            {
-                authtoken = await GetRefreshedAuthorizationTokenAsync();
-                count++;
-            }
-            else
-            {
-                var token = await _context.Token.FirstOrDefaultAsync();
-                authtoken = token.AuthToken;
-                count++;
-            }
+            //string authtoken = "";
+
+            //if (count % 2 != 0)
+            //{
+            //    authtoken = await GetRefreshedAuthorizationTokenAsync();
+            //    count++;
+            //}
+            //else
+            //{
+            //    var token = await _context.Token.FirstOrDefaultAsync();
+            //    authtoken = token.AuthToken;
+            //    count++;
+            //}
 
             // Extract only the date part from StartDate
             var startDateOnly = stockRequest.StartDate.Date;
@@ -269,6 +314,7 @@ namespace StockLogger.Controllers.API_Controllers
                 Content = new StringContent(jsonData, Encoding.UTF8, "application/json")
             };
 
+
             // Set the headers
             requestMessage.Headers.Add("Accept", "application/json");
             requestMessage.Headers.Add("X-SourceID", "WEB");
@@ -280,21 +326,112 @@ namespace StockLogger.Controllers.API_Controllers
             requestMessage.Headers.Add("Authorization", "Bearer " + authtoken);
             requestMessage.Headers.Add("X-PrivateKey", "DcsJlRJp"); // Your actual API Key
 
+
+
+            var requestMessage2 = new HttpRequestMessage(HttpMethod.Get, "https://apiconnect.angelone.in/rest/secure/angelbroking/order/v1/getOrderBook");
+
+            requestMessage2.Headers.Add("Accept", "application/json");
+            requestMessage2.Headers.Add("X-SourceID", "WEB");
+            requestMessage2.Headers.Add("X-ClientLocalIP", "192.168.56.177");  // Your local IP from ipconfig
+            requestMessage2.Headers.Add("X-ClientPublicIP", await GetPublicIPAsync());  // Fetching the public IP dynamically
+            requestMessage2.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX"); // Replace with your actual MAC address
+            requestMessage2.Headers.Add("X-UserType", "USER");
+            requestMessage2.Headers.Add("Authorization", "Bearer " + authtoken);
+            requestMessage2.Headers.Add("X-PrivateKey", "DcsJlRJp"); // Your actual API Key
+
+
+
+
             try
             {
                 // Send request to get historical data
                 HttpResponseMessage response = await client.SendAsync(requestMessage);
 
+                HttpResponseMessage response2 = await client.SendAsync(requestMessage2);
+
+
+
                 if (!response.IsSuccessStatusCode)
                 {
                     //HttpResponseMessage tokenResponse = await client.PostAsync("https://localhost:44364/api/Token", null); //Creats new JWT token in database
+                    await GetRefreshedAuthorizationTokenAsync();
                 }
 
-                response.EnsureSuccessStatusCode();
+                //response.EnsureSuccessStatusCode();
 
                 string responseContent = await response.Content.ReadAsStringAsync();
                 dynamic candleData = JsonConvert.DeserializeObject(responseContent);
                 var rawCandelData = candleData.data;
+
+                string responseContent2 = await response2.Content.ReadAsStringAsync();
+                dynamic OrderData = JsonConvert.DeserializeObject(responseContent2);
+                var rawOrderData = OrderData.data;
+
+                List<StockOrder> stockOrders = new List<StockOrder>();
+
+                foreach (var item in rawOrderData)
+                {
+                    StockOrder order = new StockOrder
+                    {
+                        Variety = item.variety,
+                        OrderType = item.ordertype,
+                        ProductType = item.producttype,
+                        Duration = item.duration,
+                        Price = (double)item.price,
+                        TriggerPrice = (double)item.triggerprice,
+                        Quantity = int.Parse((string)item.quantity),
+                        DisclosedQuantity = int.Parse((string)item.disclosedquantity),
+                        SquareOff = (double)item.squareoff,
+                        StopLoss = (double)item.stoploss,
+                        TrailingStopLoss = (double)item.trailingstoploss,
+                        TradingSymbol = item.tradingsymbol,
+                        TransactionType = item.transactiontype,
+                        Exchange = item.exchange,
+                        SymbolToken = item.symboltoken,
+                        OrderTag = item.ordertag,
+                        InstrumentType = item.instrumenttype,
+                        StrikePrice = (double)item.strikeprice,
+                        OptionType = item.optiontype,
+                        ExpiryDate = item.expirydate,
+                        LotSize = int.Parse((string)item.lotsize),
+                        CancelSize = int.Parse((string)item.cancelsize),
+                        AveragePrice = (double)item.averageprice,
+                        FilledShares = int.Parse((string)item.filledshares),
+                        UnfilledShares = int.Parse((string)item.unfilledshares),
+                        OrderId = item.orderid,
+                        Text = item.text,
+                        Status = item.status,
+                        OrderStatus = item.orderstatus,
+                        UpdateTime = (item.updatetime.ToString()),
+                        ExchangeTime = (item.exchtime.ToString()),
+                        ExchangeOrderUpdateTime = (item.exchorderupdatetime.ToString()),
+                        FillId = item.fillid,
+                        FillTime = item.filltime,
+                        ParentOrderId = item.parentorderid,
+                        UniqueOrderId = item.uniqueorderid,
+                        ExchangeOrderId = item.exchangeorderid
+                    };
+
+                    stockOrders.Add(order);
+                }
+
+
+                // Filter list to include only "BUY" transactions with "complete" status
+                List<StockOrder> buyCompletedOrders = stockOrders
+                    .Where(o => o.TransactionType == "BUY" && o.OrderStatus == "complete")
+                    .OrderBy(o => o.UpdateTime)
+                    .ToList();
+
+                // Filter list to include only "SELL" transactions with "complete" status
+                List<StockOrder> sellCompletedOrders = stockOrders
+                    .Where(o => o.TransactionType == "SELL" && o.OrderStatus == "complete")
+                    .ToList();
+
+                List<StockOrder> Comp = new List<StockOrder>();
+
+
+
+
 
                 List<Candel> ModifiedCandelDataList = new List<Candel>();
 
