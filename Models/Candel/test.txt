@@ -2,973 +2,113 @@
 
 
 
-               MPocket--     4336 -1720-2616------------7MARCH----\
-                             4336 -1720-2616------------7MARCH----|
-                             4336 -1720-2616-----------27FEB------|---16960--\
-                                        2688-----------22FEB------|          |
-                                        2688-----------10FEB------/          |
+               MPocket--     4336 -1720-2616------------19MARCH---\
+                             4336 -1720-2616------------19MARCH---|
+                             4336 -1720-2616-----------17MARCH----|---23848--\
+                                         2168---------13MARCH-----|          |
+                             4336 -1720-2616---------8MARCH-------|          |
+                             4336 -1720-2616---------8MARCH-------/          |
                                                                              |
                                                                              |
-               Kissht--       2746-2746-2746-2746-2746-----8MARCH---13730----|     6  JANUARY REMIANING LOAN
+               Kissht--       2746-2746-2746-2746-2746-----8MARCH---13730----|     6  FEBRUARY REMIANING LOAN TO BE PAID IN MARCH
                                                                              |
-               Olyv--     2100-2100-2100------22FEB----------------6300------|
-                                                                             |----------71973                    
+               Olyv--          2100-2100------22FEB----------------4200------|
+                                                                             |----------72043                   
                Branch--         2262-2262-2262---6MARCH-------------6786-----|                                         
                                                                              |                                         
-               Pocketly--      3536-3536--------3MARCH-------------7072------|                                  
+               Pocketly--      3536-3536-3536---16MARCH------------10608-----|                                  
                                                                              |
-               TrueBalance--     2475-2475-2475-2475-2525----20FEB----12425--|
+               TrueBalance--          2475-2475-2475-2525----20FEB----9900---|
                                                                              |
-               RupeeReady--         2971-2971---23FEB---------------5942-----/
+               RupeeReady--              2971---23FEB---------------2971-----/
 
 
-               22250+2000+6500 to be paid this month
+               BELOW TO BE DONE AFTER MARCH PAYMENT
 
-               I have
-                 1000
-               + 5500
-               + 22000
-               --------
-               28500
+               MPocket - 10768
+               Kissht - 2746
+               Olyv - 2100
+               Branch - 2262
+               Pocketly - 3536
+               TrueBalance - 2475
+               RupeeReady - 2971
+               ------------------
+                            26858
+               Rent -        6500 
+               IDFC EMI -    6050
+               ------------------
+                            39408
 
-               Required amount to pay is 30750
+                            ||
+                            \/
+
+
+               MPocket--                2616------------19MARCH---\
+                                        2616------------19MARCH---|
+                                        2616-----------17MARCH----|---13080--\
+                                        2616---------8MARCH-------|          |
+                                        2616---------8MARCH-------/          |
+                                                                             |
+                                                                             |
+               Kissht--            2746-2746-2746-2746-----8MARCH---10984----|     6  MARCH REMIANING LOAN TO BE PAID IN APRIL
+                                                                             |
+               Olyv--               2100------22FEB----------------2100------|
+                                                                             |----------45185                   
+               Branch--              2262-2262---6MARCH-------------4524-----|                                         
+                                                                             |                                         
+               Pocketly--           3536-3536---16MARCH------------7072------|                                  
+                                                                             |
+               TrueBalance--               2475-2475-2525----20FEB----7425---/
+
+
+
+               BELOW TO BE DONE AFTER APRIL PAYMENT
+
+               MPocket - 2760
+               Kissht - 2746
+               Olyv - 2100
+               Branch - 2262
+               Pocketly - 3536
+               TrueBalance - 2475
+               ------------------
+                            15879
+               Rent -        6500 
+               IDFC EMI -    6050
+               ------------------
+                            28429                 41666-28429 = 13237  REMAINING SO CLOSE OLYV , POCKETLY
+               Pocketly -   7072
+               ------------------
+                           35501                 41666 - 35501 = 6165 REMAINING FOR MONTHLY EXPENSE
+
+                            ||
+                            \/
+
+
+               MPocket--                2064------------19MARCH---\
+                                        2064------------19MARCH---|
+                                        2064-----------17MARCH----|---10320--\
+                                        2064---------8MARCH-------|          |
+                                        2064---------8MARCH-------/          |
+                                                                             |      6  APRIL REMIANING LOAN
+                                                                             |      
+               Kissht--                 2746-2746-2746-----8MARCH----8238----|     
+                                                                             |----------25820                      
+               Branch--                   2262---6MARCH-------------2262-----|                                         
+                                                                             |                                         
+               TrueBalance--                    2475-2525----20FEB----5000---/
 
 
                
 
-               MPocket--                 2688-----------8FEB-------\
-                                         2688-----------8FEB-------|
-                                                                   |---5376--\
-                                                                             |
-               Kissht--       2746-2746-2746-2746-2746----22FEB-----13730----|       6 FEBRUARY Remaining LOAN //// Paid amt - 27624
-                                                                             |
-               Olyv--               2050------26FEB----------------2050------|
-                                                                             |----------44349          This month(27624+6500+6050 = 40174)--Paid
-               Branch--         2262-2262-2262---6FEB---------------6786-----|
-                                                                             |   
-               Pocketly--           3536--------3MARCH-------------3536------|
-                                                                             |
-               TrueBalance--          2475-2475-2475-2475----20JAN----9900---|
-                                                                             |
-               RupeeReady--              2971---23JAN---------------2971-----/
 
 
 
 
 
-               Kissht--            2746-2746-2746-2746----22FEB-----10984----\    6 MARCH REMAINING LOAN //// Paid amt - 21416
-                                                                             |
-               Branch--              2262-2262---6FEB---------------4524-----|----------22933          This month(21416+6500+6050 = 33966)--Paid
-                                                                             |   
-               TrueBalance--               2475-2475-2475----20JAN----7425---/
 
 
 
 
 
 
-               Kissht--            2746-2746-2746-2746----22FEB-----10984----\    6 APRIL REMAINING LOAN //// Paid amt - 22933
-                                                                             |
-               Branch--              2262-2262---6FEB---------------4524-----|----------22933          This month(22933+6500+6050 = 35483)--Paid
-                                                                             |   
-               TrueBalance--               2475-2475-2475----20JAN----7425---/
 
-
-
-
-
-
-
-
-
-python start_services.py
-
-
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using OtpNet;
-using StockLogger.Data;
-using StockLogger.Models.Candel;
-using StockLogger.Models.Stratergic_Models.Dragonfly_Doji;
-using System.Text;
-
-namespace StockLogger.Controllers.API_Controllers
-{
-    [Route("api/[controller]")]
-    [ApiController]
-    public class TestController : ControllerBase
-    {
-        private readonly StockLoggerDbContext _context;
-        private readonly List<(string ticker, string exchange, string name, long id, string symboltoken)> _stocks;
-
-        public TestController(StockLoggerDbContext context)
-        {
-            _context = context;
-
-            // Fetch stocks from StockList and transform them into the required tuple format
-            _stocks = StockList2.GetStocks()
-                .Select(stock => (stock.Ticker, stock.Exchange, stock.Name, stock.Id, stock.SymbolToken))
-                .ToList();
-        }
-
-        [HttpGet]
-        public IActionResult GetStocks()
-        {
-            var stocks = StockList.GetStocks();
-            return Ok(stocks);
-        }
-
-        public class TestRequestModel
-        {
-            public string Symboltoken { get; set; }
-            public DateTime StartDate { get; set; }
-            public DateTime EndDate { get; set; }
-        }
-
-        public class BulkTestRequestModel
-        {
-            public DateTime StartDate { get; set; }
-            public DateTime EndDate { get; set; }
-        }
-
-        //POST https://localhost:44364/api/Test/BulkTestMasterAPI
-        [HttpPost("BulkTestMasterAPI")]
-        public async Task<IActionResult> BulkTestMasterAPI([FromBody] BulkTestRequestModel request)
-        {
-            var Tokenresponse = await _context.Token.FirstOrDefaultAsync();
-
-            string authtoken = Tokenresponse.AuthToken;
-
-            //string authtoken = await GetAuthorizationTokenAsync();
-
-            List<List<List<Candel>>> MainCorrectPredictionList = new List<List<List<Candel>>>();
-            List<List<List<Candel>>> MainWrongPredictionList = new List<List<List<Candel>>>();
-
-            List<List<Candel>> MainMasterList = new List<List<Candel>>();
-
-
-            decimal MainProfit = 0;
-            decimal MainLoss = 0;
-
-
-            foreach (var stock in _stocks)
-            {
-                List<Candel> MasterList = new List<Candel>();
-
-                List<Candel> DrafonFlyDojiCandels = new List<Candel>();
-
-                List<List<Candel>> AnalyzerList = new List<List<Candel>>();
-
-                List<List<Candel>> CorrectPredictionList = new List<List<Candel>>();
-                List<List<Candel>> WrongPredictionList = new List<List<Candel>>();
-
-                List<Candel> CandelData = new List<Candel>();
-
-                // Variables for profit and loss tracking
-                decimal TotalProfit = 0;
-                decimal NetLoss = 0;
-
-                var token = authtoken;
-
-                var requestBody = new
-                {
-                    SymbolToken = stock.symboltoken,
-                    AuthorizationToken = token,
-                    StartDate = request.StartDate.ToString("o"), // ISO string format
-                    EndDate = request.EndDate.ToString("o") // ISO string format
-                };
-
-
-                var client = new HttpClient();
-                var jsonRequestBody = JsonConvert.SerializeObject(requestBody);
-                var content = new StringContent(jsonRequestBody, Encoding.UTF8, "application/json");
-
-                try
-                {
-                    var response = await client.PostAsync("https://localhost:44364/api/AngelCandel/getCandleDataForTest", content);
-
-                    if (response.IsSuccessStatusCode)
-                    {
-
-                        var responseData = await response.Content.ReadAsStringAsync();
-                        CandelData = JsonConvert.DeserializeObject<List<Candel>>(responseData);
-
-                        //Candel EndCandel = CandelData.LastOrDefault();
-
-                        Candel EndCandel = CandelData.FirstOrDefault(c => c.OpenTime.TimeOfDay == new TimeSpan(15, 15, 0));
-
-                        List<Candel>? dragonFlyDojiCandles = new List<Candel>();
-
-                        if (CandelData != null)
-                        {
-                            dragonFlyDojiCandles = IdentifyDragonflyDojiCandles(CandelData);
-                        }
-
-                        MasterList = CandelData;
-                        MainMasterList.Add(MasterList);
-                        DrafonFlyDojiCandels = dragonFlyDojiCandles;
-
-                        if (DrafonFlyDojiCandels.Count > 0)
-                        {
-                            // Iterating through each Dragonfly Doji Candle
-                            foreach (Candel dojiCandle in dragonFlyDojiCandles)
-                            {
-                                // Get the index of the Dragonfly Doji candle in the full list
-                                int dojiIndex = CandelData.IndexOf(dojiCandle);
-
-                                // List to store the next 5 candles
-                                List<Candel> nextFiveCandles = new List<Candel>();
-
-                                nextFiveCandles.Add(dojiCandle);
-
-                                // Check if there are at least 5 more candles after the identified Dragonfly Doji candle 6
-                                for (int i = dojiIndex + 1; i < dojiIndex + 6 && i < CandelData.Count; i++)
-                                {
-                                    nextFiveCandles.Add(CandelData[i]);
-                                }
-
-                                // Add the list of next 5 candles to the AnalyzerList
-                                AnalyzerList.Add(nextFiveCandles);
-                            }
-
-                            foreach (List<Candel> detectedCandelList in AnalyzerList)
-                            {
-                                Candel firstCandel = detectedCandelList[0];
-                                Candel lastCandel = detectedCandelList[5];//5
-
-                                var expectedPrice = firstCandel.EndPrice * 1.001429m;
-
-                                var stopLoss = (firstCandel.EndPrice - ((expectedPrice - firstCandel.EndPrice) * 5));
-
-                                Candel CandelWithHighestPrice = CandelData?
-                                                               .Where(c => firstCandel != null && c.OpenTime > firstCandel.OpenTime)
-                                                               .OrderByDescending(c => c.HighestPrice)
-                                                               .FirstOrDefault();                           
-
-                                Candel stoplossCandel = CandelData
-                                                      .Where(c => c.LowestPrice <= stopLoss && c.OpenTime > firstCandel.OpenTime)
-                                                      .OrderBy(c => c.OpenTime)
-                                                      .FirstOrDefault();
-
-                                Candel profitCandel = CandelData
-                                                      .Where(c => c.HighestPrice >= expectedPrice && c.OpenTime > firstCandel.OpenTime)
-                                                      .OrderBy(c => c.OpenTime)
-                                                      .FirstOrDefault();
-
-                                bool stoplossCandelHitbeforTargetPrice = false;
-
-
-                                if (stoplossCandel != null)
-                                {
-                                    if(profitCandel == null && stoplossCandel != null)
-                                    {
-                                        stoplossCandelHitbeforTargetPrice = true;
-                                    }
-                                    else if(profitCandel != null && stoplossCandel == null)
-                                    {
-                                        stoplossCandelHitbeforTargetPrice = false;
-                                    }
-                                    else if(profitCandel != null && stoplossCandel != null)
-                                    {
-                                        if (stoplossCandel.OpenTime < profitCandel.OpenTime)
-                                        {
-                                            stoplossCandelHitbeforTargetPrice = true;
-                                        }
-                                        else
-                                        {
-                                            stoplossCandelHitbeforTargetPrice = false;
-                                        }
-                                    }
-                                }
-
-                                if(stoplossCandelHitbeforTargetPrice == true)
-                                {
-                                    WrongPredictionList.Add(detectedCandelList);
-                                    MainWrongPredictionList.Add(WrongPredictionList);
-                                    NetLoss = NetLoss + (firstCandel.EndPrice - stopLoss);
-                                    MainLoss = MainLoss + (firstCandel.EndPrice - stopLoss);
-                                }
-                                else
-                                {
-                                    if (expectedPrice < CandelWithHighestPrice.HighestPrice)
-                                    {
-                                        CorrectPredictionList.Add(detectedCandelList);
-                                        MainCorrectPredictionList.Add(CorrectPredictionList);
-
-                                        TotalProfit = TotalProfit + (firstCandel.EndPrice * 1.001429m - firstCandel.EndPrice);
-                                        MainProfit = MainProfit + (firstCandel.EndPrice * 1.001429m - firstCandel.EndPrice);
-                                    }
-                                    else
-                                    {
-                                        if (EndCandel != null && firstCandel != null)
-                                        {
-                                            WrongPredictionList.Add(detectedCandelList);
-                                            MainWrongPredictionList.Add(WrongPredictionList);
-                                            NetLoss = NetLoss + (firstCandel.EndPrice - EndCandel.EndPrice);
-                                            MainLoss = MainLoss + (firstCandel.EndPrice - EndCandel.EndPrice);
-                                        }
-
-                                    }
-                                }
-
-
-
-
-
-                            }
-
-                        }
-
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Error: {response.StatusCode}");
-                    }
-
-
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"An error occurred: {ex.Message}");
-                }
-
-
-
-
-
-            }
-
-            return Ok(new
-            {
-                Net = MainProfit - MainLoss,
-                MainProfit,
-                MainLoss,
-                MainCorrectPredictionList,
-                MainWrongPredictionList,
-                MainMasterList
-            });
-
-        }
-
-
-        // Function to identify Dragonfly Doji candles
-        private List<Candel> IdentifyDragonflyDojiCandles(List<Candel> CandelData)
-        {
-
-            List<Candel> dragonFlyDojiCandles = new List<Candel>();
-
-            //foreach (Candel c in CandelData)
-            //{
-            //    // Get the last (most recent) candle
-            //    Candel latestCandel = c;
-
-            //    Candel previousCandel = CandelData
-            //                .Where(c => c.CloseTime < latestCandel.CloseTime)
-            //                .OrderByDescending(c => c.CloseTime) // Ensures we get the closest one before recentCandel
-            //                .FirstOrDefault();
-
-
-            //    // Calculate the body size
-            //    decimal bodySize = Math.Abs(latestCandel.EndPrice - latestCandel.StartPrice);
-
-            //    // Calculate the lower shadow size
-            //    decimal lowerShadowSize = latestCandel.StartPrice - latestCandel.LowestPrice;
-
-            //    // Calculate the upper shadow size
-            //    decimal upperShadowSize = latestCandel.HighestPrice - latestCandel.EndPrice;
-
-            //    // Check if the candle is bullish
-            //    bool isBullish = latestCandel.IsBullish == true &&
-            //                     (latestCandel.EndPrice > (latestCandel.LowestPrice + latestCandel.HighestPrice) / 2);
-
-            //    // Check if the body is small relative to the range
-            //    bool smallBody = bodySize < (latestCandel.HighestPrice - latestCandel.LowestPrice) * 0.2m;
-
-            //    // Check if the lower shadow is significantly longer than the body
-            //    bool longLowerShadow = lowerShadowSize > (latestCandel.HighestPrice - latestCandel.LowestPrice) * 0.5m;
-
-            //    // Check if the upper shadow is very small
-            //    bool smallUpperShadow = upperShadowSize < bodySize * 0.1m;
-
-            //    bool highVolume = false;
-
-            //    if (previousCandel != null)
-            //    {
-            //        decimal previousVolume = previousCandel.Volume;
-            //        // Optional: Add a volume check for additional confirmation (if volume data is available)
-            //        highVolume = latestCandel.Volume > (previousVolume * 1.5m); // Modify this based on available data
-            //    }
-
-            //    Candel verificationCandel = CandelData
-            //                       .Where(c => c.CloseTime > latestCandel.CloseTime)
-            //                       .OrderBy(c => c.CloseTime) // Ensures we get the closest one
-            //                       .FirstOrDefault();
-
-            //    bool nextcandelbullish = false;
-
-            //    if (verificationCandel != null)
-            //    {
-            //        if (verificationCandel.IsBullish == true)
-            //        {
-            //            nextcandelbullish = true;
-            //        }
-            //    }
-
-            //    // Final check
-            //    if (isBullish && smallBody && longLowerShadow && smallUpperShadow && highVolume && nextcandelbullish)
-            //    {
-            //        if (verificationCandel.OpenTime.TimeOfDay < new TimeSpan(11, 00, 0))
-            //        {
-            //            dragonFlyDojiCandles.Add(verificationCandel);
-            //        }
-            //    }
-
-
-            //    //// Fetch the last and previous candles
-            //    //Candel latestCandel = c;
-            //    //Candel previousCandel = CandelData
-            //    //    .Where(c => c.CloseTime < latestCandel.CloseTime)
-            //    //    .OrderByDescending(c => c.CloseTime)
-            //    //    .FirstOrDefault();
-
-            //    //Candel verificationCandel = CandelData
-            //    //                   .Where(c => c.CloseTime > latestCandel.CloseTime)
-            //    //                   .OrderBy(c => c.CloseTime) // Ensures we get the closest one
-            //    //                   .FirstOrDefault();
-
-            //    //// Calculate key metrics
-            //    //decimal bodySize = Math.Abs(latestCandel.EndPrice - latestCandel.StartPrice);
-            //    //decimal range = latestCandel.HighestPrice - latestCandel.LowestPrice;
-            //    //decimal lowerShadowSize = latestCandel.StartPrice - latestCandel.LowestPrice;
-            //    //decimal upperShadowSize = latestCandel.HighestPrice - latestCandel.EndPrice;
-
-            //    //// Define thresholds
-            //    //bool isBullish = latestCandel.IsBullish == true &&
-            //    //                 latestCandel.EndPrice > (latestCandel.LowestPrice + range / 2);
-            //    //bool smallBody = bodySize < (range * 0.15m); // Tweaked threshold
-            //    //bool longLowerShadow = lowerShadowSize > (range * 0.6m); // Increased relative size
-            //    //bool smallUpperShadow = upperShadowSize < bodySize * 0.1m;
-
-            //    //// High volume check
-            //    //bool highVolume = false;
-            //    //if (previousCandel != null)
-            //    //{
-            //    //    highVolume = latestCandel.Volume > (previousCandel.Volume * 1.7m); // Increased factor
-            //    //}
-
-            //    //// Price change confirmation
-            //    //bool significantPriceChange = latestCandel.PriceChangePercentage > 0.005m; // Ensure meaningful move
-
-            //    //bool nextcandelbullish = false;
-
-            //    //if (verificationCandel != null)
-            //    //{
-            //    //    if (verificationCandel.IsBullish == true)
-            //    //    {
-            //    //        nextcandelbullish = true;
-            //    //    }
-            //    //}
-
-            //    //// Combine conditions
-            //    //if (isBullish
-            //    //    && smallBody
-            //    //    && longLowerShadow
-            //    //    && smallUpperShadow
-            //    //    && highVolume
-            //    //    && significantPriceChange
-            //    //    && nextcandelbullish
-            //    //    )
-            //    //{
-            //    //    if (verificationCandel.OpenTime.TimeOfDay < new TimeSpan(11, 00, 0))
-            //    //    {
-            //    //        dragonFlyDojiCandles.Add(verificationCandel);
-            //    //    }
-
-            //    //}
-
-            //}
-
-            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-            //foreach (Candel c in CandelData)
-            //{
-            //    // Fetch the last and previous candles
-            //    Candel latestCandel = c;
-            //    Candel previousCandel = CandelData
-            //        .Where(c => c.CloseTime < latestCandel.CloseTime)
-            //        .OrderByDescending(c => c.CloseTime)
-            //        .FirstOrDefault();
-
-            //    Candel verificationCandel = CandelData
-            //                       .Where(c => c.CloseTime > latestCandel.CloseTime)
-            //                       .OrderBy(c => c.CloseTime) // Ensures we get the closest one
-            //                       .FirstOrDefault();
-
-            //    // Calculate key metrics
-            //    decimal bodySize = Math.Abs(latestCandel.EndPrice - latestCandel.StartPrice);
-            //    decimal range = latestCandel.HighestPrice - latestCandel.LowestPrice;
-            //    decimal lowerShadowSize = latestCandel.StartPrice - latestCandel.LowestPrice;
-            //    decimal upperShadowSize = latestCandel.HighestPrice - latestCandel.EndPrice;
-
-            //    // Define thresholds
-            //    bool isBullish = latestCandel.IsBullish == true &&
-            //                     latestCandel.EndPrice > (latestCandel.LowestPrice + range / 2);
-            //    bool smallBody = bodySize < (range * 0.15m); // Tweaked threshold
-            //    bool longLowerShadow = lowerShadowSize > (range * 0.6m); // Increased relative size
-            //    bool smallUpperShadow = upperShadowSize < bodySize * 0.1m;
-
-            //    // High volume check
-            //    bool highVolume = false;
-            //    if (previousCandel != null)
-            //    {
-            //        highVolume = latestCandel.Volume > (previousCandel.Volume * 1.7m); // Increased factor
-            //    }
-
-            //    // Price change confirmation
-            //    bool significantPriceChange = latestCandel.PriceChangePercentage > 0.005m; // Ensure meaningful move
-
-            //    bool nextcandelbullish = false;
-
-            //    if (verificationCandel != null)
-            //    {
-            //        if (verificationCandel.IsBullish == true)
-            //        {
-            //            nextcandelbullish = true;
-            //        }
-            //    }
-
-            //    // Combine conditions
-            //    if (isBullish
-            //        && smallBody
-            //        && longLowerShadow
-            //        && smallUpperShadow
-            //        && highVolume
-            //        && significantPriceChange
-            //        && nextcandelbullish
-            //        )
-            //    {
-            //        if (verificationCandel.OpenTime.TimeOfDay < new TimeSpan(11, 00, 0))
-            //        {
-            //            dragonFlyDojiCandles.Add(verificationCandel);
-            //        }
-
-            //    }
-            //}
-
-
-
-            //foreach (Candel c in CandelData)
-            //{
-            //        // Fetch the current, previous, and verification candles
-            //        Candel latestCandel = c;
-            //        Candel previousCandel = CandelData
-            //            .Where(c => c.CloseTime < latestCandel.CloseTime)
-            //            .OrderByDescending(c => c.CloseTime)
-            //            .FirstOrDefault();
-
-            //        Candel verificationCandel = CandelData
-            //            .Where(c => c.CloseTime > latestCandel.CloseTime)
-            //            .OrderBy(c => c.CloseTime)
-            //            .FirstOrDefault();
-
-
-            //        // Calculate key metrics
-            //        decimal bodySize = Math.Abs(latestCandel.EndPrice - latestCandel.StartPrice);
-            //        decimal range = latestCandel.HighestPrice - latestCandel.LowestPrice;
-            //        decimal lowerShadowSize = Math.Min(latestCandel.StartPrice, latestCandel.EndPrice) - latestCandel.LowestPrice;
-            //        decimal upperShadowSize = latestCandel.HighestPrice - Math.Max(latestCandel.StartPrice, latestCandel.EndPrice);
-
-            //        // Define thresholds for dragonfly doji
-            //        bool isDoji = bodySize <= (range * 0.05m); // Body is less than 5% of the range
-            //        bool longLowerShadow = lowerShadowSize >= (range * 0.7m); // Lower shadow is 70% or more of the range
-            //        bool minimalUpperShadow = upperShadowSize <= (range * 0.1m); // Upper shadow is 10% or less of the range
-
-            //        // Confirm bullish context
-            //        bool bullishContext = previousCandel != null && previousCandel.EndPrice > previousCandel.StartPrice; // Prior candle bullish
-
-            //        // High volume check
-            //        bool highVolume = false;
-            //        if (previousCandel != null)
-            //        {
-            //            highVolume = latestCandel.Volume > (previousCandel.Volume * 1.5m); // Increased activity
-            //        }
-
-            //        // Price change confirmation
-            //        bool nextCandleBullish = false;
-            //        if (verificationCandel != null && verificationCandel.IsBullish.HasValue)
-            //        {
-            //            nextCandleBullish = verificationCandel.IsBullish.Value;
-            //        }
-
-            //        // Combine conditions for dragonfly doji
-            //        if (
-            //        isDoji
-            //        && longLowerShadow
-            //        && minimalUpperShadow
-            //        && bullishContext
-            //        && highVolume
-            //        && nextCandleBullish
-            //        )
-            //        {
-            //        if (verificationCandel != null && verificationCandel.OpenTime.TimeOfDay < new TimeSpan(11, 00, 0))
-            //        {
-            //            dragonFlyDojiCandles.Add(verificationCandel);
-            //        }
-            //}
-
-
-            //}
-
-            foreach (Candel c in CandelData)
-            {
-                // Fetch the current candle
-                Candel latestCandel = c;
-
-                // Fetch the previous and verification candles
-                Candel previousCandel = CandelData
-                    .Where(c => c.CloseTime < latestCandel.CloseTime)
-                    .OrderByDescending(c => c.CloseTime)
-                    .FirstOrDefault();
-
-                Candel verificationCandel = CandelData
-                    .Where(c => c.CloseTime > latestCandel.CloseTime)
-                    .OrderBy(c => c.CloseTime)
-                    .FirstOrDefault();
-
-                // Calculate key metrics
-                decimal bodySize = Math.Abs(latestCandel.EndPrice - latestCandel.StartPrice);
-                decimal range = latestCandel.HighestPrice - latestCandel.LowestPrice;
-                decimal lowerShadowSize = Math.Abs(latestCandel.StartPrice - latestCandel.LowestPrice);
-                decimal upperShadowSize = Math.Abs(latestCandel.HighestPrice - latestCandel.EndPrice);
-
-                // Define thresholds for dragonfly doji
-                bool isDoji = bodySize < (range * 0.05m); // Very small or no body
-                bool longLowerShadow = lowerShadowSize > (range * 0.7m); // Lower shadow occupies most of the range
-                bool noUpperShadow = upperShadowSize < (range * 0.05m); // Minimal or no upper shadow
-
-                // Check if it occurs at the bottom of a downtrend
-                bool isAtDowntrend = previousCandel != null && latestCandel.LowestPrice < previousCandel.LowestPrice;
-
-                // High volume confirmation
-                bool highVolume = previousCandel != null && latestCandel.Volume > (previousCandel.Volume * 1.5m);
-
-                // Price change confirmation
-                bool significantPriceChange = latestCandel.PriceChangePercentage > 0.005m;
-
-                // Verify if the next candle is bullish
-                bool nextCandelBullish = verificationCandel != null && verificationCandel.IsBullish == true;
-
-                // Combine conditions for dragonfly doji detection
-                if (isDoji
-                    && longLowerShadow
-                    && noUpperShadow
-                    && isAtDowntrend
-                    && highVolume
-                    && significantPriceChange
-                    && nextCandelBullish)
-                {
-                    //if (verificationCandel != null && verificationCandel.OpenTime.TimeOfDay < new TimeSpan(11, 00, 0))
-                    //{
-                        dragonFlyDojiCandles.Add(verificationCandel);
-                    //}
-                }
-            }
-
-            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
-
-
-
-
-
-            //List<List<Candel>> MasterCandelList = new List<List<Candel>>();
-
-            //for (int i = 0; i < CandelData.Count - 2; i++)
-            //{
-            //    List<Candel> sublist = new List<Candel>
-            //    {
-            //        CandelData[i],
-            //        CandelData[i + 1],
-            //        CandelData[i + 2]
-            //    };
-
-            //    MasterCandelList.Add(sublist);
-            //}
-
-
-
-            //List<Candel> dragonFlyDojiCandles = new List<Candel>();
-
-            //foreach (List<Candel> candelList in MasterCandelList)
-            //{
-
-            //    // Get the last 3 candles from the list (the most recent 3)
-            //    List<Candel> recentThreeCandles = candelList.OrderByDescending(c => c.CloseTime).Take(3).ToList();
-
-            //    Candel latestCandel = recentThreeCandles.FirstOrDefault();
-
-            //    // Check if all three candles are bullish
-            //    bool allThreeBullish = recentThreeCandles.All(c => c.IsBullish == true);
-
-            //    // Check if the three candles close higher than the previous one
-            //    bool progressiveCloses = recentThreeCandles[0].EndPrice > recentThreeCandles[1].EndPrice
-            //                                                            &&
-            //                             recentThreeCandles[1].EndPrice > recentThreeCandles[2].EndPrice;
-
-            //    // Check if the bodies of the candles are progressively larger
-            //    bool increasingBodySize = (recentThreeCandles[0].EndPrice - recentThreeCandles[0].StartPrice) > (recentThreeCandles[1].EndPrice - recentThreeCandles[1].StartPrice)
-            //                                                                                                  &&
-            //                              (recentThreeCandles[1].EndPrice - recentThreeCandles[1].StartPrice) > (recentThreeCandles[2].EndPrice - recentThreeCandles[2].StartPrice);
-
-            //    // Check for small upper and lower shadows
-            //    bool smallUpperShadow = (recentThreeCandles[0].HighestPrice - recentThreeCandles[0].EndPrice) < (recentThreeCandles[0].EndPrice - recentThreeCandles[0].StartPrice);
-            //    bool smallLowerShadow = (recentThreeCandles[0].StartPrice - recentThreeCandles[0].LowestPrice) < (recentThreeCandles[0].EndPrice - recentThreeCandles[0].StartPrice);
-
-            //    // Check if the body is at least 60% of the total range (strong body)
-            //    decimal range = recentThreeCandles[0].HighestPrice - recentThreeCandles[0].LowestPrice;
-            //    bool strongBodyRatio = range != 0 && (recentThreeCandles[0].EndPrice - recentThreeCandles[0].StartPrice) / range > 0.6m;
-
-            //    bool increasingVolume = recentThreeCandles[0].Volume > recentThreeCandles[1].Volume &&
-            //            recentThreeCandles[1].Volume > recentThreeCandles[2].Volume;
-
-            //    // Get the Candel where CloseTime is greater than latestCandel's CloseTime
-            //    Candel verificationCandel = CandelData
-            //        .Where(c => c.CloseTime > latestCandel.CloseTime)
-            //        .OrderBy(c => c.CloseTime) // Ensures we get the closest one
-            //        .FirstOrDefault();
-
-            //    bool precedingCandelBullish = false;
-
-            //    if(verificationCandel != null)
-            //    {
-            //        if (verificationCandel.IsBullish == true)
-            //        {
-            //            precedingCandelBullish = true;
-            //        }
-            //    }
-
-
-            //    if (
-            //        allThreeBullish
-            //        && progressiveCloses
-            //        && increasingBodySize
-            //        && smallUpperShadow
-            //        && smallLowerShadow
-            //        && strongBodyRatio
-            //        && increasingVolume
-            //        && precedingCandelBullish
-            //        )
-            //    {
-            //        dragonFlyDojiCandles.Add(verificationCandel);
-            //    }
-
-
-
-            //List<Candel> dragonFlyDojiCandles = new List<Candel>();
-
-            //foreach (Candel c in CandelData)
-            //{
-            //    Candel recentCandel = c;
-
-            //    Candel verificationCandel = CandelData
-            //                       .Where(c => c.CloseTime > recentCandel.CloseTime)
-            //                       .OrderBy(c => c.CloseTime) // Ensures we get the closest one
-            //                       .FirstOrDefault();
-
-            //    Candel previousCandel = CandelData
-            //                .Where(c => c.CloseTime < recentCandel.CloseTime)
-            //                .OrderByDescending(c => c.CloseTime) // Ensures we get the closest one before recentCandel
-            //                .FirstOrDefault();
-
-            //    //List<Candel> futureCandels = CandelData
-            //    //              .Where(c => c.CloseTime > recentCandel.CloseTime)
-            //    //              .OrderBy(c => c.CloseTime)
-            //    //              .Take(3)
-            //    //              .ToList();
-
-
-            //    //Candel v1 = futureCandels[0];
-            //    //Candel v2 = futureCandels[1];
-            //    //Candel verificationCandel = futureCandels[1];
-
-            //    // Check if it is a Doji with a small body
-            //    bool isDoji = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.1m;
-
-            //    // Check for a long lower shadow (shadow size relative to the body)
-            //    bool longLowerShadow = (recentCandel.StartPrice - recentCandel.LowestPrice) > 3 * (recentCandel.EndPrice - recentCandel.StartPrice);
-
-            //    // The body of the candle should be small and at the top of the range
-            //    bool smallBodyAtTop = Math.Abs(recentCandel.StartPrice - recentCandel.EndPrice) < (recentCandel.HighestPrice - recentCandel.LowestPrice) * 0.3m;
-
-            //    //// Preceding candle's trend should be bullish (for confirming upward momentum)
-            //    ////bool precedingBullishTrend = CandelData.Where(x => x.CloseTime < recentCandel.OpenTime)
-            //    ////                                       .OrderByDescending(x => x.CloseTime)
-            //    ////                                       .Take(3)
-            //    ////                                       .All(x => x.EndPrice > x.StartPrice); // At least the last 3 candles should be bullish
-
-
-            //    //// Check for higher volume
-            //    //bool higherVolume = recentCandel.Volume > CandelData.Average(x => x.Volume);
-
-            //    //bool higherVolume = recentCandel.Volume > CandelData.TakeLast(10).Max(x => x.Volume) * 0.75m; // Volume above 75% of the max in last 10 candles
-            //    bool higherVolume2 = recentCandel.Volume > CandelData.Average(x => x.Volume);
-
-
-            //    // Find the index of the recentCandel
-            //    int recentCandelIndex = CandelData.IndexOf(recentCandel);
-
-            //    // Get the 10 candles immediately before the recentCandel
-            //    var last10CandelsBefore = CandelData.Skip(recentCandelIndex - 10).Take(10);
-
-            //    // Determine if the volume of recentCandel is higher than 75% of the max volume from the previous 10 candles
-            //    bool higherVolume = recentCandel.Volume > last10CandelsBefore.Max(x => x.Volume) * 0.75m;
-
-
-            //    ////The next candle should also be bullish for confirmation
-
-            //    bool nextCandleBullish = false;
-
-            //    if (verificationCandel != null)
-            //    {
-            //        if (verificationCandel.IsBullish == true)
-            //        {
-            //            nextCandleBullish = true;
-            //        }
-            //    }
-
-            //    bool previousCandelBearish = false;
-
-            //    if (previousCandel != null)
-            //    {
-            //        if (previousCandel.IsBearish == true)
-            //        {
-            //            previousCandelBearish = true;
-            //        }
-            //    }
-
-            //    // If all conditions match, then it's a Dragonfly Doji with high probability of upward movement
-            //    if (isDoji
-            //        && longLowerShadow
-            //        && smallBodyAtTop
-            //        //&& higherVolume
-            //        && higherVolume2
-            //        && nextCandleBullish
-            //        && previousCandelBearish
-            //        )
-            //    {
-            //        if (verificationCandel.OpenTime.TimeOfDay < new TimeSpan(11, 00, 0))
-            //        {
-            //            dragonFlyDojiCandles.Add(recentCandel);
-            //        }
-            //    }
-
-            //}
-
-            return dragonFlyDojiCandles;
-        }
-
-
-
-
-
-
-        // Helper method to fetch the JWT token
-        private async Task<string> GetAuthorizationTokenAsync()
-        {
-            string authorizationToken = string.Empty;
-
-            // Fetch public IP using ipify API
-            string publicIp = await GetPublicIPAsync();
-
-            // Setup login credentials and generate TOTP
-            var loginData = new
-            {
-                clientcode = "AAAF282130",  // Your actual client code
-                password = "6366",          // Your actual pin
-                totp = GenerateTOTP("3IGPCM52A2WTQCH7FW2RYOCYIY") // Generate TOTP from secret key
-            };
-
-            var loginJsonData = JsonConvert.SerializeObject(loginData);
-            var loginClient = new HttpClient();
-            var loginRequestMessage = new HttpRequestMessage(HttpMethod.Post, "https://apiconnect.angelone.in/rest/auth/angelbroking/user/v1/loginByPassword")
-            {
-                Content = new StringContent(loginJsonData, Encoding.UTF8, "application/json")
-            };
-
-            // Set headers for login request
-            loginRequestMessage.Headers.Add("Accept", "application/json");
-            loginRequestMessage.Headers.Add("X-UserType", "USER");
-            loginRequestMessage.Headers.Add("X-SourceID", "WEB");
-            loginRequestMessage.Headers.Add("X-ClientLocalIP", "192.168.56.177");  // Your local IP from ipconfig
-            loginRequestMessage.Headers.Add("X-ClientPublicIP", publicIp);
-            loginRequestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX"); // Replace with your MAC address
-            loginRequestMessage.Headers.Add("X-PrivateKey", "DcsJlRJp");          // Your actual API Key
-
-            try
-            {
-                // Send login request and fetch login token
-                HttpResponseMessage loginResponse = await loginClient.SendAsync(loginRequestMessage);
-                loginResponse.EnsureSuccessStatusCode();  // Throws an exception if not successful
-                string loginResponseContent = await loginResponse.Content.ReadAsStringAsync();
-                dynamic loginResponseJson = JsonConvert.DeserializeObject(loginResponseContent);
-
-                // Check login status
-                if (loginResponseJson.status == true)
-                {
-                    authorizationToken = loginResponseJson.data.jwtToken;  // Assuming the token is present here
-                }
-                else
-                {
-                    throw new Exception("Failed to authenticate: " + loginResponseJson.message);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error during login: {ex.Message}");
-                throw;
-            }
-
-            return authorizationToken;
-        }
-
-        // Fetches the public IP from ipify API
-        private static async Task<string> GetPublicIPAsync()
-        {
-            using (var httpClient = new HttpClient())
-            {
-                try
-                {
-                    HttpResponseMessage response = await httpClient.GetAsync("https://api.ipify.org?format=json");
-                    response.EnsureSuccessStatusCode();
-                    string content = await response.Content.ReadAsStringAsync();
-                    dynamic ipData = JsonConvert.DeserializeObject(content);
-                    return ipData.ip;
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine("Error fetching public IP: " + ex.Message);
-                    return string.Empty;
-                }
-            }
-        }
-
-        // Generate TOTP based on the secret key
-        private static string GenerateTOTP(string secretKey)
-        {
-            var otp = new Totp(Base32Encoding.ToBytes(secretKey));
-            return otp.ComputeTotp(); // Generates the TOTP value
-        }
-
-
-
-
-    }
-
-
-}

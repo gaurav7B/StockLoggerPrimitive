@@ -17,6 +17,18 @@ using System.Reflection;
 using System.Runtime.Intrinsics.X86;
 using System.Web.Razor.Parser.SyntaxTree;
 using System;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.SignalR;
+using Polly.Caching;
+using static System.Net.WebRequestMethods;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Collections;
+using System.Net.NetworkInformation;
+using System.Numerics;
+using System.Runtime.ConstrainedExecution;
+using System.Runtime.InteropServices.JavaScript;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography.Xml;
 
 namespace StockLogger.Models.Candel
 {
@@ -222,51 +234,512 @@ namespace StockLogger.Models.Candel
                 ////new Stock { Ticker = "", Exchange = "NSE", Name = "", Id = 163, SymbolToken = "" },
                 ////new Stock { Ticker = "", Exchange = "NSE", Name = "", Id = 164, SymbolToken = "" },
 
+                //new Stock { Ticker = "360ONE-EQ", Exchange = "NSE", Name = "360ONE-EQ", Id = 1, SymbolToken = "13061" },
+                //new Stock { Ticker = "3MINDIA-EQ", Exchange = "NSE", Name = "3MINDIA-EQ", Id = 2, SymbolToken = "474" },
+                //new Stock { Ticker = "ABB-EQ", Exchange = "NSE", Name = "ABB-EQ", Id = 3, SymbolToken = "13" },
+                //new Stock { Ticker = "ACC-EQ", Exchange = "NSE", Name = "ACC-EQ", Id = 4, SymbolToken = "22" },
+                //new Stock { Ticker = "AIAENG-EQ", Exchange = "NSE", Name = "AIAENG-EQ", Id = 5, SymbolToken = "13086" },
+                //new Stock { Ticker = "APLAPOLLO-EQ", Exchange = "NSE", Name = "APLAPOLLO-EQ", Id = 6, SymbolToken = "25780" },
+                //new Stock { Ticker = "AUBANK-EQ", Exchange = "NSE", Name = "AUBANK-EQ", Id = 7, SymbolToken = "21238" },
+                //new Stock { Ticker = "", Exchange = "NSE", Name = "", Id = , SymbolToken = "" },
+                //new Stock { Ticker = "", Exchange = "NSE", Name = "", Id = , SymbolToken = "" },
+                //new Stock { Ticker = "", Exchange = "NSE", Name = "", Id = , SymbolToken = "" },
 
 
 
-
-//SJVN Ltd.   Power   SJVN    EQ  INE002L01015
-//SRF Ltd.    Chemicals   SRF EQ  INE647A01010
-//Samvardhana Motherson International Ltd.    Automobile and Auto Components  MOTHERSON   EQ  INE775A01035
-//Shree Cement Ltd.   Construction Materials  SHREECEM    EQ  INE070A01015
-//Shriram Finance Ltd.    Financial Services  SHRIRAMFIN  EQ  INE721A01047
-//Siemens Ltd.    Capital Goods   SIEMENS EQ  INE003A01024
-//Solar Industries India Ltd. Chemicals   SOLARINDS   EQ  INE343H01029
-//Sona BLW Precision Forgings Ltd.    Automobile and Auto Components  SONACOMS    EQ  INE073K01018
-//State Bank of India Financial Services  SBIN    EQ  INE062A01020
-//Steel Authority of India Ltd.   Metals & Mining SAIL    EQ  INE114A01011
-//Sun Pharmaceutical Industries Ltd.  Healthcare  SUNPHARMA   EQ  INE044A01036
-//Sundaram Finance Ltd.   Financial Services  SUNDARMFIN  EQ  INE660A01013
-//Supreme Industries Ltd. Capital Goods   SUPREMEIND  EQ  INE195A01028
-//Suzlon Energy Ltd.  Capital Goods   SUZLON  EQ  INE040H01021
-//TVS Motor Company Ltd.  Automobile and Auto Components  TVSMOTOR    EQ  INE494B01023
-//Tata Chemicals Ltd. Chemicals   TATACHEM    EQ  INE092A01019
-//Tata Communications Ltd.    Telecommunication   TATACOMM    EQ  INE151A01013
-//Tata Consultancy Services Ltd.  Information Technology  TCS EQ  INE467B01029
-//Tata Consumer Products Ltd. Fast Moving Consumer Goods  TATACONSUM  EQ  INE192A01025
-//Tata Elxsi Ltd. Information Technology  TATAELXSI   EQ  INE670A01012
-//Tata Motors Ltd.    Automobile and Auto Components  TATAMOTORS  EQ  INE155A01022
-//Tata Power Co. Ltd. Power   TATAPOWER   EQ  INE245A01021
-//Tata Steel Ltd. Metals & Mining TATASTEEL   EQ  INE081A01020
-//Tata Technologies Ltd.  Information Technology  TATATECH    EQ  INE142M01025
-//Tech Mahindra Ltd.  Information Technology  TECHM   EQ  INE669C01036
-//Titan Company Ltd.  Consumer Durables   TITAN   EQ  INE280A01028
-//Torrent Pharmaceuticals Ltd.    Healthcare  TORNTPHARM  EQ  INE685A01028
-//Torrent Power Ltd.  Power   TORNTPOWER  EQ  INE813H01021
-//Trent Ltd.  Consumer Services   TRENT   EQ  INE849A01020
-//Tube Investments of India Ltd.  Automobile and Auto Components  TIINDIA EQ  INE974X01010
-//UPL Ltd.    Chemicals   UPL EQ  INE628A01036
-//UltraTech Cement Ltd.   Construction Materials  ULTRACEMCO  EQ  INE481G01011
-//Union Bank of India Financial Services  UNIONBANK   EQ  INE692A01016
-//United Spirits Ltd. Fast Moving Consumer Goods  UNITDSPR    EQ  INE854D01024
-//Varun Beverages Ltd.    Fast Moving Consumer Goods  VBL EQ  INE200M01039
-//Vedanta Ltd.    Metals & Mining VEDL    EQ  INE205A01025
-//Vodafone Idea Ltd.  Telecommunication   IDEA    EQ  INE669E01016
-//Voltas Ltd. Consumer Durables   VOLTAS  EQ  INE226A01021
-//Yes Bank Ltd.   Financial Services  YESBANK EQ  INE528G01035
-//Zomato Ltd. Consumer Services   ZOMATO  EQ  INE758T01015
-//Zydus Lifesciences Ltd. Healthcare  ZYDUSLIFE   EQ  INE010B01027
+                //AADHARHFC
+                //AARTIIND
+                //AAVAS
+                //ABBOTINDIA
+                //ACE
+                //ADANIENSOL
+                //ADANIENT
+                //ADANIGREEN
+                //ADANIPORTS
+                //ADANIPOWER
+                //ATGL
+                //AWL
+                //ABCAPITAL
+                //ABFRL
+                //ABREL
+                //ABSLAMC
+                //AEGISLOG
+                //AFFLE
+                //AJANTPHARM
+                //AKUMS
+                //APLLTD
+                //ALKEM
+                //ALKYLAMINE
+                //ALOKINDS
+                //ARE&M
+                //AMBER
+                //AMBUJACEM
+                //ANANDRATHI
+                //ANANTRAJ
+                //ANGELONE
+                //APARINDS
+                //APOLLOHOSP
+                //APOLLOTYRE
+                //APTUS
+                //ACI
+                //ASAHIINDIA
+                //ASHOKLEY
+                //ASIANPAINT
+                //ASTERDM
+                //ASTRAZEN
+                //ASTRAL
+                //ATUL
+                //AUROPHARMA
+                //AVANTIFEED
+                //DMART
+                //AXISBANK
+                //BASF
+                //BEML
+                //BLS
+                //BSE
+                //BAJAJ-AUTO
+                //BAJFINANCE
+                //BAJAJFINSV
+                //BAJAJHLDNG
+                //BALAMINES
+                //BALKRISIND
+                //BALRAMCHIN
+                //BANDHANBNK
+                //BANKBARODA
+                //BANKINDIA
+                //MAHABANK
+                //BATAINDIA
+                //BAYERCROP
+                //BERGEPAINT
+                //BDL
+                //BEL
+                //BHARATFORG
+                //BHEL
+                //BPCL
+                //BHARTIARTL
+                //BHARTIHEXA
+                //BIKAJI
+                //BIOCON
+                //BIRLACORPN
+                //BSOFT
+                //BLUEDART
+                //BLUESTARCO
+                //BBTC
+                //BOSCHLTD
+                //BRIGADE
+                //BRITANNIA
+                //MAPMYINDIA
+                //CCL
+                //CESC
+                //CGPOWER
+                //CIEINDIA
+                //CRISIL
+                //CAMPUS
+                //CANFINHOME
+                //CANBK
+                //CAPLIPOINT
+                //CGCL
+                //CARBORUNIV
+                //CASTROLIND
+                //CEATLTD
+                //CELLO
+                //CENTRALBK
+                //CDSL
+                //CENTURYPLY
+                //CERA
+                //CHALET
+                //CHAMBLFERT
+                //CHEMPLASTS
+                //CHENNPETRO
+                //CHOLAHLDNG
+                //CHOLAFIN
+                //CIPLA
+                //CUB
+                //CLEAN
+                //COALINDIA
+                //COCHINSHIP
+                //COFORGE
+                //COLPAL
+                //CAMS
+                //CONCORDBIO
+                //CONCOR
+                //COROMANDEL
+                //CRAFTSMAN
+                //CREDITACC
+                //CROMPTON
+                //CUMMINSIND
+                //CYIENT
+                //DLF
+                //DOMS
+                //DABUR
+                //DALBHARAT
+                //DATAPATTNS
+                //DEEPAKFERT
+                //DEEPAKNTR
+                //DELHIVERY
+                //DEVYANI
+                //DIVISLAB
+                //DIXON
+                //LALPATHLAB
+                //DRREDDY
+                //EIDPARRY
+                //EIHOTEL
+                //EASEMYTRIP
+                //EICHERMOT
+                //ELECON
+                //ELGIEQUIP
+                //EMAMILTD
+                //EMCURE
+                //ENDURANCE
+                //ENGINERSIN
+                //EQUITASBNK
+                //ERIS
+                //ESCORTS
+                //EXIDEIND
+                //NYKAA
+                //FEDERALBNK
+                //FACT
+                //FINEORG
+                //FINCABLES
+                //FINPIPE
+                //FSL
+                //FIVESTAR
+                //FORTIS
+                //GRINFRA
+                //GAIL
+                //GVT&D
+                //GMRAIRPORT
+                //GRSE
+                //GICRE
+                //GILLETTE
+                //GLAND
+                //GLAXO
+                //GLENMARK
+                //MEDANTA
+                //GODIGIT
+                //GPIL
+                //GODFRYPHLP
+                //GODREJAGRO
+                //GODREJCP
+                //GODREJIND
+                //GODREJPROP
+                //GRANULES
+                //GRAPHITE
+                //GRASIM
+                //GESHIP
+                //GRINDWELL
+                //GAEL
+                //FLUOROCHEM
+                //GUJGASLTD
+                //GMDCLTD
+                //GNFC
+                //GPPL
+                //GSFC
+                //GSPL
+                //HEG
+                //HBLENGINE
+                //HCLTECH
+                //HDFCAMC
+                //HDFCBANK
+                //HDFCLIFE
+                //HFCL
+                //HAPPSTMNDS
+                //HAVELLS
+                //HEROMOTOCO
+                //HSCL
+                //HINDALCO
+                //HAL
+                //HINDCOPPER
+                //HINDPETRO
+                //HINDUNILVR
+                //HINDZINC
+                //POWERINDIA
+                //HOMEFIRST
+                //HONASA
+                //HONAUT
+                //HUDCO
+                //ICICIBANK
+                //ICICIGI
+                //ICICIPRULI
+                //ISEC
+                //IDBI
+                //IDFCFIRSTB
+                //IFCI
+                //IIFL
+                //INOXINDIA
+                //IRB
+                //IRCON
+                //ITC
+                //ITI
+                //INDGN
+                //INDIACEM
+                //INDIAMART
+                //INDIANB
+                //IEX
+                //INDHOTEL
+                //IOC
+                //IOB
+                //IRCTC
+                //IRFC
+                //IREDA
+                //IGL
+                //INDUSTOWER
+                //INDUSINDBK
+                //NAUKRI
+                //INFY
+                //INOXWIND
+                //INTELLECT
+                //INDIGO
+                //IPCALAB
+                //JBCHEPHARM
+                //JKCEMENT
+                //JBMA
+                //JKLAKSHMI
+                //JKTYRE
+                //JMFINANCIL
+                //JSWENERGY
+                //JSWINFRA
+                //JSWSTEEL
+                //JPPOWER
+                //J&KBANK
+                //JINDALSAW
+                //JSL
+                //JINDALSTEL
+                //JIOFIN
+                //JUBLFOOD
+                //JUBLINGREA
+                //JUBLPHARMA
+                //JWL
+                //JUSTDIAL
+                //JYOTHYLAB
+                //JYOTICNC
+                //KPRMILL
+                //KEI
+                //KNRCON
+                //KPITTECH
+                //KSB
+                //KAJARIACER
+                //KPIL
+                //KALYANKJIL
+                //KANSAINER
+                //KARURVYSYA
+                //KAYNES
+                //KEC
+                //KFINTECH
+                //KIRLOSBROS
+                //KIRLOSENG
+                //KOTAKBANK
+                //KIMS
+                //LTF
+                //LTTS
+                //LICHSGFIN
+                //LTIM
+                //LT
+                //LATENTVIEW
+                //LAURUSLABS
+                //LEMONTREE
+                //LICI
+                //LINDEINDIA
+                //LLOYDSME
+                //LUPIN
+                //MMTC
+                //MRF
+                //LODHA
+                //MGL
+                //MAHSEAMLES
+                //M&MFIN
+                //M&M
+                //MAHLIFE
+                //MANAPPURAM
+                //MRPL
+                //MANKIND
+                //MARICO
+                //MARUTI
+                //MASTEK
+                //MFSL
+                //MAXHEALTH
+                //MAZDOCK
+                //METROBRAND
+                //METROPOLIS
+                //MINDACORP
+                //MSUMI
+                //MOTILALOFS
+                //MPHASIS
+                //MCX
+                //MUTHOOTFIN
+                //NATCOPHARM
+                //NBCC
+                //NCC
+                //NHPC
+                //NLCINDIA
+                //NMDC
+                //NSLNISP
+                //NTPC
+                //NH
+                //NATIONALUM
+                //NAVINFLUOR
+                //NESTLEIND
+                //NETWEB
+                //NETWORK18
+                //NEWGEN
+                //NAM-INDIA
+                //NUVAMA
+                //NUVOCO
+                //OBEROIRLTY
+                //ONGC
+                //OIL
+                //OLECTRA
+                //PAYTM
+                //OFSS
+                //POLICYBZR
+                //PCBL
+                //PIIND
+                //PNBHOUSING
+                //PNCINFRA
+                //PTCIL
+                //PVRINOX
+                //PAGEIND
+                //PATANJALI
+                //PERSISTENT
+                //PETRONET
+                //PFIZER
+                //PHOENIXLTD
+                //PIDILITIND
+                //PEL
+                //PPLPHARMA
+                //POLYMED
+                //POLYCAB
+                //POONAWALLA
+                //PFC
+                //POWERGRID
+                //PRAJIND
+                //PRESTIGE
+                //PGHH
+                //PNB
+                //QUESS
+                //RRKABEL
+                //RBLBANK
+                //RECLTD
+                //RHIM
+                //RITES
+                //RADICO
+                //RVNL
+                //RAILTEL
+                //RAINBOW
+                //RAJESHEXPO
+                //RKFORGE
+                //RCF
+                //RATNAMANI
+                //RTNINDIA
+                //RAYMOND
+                //REDINGTON
+                //RELIANCE
+                //ROUTE
+                //SBFC
+                //SBICARD
+                //SBILIFE
+                //SJVN
+                //SKFINDIA
+                //SRF
+                //SAMMAANCAP
+                //MOTHERSON
+                //SANOFI
+                //SAPPHIRE
+                //SAREGAMA
+                //SCHAEFFLER
+                //SCHNEIDER
+                //SCI
+                //SHREECEM
+                //RENUKA
+                //SHRIRAMFIN
+                //SHYAMMETL
+                //SIEMENS
+                //SIGNATURE
+                //SOBHA
+                //SOLARINDS
+                //SONACOMS
+                //SONATSOFTW
+                //STARHEALTH
+                //SBIN
+                //SAIL
+                //SWSOLAR
+                //SUMICHEM
+                //SPARC
+                //SUNPHARMA
+                //SUNTV
+                //SUNDARMFIN
+                //SUNDRMFAST
+                //SUPREMEIND
+                //SUVENPHAR
+                //SUZLON
+                //SWANENERGY
+                //SYNGENE
+                //SYRMA
+                //TBOTEK
+                //TVSMOTOR
+                //TVSSCS
+                //TANLA
+                //TATACHEM
+                //TATACOMM
+                //TCS
+                //TATACONSUM
+                //TATAELXSI
+                //TATAINVEST
+                //TATAMOTORS
+                //TATAPOWER
+                //TATASTEEL
+                //TATATECH
+                //TTML
+                //TECHM
+                //TECHNOE
+                //TEJASNET
+                //NIACL
+                //RAMCOCEM
+                //THERMAX
+                //TIMKEN
+                //TITAGARH
+                //TITAN
+                //TORNTPHARM
+                //TORNTPOWER
+                //TRENT
+                //TRIDENT
+                //TRIVENI
+                //TRITURBINE
+                //TIINDIA
+                //UCOBANK
+                //UNOMINDA
+                //UPL
+                //UTIAMC
+                //UJJIVANSFB
+                //ULTRACEMCO
+                //UNIONBANK
+                //UBL
+                //UNITDSPR
+                //USHAMART
+                //VGUARD
+                //VIPIND
+                //DBREALTY
+                //VTL
+                //VARROC
+                //VBL
+                //MANYAVAR
+                //VEDL
+                //VIJAYA
+                //VINATIORGA
+                //IDEA
+                //VOLTAS
+                //WELCORP
+                //WELSPUNLIV
+                //WESTLIFE
+                //WHIRLPOOL
+                //WIPRO
+                //YESBANK
+                //ZFCVINDIA
+                //ZEEL
+                //ZENSARTECH
+                //ZOMATO
+                //ZYDUSLIFE
+                //ECLERX
 
 
 

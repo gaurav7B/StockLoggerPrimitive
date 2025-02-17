@@ -1090,6 +1090,7 @@ namespace StockLogger.Controllers.API_Controllers
 
                             //}
 
+                            List<Candel> TestCandelList = new List<Candel>();
 
                             foreach (Candel testCandel in CandelData)
                             {
@@ -1138,22 +1139,78 @@ namespace StockLogger.Controllers.API_Controllers
                                 decimal? VWPA = CalculateVWPA(TotalList);
 
 
+                                // VALIDATE IF THIS HAS APPEARED EARLIER
+
+                                bool thisIncidentHasOccured = false;
+
+                                Candel matchingCandel = TestCandelList.FirstOrDefault(c => c.Ticker == testCandel.Ticker);
+
+                                if(matchingCandel != null)
+                                {
+                                    List<Candel> CandelDataAfterMatchingCandel = CandelData
+                                                .Where(candel => candel.OpenTime > matchingCandel.OpenTime && candel.OpenTime < testCandel.OpenTime)
+                                                .OrderBy(c => c.OpenTime)
+                                                .ToList();
+
+                                    //var expectedMatchingCandelPrice = matchingCandel.EndPrice - (matchingCandel.EndPrice * 0.00065m);
+                                    var expectedMatchingCandelPrice = matchingCandel.EndPrice - (matchingCandel.EndPrice * 0.0025m);
+
+                                    if (CandelDataAfterMatchingCandel != null)
+                                    {
+                                        Candel ProfitCandel = CandelDataAfterMatchingCandel
+                                               .FirstOrDefault(c => c.LowestPrice <= expectedMatchingCandelPrice);
+
+                                        if (ProfitCandel != null)
+                                        {
+                                            thisIncidentHasOccured = true;
+                                        }
+                                    }
+
+                                }
+
+
+                                if (
+                                   ((RSI != null) && (RSI > 90))
+                                   && ((MFI != null) && (MFI > 80))
+                                   )
+                                {
+                                    TestCandelList.Add(testCandel);
+
+                                    //if (!dragonFlyDojiCandles.Any(candle => candle.Ticker == testCandel.Ticker))
+                                    //{
+                                    //    dragonFlyDojiCandles.Add(testCandel);
+                                    //}
+                                }
+
+                                if(
+                                   ((RSI != null) && (RSI > 90))
+                                   && ((MFI != null) && (MFI > 80))
+                                   && thisIncidentHasOccured
+                                    )
+                                {
+                                    if (!dragonFlyDojiCandles.Any(candle => candle.Ticker == testCandel.Ticker))
+                                    {
+                                        dragonFlyDojiCandles.Add(testCandel);
+                                    }
+                                }
+
+
                                 //if (
-                                //   //((RSI != null) && (RSI > 70))
+                                //   ((RSI != null) && (RSI > 70))
                                 //   //&& ((SO != null) && (SO > 80))
-                                //   //&& ((MFI != null) && (MFI > 80))
+                                //   && ((MFI != null) && (MFI > 80))
 
                                 //   //&& ((WILLIAMSR != null) && (WILLIAMSR > -20) && (WILLIAMSR <= 0))
                                 //   //&& ((CCI != null) && (CCI > 100))
 
 
 
-                                //   ((RSI != null) && (RSI > 93))
-                                //   && ((SO != null) && (SO > 80))
-                                //   && ((MFI != null) && (MFI > 80))
+                                //   //((RSI != null) && (RSI > 93))
+                                //   //&& ((SO != null) && (SO > 80))
+                                //   //&& ((MFI != null) && (MFI > 80))
 
-                                //   && ((WILLIAMSR != null) && (WILLIAMSR > -20) && (WILLIAMSR <= 0))
-                                //   && ((CCI != null) && (CCI > 250))
+                                //   //&& ((WILLIAMSR != null) && (WILLIAMSR > -20) && (WILLIAMSR <= 0))
+                                //   //&& ((CCI != null) && (CCI > 250))
 
 
 
@@ -1180,16 +1237,16 @@ namespace StockLogger.Controllers.API_Controllers
                                 //    //}
                                 //}
 
-                                if (
-                                    //((RSI != null) && (RSI > 93))
-                                    //&& (CCI != null) && (CCI > 250)
-                                    //((WILLIAMSR != null) && (WILLIAMSR >= -1) && (WILLIAMSR <= 0))
-                                    ((WILLIAMSR != null) && (WILLIAMSR == 0))
-                                    && (MFI > 90)
-                                    )
-                                {
-                                    dragonFlyDojiCandles.Add(testCandel);
-                                }
+                                //if (
+                                //    //((RSI != null) && (RSI > 93))
+                                //    //&& (CCI != null) && (CCI > 250)
+                                //    //((WILLIAMSR != null) && (WILLIAMSR >= -1) && (WILLIAMSR <= 0))
+                                //    ((WILLIAMSR != null) && (WILLIAMSR == 0))
+                                //    && (MFI > 90)
+                                //    )
+                                //{
+                                //    dragonFlyDojiCandles.Add(testCandel);
+                                //}
 
                                 //Best Strategy
                                 //Combine indicators: Use RSI +MFI + Bollinger Bands for strong signals.
