@@ -331,6 +331,144 @@ namespace StockLogger.Controllers.API_Controllers
             public decimal CurrentPrice { get; set; }
         }
 
+        public class StockOrder
+        {
+            public string Variety { get; set; }
+            public string OrderType { get; set; }
+            public string ProductType { get; set; }
+            public string Duration { get; set; }
+            public double Price { get; set; }
+            public double TriggerPrice { get; set; }
+            public int Quantity { get; set; }
+            public int DisclosedQuantity { get; set; }
+            public double SquareOff { get; set; }
+            public double StopLoss { get; set; }
+            public double TrailingStopLoss { get; set; }
+            public string TradingSymbol { get; set; }
+            public string TransactionType { get; set; }
+            public string Exchange { get; set; }
+            public string SymbolToken { get; set; }
+            public string OrderTag { get; set; }
+            public string InstrumentType { get; set; }
+            public double StrikePrice { get; set; }
+            public string OptionType { get; set; }
+            public string ExpiryDate { get; set; }
+            public int LotSize { get; set; }
+            public int CancelSize { get; set; }
+            public double AveragePrice { get; set; }
+            public int FilledShares { get; set; }
+            public int UnfilledShares { get; set; }
+            public string OrderId { get; set; }
+            public string Text { get; set; }
+            public string Status { get; set; }
+            public string OrderStatus { get; set; }
+            public string UpdateTime { get; set; }
+            public string ExchangeTime { get; set; }
+            public string ExchangeOrderUpdateTime { get; set; }
+            public string FillId { get; set; }
+            public string FillTime { get; set; }
+            public string ParentOrderId { get; set; }
+            public string UniqueOrderId { get; set; }
+            public string ExchangeOrderId { get; set; }
+        }
+
+
+        // Helper method to fetch the JWT token
+        private async Task<string> GetRefreshedAuthorizationTokenAsync()
+        {
+            var Token = await _context.Token.FirstOrDefaultAsync();
+
+            var RefreshToken = Token.RefreshToken;
+
+            string authorizationToken = string.Empty;
+
+            // Fetch public IP using ipify API
+            string publicIp = await GetPublicIPAsync();
+
+            // Setup login credentials and generate TOTP
+            var loginData = new
+            {
+                refreshToken = RefreshToken,
+            };
+
+            var loginJsonData = JsonConvert.SerializeObject(loginData);
+            var loginClient = new HttpClient();
+            var loginRequestMessage = new HttpRequestMessage(HttpMethod.Post, "https://apiconnect.angelone.in/rest/auth/angelbroking/jwt/v1/generateTokens")
+            {
+                Content = new StringContent(loginJsonData, Encoding.UTF8, "application/json")
+            };
+
+            // Set headers for login request
+            loginRequestMessage.Headers.Add("Authorization", "Bearer " + Token.AuthToken);
+            loginRequestMessage.Headers.Add("Accept", "application/json");
+            loginRequestMessage.Headers.Add("X-UserType", "USER");
+            loginRequestMessage.Headers.Add("X-SourceID", "WEB");
+            loginRequestMessage.Headers.Add("X-ClientLocalIP", "192.168.56.177");  // Your local IP from ipconfig
+            loginRequestMessage.Headers.Add("X-ClientPublicIP", publicIp);
+            loginRequestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX"); // Replace with your MAC address
+            loginRequestMessage.Headers.Add("X-PrivateKey", "DcsJlRJp");          // Your actual API Key
+
+            try
+            {
+                // Send login request and fetch login token
+                HttpResponseMessage loginResponse = await loginClient.SendAsync(loginRequestMessage);
+                loginResponse.EnsureSuccessStatusCode();  // Throws an exception if not successful
+                string loginResponseContent = await loginResponse.Content.ReadAsStringAsync();
+                dynamic loginResponseJson = JsonConvert.DeserializeObject(loginResponseContent);
+
+                // Check login status
+                if (loginResponseJson.status == true)
+                {
+                    authorizationToken = loginResponseJson.data.jwtToken;  // Assuming the token is present here
+
+
+                    // Look for an existing token
+                    var existingToken = await _context.Token.FirstOrDefaultAsync();
+
+                    if (existingToken != null)
+                    {
+                        // If a token exists, update it
+                        existingToken.AuthToken = loginResponseJson.data.jwtToken;  // Assuming `AuthToken` is the property to update
+                        existingToken.RefreshToken = loginResponseJson.data.refreshToken;
+                        existingToken.AuthTokenCreationTime = DateTime.UtcNow;  // Update the creation time
+
+                        // Mark the entry as modified
+                        _context.Entry(existingToken).State = EntityState.Modified;
+                    }
+                    else
+                    {
+                        // Otherwise, create a new token
+                        var token = new Token
+                        {
+                            AuthToken = loginResponseJson.data.jwtToken,
+                            RefreshToken = loginResponseJson.data.refreshToken,
+                            AuthTokenCreationTime = DateTime.UtcNow, // Set creation time
+                        };
+
+                        // Add the new token to the context
+                        _context.Token.Add(token);
+                    }
+
+                    // Save changes to the context (whether adding or updating)
+                    await _context.SaveChangesAsync();
+
+                }
+                else
+                {
+                    throw new Exception("Failed to authenticate: " + loginResponseJson.message);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error during login: {ex.Message}");
+                throw;
+            }
+
+            return authorizationToken;
+        }
+
+
+
         //POST https://localhost:44364/api/BuySell/sell
         [HttpPost("sell")]
         public async Task<IActionResult> SellIntradayStock([FromBody] SellData sellData)
@@ -338,7 +476,94 @@ namespace StockLogger.Controllers.API_Controllers
             // Fetch the authorization token (assuming this is a string)
             string authToken = await GetAuthorizationTokenAsync();
 
+            string authToken2 = await GetRefreshedAuthorizationTokenAsync();
+
             var client = new HttpClient();
+
+
+
+
+
+            var requestMessage2 = new HttpRequestMessage(HttpMethod.Get, "https://apiconnect.angelone.in/rest/secure/angelbroking/order/v1/getOrderBook");
+
+            requestMessage2.Headers.Add("Accept", "application/json");
+            requestMessage2.Headers.Add("X-SourceID", "WEB");
+            requestMessage2.Headers.Add("X-ClientLocalIP", "192.168.56.177");  // Your local IP from ipconfig
+            requestMessage2.Headers.Add("X-ClientPublicIP", await GetPublicIPAsync());  // Fetching the public IP dynamically
+            requestMessage2.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX"); // Replace with your actual MAC address
+            requestMessage2.Headers.Add("X-UserType", "USER");
+            requestMessage2.Headers.Add("Authorization", "Bearer " + authToken2);
+            requestMessage2.Headers.Add("X-PrivateKey", "DcsJlRJp"); // Your actual API Key
+
+            HttpResponseMessage response2 = await client.SendAsync(requestMessage2);
+
+
+
+            string responseContent2 = await response2.Content.ReadAsStringAsync();
+            dynamic OrderData = JsonConvert.DeserializeObject(responseContent2);
+            var rawOrderData = OrderData.data;
+
+            List<StockOrder> stockOrders = new List<StockOrder>();
+
+            foreach (var item in rawOrderData)
+            {
+                StockOrder order = new StockOrder
+                {
+                    Variety = item.variety,
+                    OrderType = item.ordertype,
+                    ProductType = item.producttype,
+                    Duration = item.duration,
+                    Price = (double)item.price,
+                    TriggerPrice = (double)item.triggerprice,
+                    Quantity = int.Parse((string)item.quantity),
+                    DisclosedQuantity = int.Parse((string)item.disclosedquantity),
+                    SquareOff = (double)item.squareoff,
+                    StopLoss = (double)item.stoploss,
+                    TrailingStopLoss = (double)item.trailingstoploss,
+                    TradingSymbol = item.tradingsymbol,
+                    TransactionType = item.transactiontype,
+                    Exchange = item.exchange,
+                    SymbolToken = item.symboltoken,
+                    OrderTag = item.ordertag,
+                    InstrumentType = item.instrumenttype,
+                    StrikePrice = (double)item.strikeprice,
+                    OptionType = item.optiontype,
+                    ExpiryDate = item.expirydate,
+                    LotSize = int.Parse((string)item.lotsize),
+                    CancelSize = int.Parse((string)item.cancelsize),
+                    AveragePrice = (double)item.averageprice,
+                    FilledShares = int.Parse((string)item.filledshares),
+                    UnfilledShares = int.Parse((string)item.unfilledshares),
+                    OrderId = item.orderid,
+                    Text = item.text,
+                    Status = item.status,
+                    OrderStatus = item.orderstatus,
+                    UpdateTime = (item.updatetime.ToString()),
+                    ExchangeTime = (item.exchtime.ToString()),
+                    ExchangeOrderUpdateTime = (item.exchorderupdatetime.ToString()),
+                    FillId = item.fillid,
+                    FillTime = item.filltime,
+                    ParentOrderId = item.parentorderid,
+                    UniqueOrderId = item.uniqueorderid,
+                    ExchangeOrderId = item.exchangeorderid
+                };
+
+                stockOrders.Add(order);
+            }
+
+
+            // Filter list to include only "BUY" transactions with "complete" status
+            List<StockOrder> buyCompletedOrders = stockOrders
+                .Where(o => o.TransactionType == "BUY" && o.OrderStatus == "complete")
+                .ToList();
+
+
+            StockOrder SO = buyCompletedOrders.LastOrDefault();
+
+
+
+
+
 
             decimal amount = 17500;
 
@@ -346,7 +571,7 @@ namespace StockLogger.Controllers.API_Controllers
 
             int ModifiedQuantity = (int)Quantity;
 
-            decimal expectedprice = sellData.CurrentPrice * 1.0025m;
+            decimal expectedprice = (decimal)SO.Price * 1.0025m;
 
             int ModifiedExpectedPrice = (int)expectedprice;
 
@@ -363,7 +588,7 @@ namespace StockLogger.Controllers.API_Controllers
                 price = ModifiedExpectedPrice.ToString(),
                 squareoff = "0",
                 stoploss = "0",
-                quantity = ModifiedQuantity.ToString(),
+                quantity = SO.Quantity.ToString(),
             };
 
 

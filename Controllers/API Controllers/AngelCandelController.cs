@@ -191,21 +191,21 @@ namespace StockLogger.Controllers.API_Controllers
         public async Task<IActionResult> GetCandleDataForTest([FromBody] StockRequest stockRequest)
         {
 
-            string authtoken = await GetRefreshedAuthorizationTokenAsync();
+            //string authtoken = await GetRefreshedAuthorizationTokenAsync();
 
-            //string authtoken = "";
+            string authtoken = "";
 
-            //if (count % 2 != 0)
-            //{
-            //    authtoken = await GetRefreshedAuthorizationTokenAsync();
-            //    count++;
-            //}
-            //else
-            //{
-            //    var token = await _context.Token.FirstOrDefaultAsync();
-            //    authtoken = token.AuthToken;
-            //    count++;
-            //}
+            if (count % 2 != 0)
+            {
+                authtoken = await GetRefreshedAuthorizationTokenAsync();
+                count++;
+            }
+            else
+            {
+                var token = await _context.Token.FirstOrDefaultAsync();
+                authtoken = token.AuthToken;
+                count++;
+            }
 
             // Extract only the date part from StartDate
             var startDateOnly = stockRequest.StartDate.Date;
