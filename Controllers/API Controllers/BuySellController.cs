@@ -571,7 +571,7 @@ namespace StockLogger.Controllers.API_Controllers
 
             int ModifiedQuantity = (int)Quantity;
 
-            decimal expectedprice = (decimal)SO.Price * 1.0025m;
+            decimal expectedprice = (decimal)SO.AveragePrice * 1.0025m;
 
             int ModifiedExpectedPrice = (int)expectedprice;
 

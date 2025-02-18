@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using OtpNet;
 using StockLogger.Data;
 using StockLogger.Models.Candel;
 using System.Diagnostics;
@@ -27,6 +28,95 @@ namespace StockLogger.BackgroundServices
             _stocks = StockList2.GetStocks()
                      .Select(s => (s.Ticker, s.Exchange, s.Name, s.Id, s.SymbolToken))
                      .ToList();
+        }
+
+        // Generate TOTP based on the secret key
+        private static string GenerateTOTP(string secretKey)
+        {
+            var otp = new Totp(Base32Encoding.ToBytes(secretKey));
+            return otp.ComputeTotp(); // Generates the TOTP value
+        }
+
+
+        // Fetches the public IP from ipify API
+        private static async Task<string> GetPublicIPAsync()
+        {
+            using (var httpClient = new HttpClient())
+            {
+                try
+                {
+                    HttpResponseMessage response = await httpClient.GetAsync("https://api.ipify.org?format=json");
+                    response.EnsureSuccessStatusCode();
+                    string content = await response.Content.ReadAsStringAsync();
+                    dynamic ipData = JsonConvert.DeserializeObject(content);
+                    return ipData.ip;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error fetching public IP: " + ex.Message);
+                    return string.Empty;
+                }
+            }
+        }
+
+
+        // Helper method to fetch the JWT token
+        private async Task<string> GetAuthorizationTokenForBuyAsync()
+        {
+            string authorizationToken = string.Empty;
+
+            // Fetch public IP using ipify API
+            string publicIp = await GetPublicIPAsync();
+
+            // Setup login credentials and generate TOTP
+            var loginData = new
+            {
+                clientcode = "AAAF282130",  // Your actual client code
+                password = "6366",          // Your actual pin
+                totp = GenerateTOTP("3IGPCM52A2WTQCH7FW2RYOCYIY") // Generate TOTP from secret key
+            };
+
+            var loginJsonData = JsonConvert.SerializeObject(loginData);
+            var loginClient = new HttpClient();
+            var loginRequestMessage = new HttpRequestMessage(HttpMethod.Post, "https://apiconnect.angelone.in/rest/auth/angelbroking/user/v1/loginByPassword")
+            {
+                Content = new StringContent(loginJsonData, Encoding.UTF8, "application/json")
+            };
+
+            // Set headers for login request
+            loginRequestMessage.Headers.Add("Accept", "application/json");
+            loginRequestMessage.Headers.Add("X-UserType", "USER");
+            loginRequestMessage.Headers.Add("X-SourceID", "WEB");
+            loginRequestMessage.Headers.Add("X-ClientLocalIP", "192.168.56.177");  // Your local IP from ipconfig
+            loginRequestMessage.Headers.Add("X-ClientPublicIP", publicIp);
+            loginRequestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX"); // Replace with your MAC address
+            loginRequestMessage.Headers.Add("X-PrivateKey", "GmTkiYil");          // Your actual API Key
+
+            try
+            {
+                // Send login request and fetch login token
+                HttpResponseMessage loginResponse = await loginClient.SendAsync(loginRequestMessage);
+                loginResponse.EnsureSuccessStatusCode();  // Throws an exception if not successful
+                string loginResponseContent = await loginResponse.Content.ReadAsStringAsync();
+                dynamic loginResponseJson = JsonConvert.DeserializeObject(loginResponseContent);
+
+                // Check login status
+                if (loginResponseJson.status == true)
+                {
+                    authorizationToken = loginResponseJson.data.jwtToken;  // Assuming the token is present here
+                }
+                else
+                {
+                    throw new Exception("Failed to authenticate: " + loginResponseJson.message);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error during login: {ex.Message}");
+                throw;
+            }
+
+            return authorizationToken;
         }
 
         private async Task Post1MinCandelToDb(string symboltoken, CancellationToken stoppingToken)
@@ -289,12 +379,65 @@ namespace StockLogger.BackgroundServices
                             PreviousDaayEndPrice = previousDayCandel.EndPrice,
                         };
 
-                        var jsonRequestBodyForbuyData = JsonConvert.SerializeObject(buyData);
-                        var contentForbuyData = new StringContent(jsonRequestBodyForbuyData, Encoding.UTF8, "application/json");
+                        //var jsonRequestBodyForbuyData = JsonConvert.SerializeObject(buyData);
+                        //var contentForbuyData = new StringContent(jsonRequestBodyForbuyData, Encoding.UTF8, "application/json");
 
-                        var buyDataApiResponse = await _httpClient.PostAsync("https://localhost:44364/api/BuySell/buy", contentForbuyData);
+                        //var buyDataApiResponse = await _httpClient.PostAsync("https://localhost:44364/api/BuySell/buy", contentForbuyData);
 
-                        buyDataApiResponse.EnsureSuccessStatusCode();
+                        //buyDataApiResponse.EnsureSuccessStatusCode();
+
+
+                        string authToken = await GetAuthorizationTokenForBuyAsync();
+
+                        var client = new HttpClient();
+
+
+                        decimal amount = 17500;
+
+                        decimal Quantity = amount / buyData.CurrentPrice;
+
+                        int ModifiedQuantity = (int)Quantity;
+
+
+                        var data = new
+                        {
+                            variety = "NORMAL",
+                            tradingsymbol = buyData.tradingsymbol,
+                            symboltoken = buyData.symboltoken,
+                            transactiontype = "BUY",
+                            exchange = "NSE",
+                            ordertype = "MARKET",
+                            producttype = "INTRADAY",
+                            duration = "DAY",
+                            price = "0",
+                            squareoff = "0",
+                            stoploss = "0",
+                            quantity = ModifiedQuantity.ToString(),
+                        };
+
+                        var jsonData = JsonConvert.SerializeObject(data);
+
+                        var requestMessage = new HttpRequestMessage(HttpMethod.Post, "https://apiconnect.angelone.in/rest/secure/angelbroking/order/v1/placeOrder")
+                        {
+                            Content = new StringContent(jsonData, Encoding.UTF8, "application/json")
+                        };
+
+                        // Set the headers
+                        requestMessage.Headers.Add("Accept", "application/json");
+                        requestMessage.Headers.Add("X-SourceID", "WEB");
+                        requestMessage.Headers.Add("X-ClientLocalIP", "192.168.56.177");  // Your local IP from ipconfig
+                        requestMessage.Headers.Add("X-ClientPublicIP", await GetPublicIPAsync());  // Fetching the public IP dynamically
+                        requestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX"); // Replace with your actual MAC address
+                        requestMessage.Headers.Add("X-UserType", "USER");
+                        requestMessage.Headers.Add("Authorization", "Bearer " + authToken);
+                        requestMessage.Headers.Add("X-PrivateKey", "GmTkiYil"); // Your actual API Key
+
+
+                            HttpResponseMessage buyDataApiResponse = await client.SendAsync(requestMessage);
+
+                            buyDataApiResponse.EnsureSuccessStatusCode();
+
+
 
                         // WHEN THE BUY API RUNS SUCCESSFULLY
                         // CALL THE SELL API
