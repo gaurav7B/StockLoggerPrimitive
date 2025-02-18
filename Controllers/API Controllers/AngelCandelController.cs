@@ -429,7 +429,7 @@ namespace StockLogger.Controllers.API_Controllers
 
                 List<StockOrder> Comp = new List<StockOrder>();
 
-
+                StockOrder SO = buyCompletedOrders.LastOrDefault();
 
 
 
