@@ -11,6 +11,7 @@ using OtpNet;
 using System;
 using static StockLogger.Controllers.API_Controllers.BuySellController;
 using StockLogger.Models.Stratergic_Models.Hammer;
+using System.Runtime.Intrinsics.X86;
 
 namespace StockLogger.Controllers.API_Controllers
 {
@@ -431,6 +432,7 @@ namespace StockLogger.Controllers.API_Controllers
 
                 StockOrder SO = buyCompletedOrders.LastOrDefault();
 
+                var boughtPrice = SO.AveragePrice;
 
 
                 List<Candel> ModifiedCandelDataList = new List<Candel>();
