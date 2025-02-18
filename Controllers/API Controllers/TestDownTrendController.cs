@@ -1152,8 +1152,8 @@ namespace StockLogger.Controllers.API_Controllers
                                                 .OrderBy(c => c.OpenTime)
                                                 .ToList();
 
-                                    //var expectedMatchingCandelPrice = matchingCandel.EndPrice - (matchingCandel.EndPrice * 0.00065m);
-                                    var expectedMatchingCandelPrice = matchingCandel.EndPrice - (matchingCandel.EndPrice * 0.0025m);
+                                    var expectedMatchingCandelPrice = matchingCandel.EndPrice - (matchingCandel.EndPrice * 0.00065m);
+                                    //var expectedMatchingCandelPrice = matchingCandel.EndPrice - (matchingCandel.EndPrice * 0.0025m);
 
                                     if (CandelDataAfterMatchingCandel != null)
                                     {
@@ -1169,29 +1169,41 @@ namespace StockLogger.Controllers.API_Controllers
                                 }
 
 
+                                //if (
+                                //   ((RSI != null) && (RSI > 90))
+                                //   && ((MFI != null) && (MFI > 80))
+                                //   )
+                                //{
+                                //    TestCandelList.Add(testCandel);
+
+                                //    //if (!dragonFlyDojiCandles.Any(candle => candle.Ticker == testCandel.Ticker))
+                                //    //{
+                                //    //    dragonFlyDojiCandles.Add(testCandel);
+                                //    //}
+                                //}
+
+                                //if (
+                                //   ((RSI != null) && (RSI > 90))
+                                //   && ((MFI != null) && (MFI > 80))
+                                //   && thisIncidentHasOccured
+                                //    )
+                                //{
+                                //    if (!dragonFlyDojiCandles.Any(candle => candle.Ticker == testCandel.Ticker))
+                                //    {
+                                //        dragonFlyDojiCandles.Add(testCandel);
+                                //    }
+                                //}
+
                                 if (
-                                   ((RSI != null) && (RSI > 90))
-                                   && ((MFI != null) && (MFI > 80))
-                                   )
+                                   ((RSI != null) && (RSI > 99))
+                                    )
                                 {
-                                    TestCandelList.Add(testCandel);
+                                    dragonFlyDojiCandles.Add(testCandel);
 
                                     //if (!dragonFlyDojiCandles.Any(candle => candle.Ticker == testCandel.Ticker))
                                     //{
                                     //    dragonFlyDojiCandles.Add(testCandel);
                                     //}
-                                }
-
-                                if(
-                                   ((RSI != null) && (RSI > 90))
-                                   && ((MFI != null) && (MFI > 80))
-                                   && thisIncidentHasOccured
-                                    )
-                                {
-                                    if (!dragonFlyDojiCandles.Any(candle => candle.Ticker == testCandel.Ticker))
-                                    {
-                                        dragonFlyDojiCandles.Add(testCandel);
-                                    }
                                 }
 
 
@@ -1227,6 +1239,20 @@ namespace StockLogger.Controllers.API_Controllers
                                 //   //&& ((MFI != null) && (MFI == 100)) // MFI at maximum value indicates extreme overbought
                                 //   //&& ((WILLIAMSR != null) && (WILLIAMSR >= -1) && (WILLIAMSR < 0)) // Williams %R close to 0 indicates extreme overbought
                                 //   //&& ((CCI != null) && (CCI >= 200)) // CCI at very high values indicates extreme overbought
+                                //   )
+                                //{
+                                //    dragonFlyDojiCandles.Add(testCandel);
+
+                                //    //if (!dragonFlyDojiCandles.Any(candle => candle.Ticker == testCandel.Ticker))
+                                //    //{
+                                //    //    dragonFlyDojiCandles.Add(testCandel);
+                                //    //}
+                                //}
+
+
+                                //if (
+                                //   ((RSI != null) && (RSI > 70))
+                                //   && ((MFI != null) && (MFI > 80))
                                 //   )
                                 //{
                                 //    dragonFlyDojiCandles.Add(testCandel);
@@ -1280,10 +1306,10 @@ namespace StockLogger.Controllers.API_Controllers
                                 {
                                     //expectedPrice = firstCandel.EndPrice * 1.000595m;
                                     //expectedPrice = firstCandel.EndPrice * 1.00061m;
-                                    //expectedPrice = firstCandel.EndPrice - (firstCandel.EndPrice * 0.00065m);
+                                    expectedPrice = firstCandel.EndPrice - (firstCandel.EndPrice * 0.00065m);
                                     //firstCandel.EndPrice - (firstCandel.EndPrice * 0.01m); //  10 R profit on 1000 R //1995 on 2 lakh
                                     //expectedPrice = firstCandel.EndPrice - (firstCandel.EndPrice * 0.005m); //  5 R profit on 1000 R //997 on 2lakh
-                                    expectedPrice = firstCandel.EndPrice - (firstCandel.EndPrice * 0.0025m); // 2.5 R profit on 1000 R //450 on 2Lakh
+                                    //expectedPrice = firstCandel.EndPrice - (firstCandel.EndPrice * 0.0025m); // 2.5 R profit on 1000 R //450 on 2Lakh
 
                                     //expectedPrice = firstCandel.EndPrice * 1.0004953m; // 4 LAKH
 
