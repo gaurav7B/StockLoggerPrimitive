@@ -738,19 +738,73 @@ namespace StockLogger.Models.Candel
                 new Stock { Ticker = "ECLERX-EQ", Exchange = "NSE", Name = "ECLERX-EQ", Id = 500, SymbolToken = "15179" },
 
 
-
-                //new Stock { Ticker = "-EQ", Exchange = "NSE", Name = "-EQ", Id = 31, SymbolToken = "" },
-
-
-
-
-
-
-
-
-
-
             };
         }
+
+        //public static List<Stock> GetStocks()
+        //{
+        //    return new List<Stock>
+        //    {
+
+        //        ////NIFTY 50
+        //        new Stock { Ticker = "ADANIENT-EQ", Exchange = "NSE", Name = "ADANIENT-EQ", Id = 14, SymbolToken = "25" },
+        //        new Stock { Ticker = "ADANIPORTS-EQ", Exchange = "NSE", Name = "ADANIPORTS-EQ", Id = 16, SymbolToken = "15083" },
+        //        new Stock { Ticker = "APOLLOHOSP-EQ", Exchange = "NSE", Name = "APOLLOHOSP-EQ", Id = 39, SymbolToken = "157" },
+        //        new Stock { Ticker = "ASIANPAINT-EQ", Exchange = "NSE", Name = "ASIANPAINT-EQ", Id = 45, SymbolToken = "236" },
+        //        new Stock { Ticker = "AXISBANK-EQ", Exchange = "NSE", Name = "AXISBANK-EQ", Id = 53, SymbolToken = "5900" },
+        //        new Stock { Ticker = "BAJAJ-AUTO-EQ", Exchange = "NSE", Name = "BAJAJ-AUTO-EQ", Id = 58, SymbolToken = "16669" },
+        //        new Stock { Ticker = "BAJFINANCE-EQ", Exchange = "NSE", Name = "BAJFINANCE-EQ", Id = 59, SymbolToken = "317" },
+        //        new Stock { Ticker = "BAJAJFINSV-EQ", Exchange = "NSE", Name = "BAJAJFINSV-EQ", Id = 60, SymbolToken = "16675" },
+        //        new Stock { Ticker = "BEL-EQ", Exchange = "NSE", Name = "BEL-EQ", Id = 73, SymbolToken = "383" },
+        //        new Stock { Ticker = "BPCL-EQ", Exchange = "NSE", Name = "BPCL-EQ", Id = 76, SymbolToken = "526" },
+        //        new Stock { Ticker = "BHARTIARTL-EQ", Exchange = "NSE", Name = "BHARTIARTL-EQ", Id = 77, SymbolToken = "10604" },
+        //        new Stock { Ticker = "BRITANNIA-EQ", Exchange = "NSE", Name = "BRITANNIA-EQ", Id = 88, SymbolToken = "547" },
+        //        new Stock { Ticker = "CIPLA-EQ", Exchange = "NSE", Name = "CIPLA-EQ", Id = 114, SymbolToken = "694" },
+        //        new Stock { Ticker = "COALINDIA-EQ", Exchange = "NSE", Name = "COALINDIA-EQ", Id = 117, SymbolToken = "20374" },
+        //        new Stock { Ticker = "DRREDDY-EQ", Exchange = "NSE", Name = "DRREDDY-EQ", Id = 142, SymbolToken = "881" },
+        //        new Stock { Ticker = "EICHERMOT-EQ", Exchange = "NSE", Name = "EICHERMOT-EQ", Id = 146, SymbolToken = "910" },
+        //        new Stock { Ticker = "GRASIM-EQ", Exchange = "NSE", Name = "GRASIM-EQ", Id = 186, SymbolToken = "1232" },
+        //        new Stock { Ticker = "HCLTECH-EQ", Exchange = "NSE", Name = "HCLTECH-EQ", Id = 199, SymbolToken = "7229" },
+        //        new Stock { Ticker = "HDFCBANK-EQ", Exchange = "NSE", Name = "HDFCBANK-EQ", Id = 201, SymbolToken = "1333" },
+        //        new Stock { Ticker = "HDFCLIFE-EQ", Exchange = "NSE", Name = "HDFCLIFE-EQ", Id = 202, SymbolToken = "467" },
+        //        new Stock { Ticker = "HEROMOTOCO-EQ", Exchange = "NSE", Name = "HEROMOTOCO-EQ", Id = 206, SymbolToken = "1348" },
+        //        new Stock { Ticker = "HINDALCO-EQ", Exchange = "NSE", Name = "HINDALCO-EQ", Id = 208, SymbolToken = "1363" },
+        //        new Stock { Ticker = "HINDUNILVR-EQ", Exchange = "NSE", Name = "HINDUNILVR-EQ", Id = 212, SymbolToken = "1394" },
+        //        new Stock { Ticker = "ICICIBANK-EQ", Exchange = "NSE", Name = "ICICIBANK-EQ", Id = 219, SymbolToken = "4963" },
+        //        new Stock { Ticker = "ITC-EQ", Exchange = "NSE", Name = "ITC-EQ", Id = 230, SymbolToken = "1660" },
+        //        new Stock { Ticker = "INDUSINDBK-EQ", Exchange = "NSE", Name = "INDUSINDBK-EQ", Id = 245, SymbolToken = "5258" },
+        //        new Stock { Ticker = "INFY-EQ", Exchange = "NSE", Name = "INFY-EQ", Id = 247, SymbolToken = "1594" },
+        //        new Stock { Ticker = "JSWSTEEL-EQ", Exchange = "NSE", Name = "JSWSTEEL-EQ", Id = 260, SymbolToken = "11723" },
+        //        new Stock { Ticker = "KOTAKBANK-EQ", Exchange = "NSE", Name = "KOTAKBANK-EQ", Id = 289, SymbolToken = "1922" },
+        //        new Stock { Ticker = "LT-EQ", Exchange = "NSE", Name = "LT-EQ", Id = 295, SymbolToken = "11483" },
+        //        new Stock { Ticker = "M%26M-EQ", Exchange = "NSE", Name = "M%26M-EQ", Id = 309, SymbolToken = "2031" },
+        //        new Stock { Ticker = "MARUTI-EQ", Exchange = "NSE", Name = "MARUTI-EQ", Id = 315, SymbolToken = "10999" },
+        //        new Stock { Ticker = "NTPC-EQ", Exchange = "NSE", Name = "NTPC-EQ", Id = 335, SymbolToken = "11630" },
+        //        new Stock { Ticker = "NESTLEIND-EQ", Exchange = "NSE", Name = "NESTLEIND-EQ", Id = 339, SymbolToken = "17963" },
+        //        new Stock { Ticker = "ONGC-EQ", Exchange = "NSE", Name = "ONGC-EQ", Id = 347, SymbolToken = "2475" },
+        //        new Stock { Ticker = "POWERGRID-EQ", Exchange = "NSE", Name = "POWERGRID-EQ", Id = 372, SymbolToken = "14977" },
+        //        new Stock { Ticker = "RELIANCE-EQ", Exchange = "NSE", Name = "RELIANCE-EQ", Id = 394, SymbolToken = "2885" },
+        //        new Stock { Ticker = "SBILIFE-EQ", Exchange = "NSE", Name = "SBILIFE-EQ", Id = 398, SymbolToken = "21808" },
+        //        new Stock { Ticker = "SHRIRAMFIN-EQ", Exchange = "NSE", Name = "SHRIRAMFIN-EQ", Id = 412, SymbolToken = "4306" },
+        //        new Stock { Ticker = "SBIN-EQ", Exchange = "NSE", Name = "SBIN-EQ", Id = 421, SymbolToken = "3045" },
+        //        new Stock { Ticker = "SUNPHARMA-EQ", Exchange = "NSE", Name = "SUNPHARMA-EQ", Id = 426, SymbolToken = "3351" },
+        //        new Stock { Ticker = "TCS-EQ", Exchange = "NSE", Name = "TCS-EQ", Id = 442, SymbolToken = "11536" },
+        //        new Stock { Ticker = "TATACONSUM-EQ", Exchange = "NSE", Name = "TATACONSUM-EQ", Id = 443, SymbolToken = "3432" },
+        //        new Stock { Ticker = "TATAMOTORS-EQ", Exchange = "NSE", Name = "TATAMOTORS-EQ", Id = 446, SymbolToken = "3456" },
+        //        new Stock { Ticker = "TATASTEEL-EQ", Exchange = "NSE", Name = "TATASTEEL-EQ", Id = 448, SymbolToken = "3499" },
+        //        new Stock { Ticker = "TECHM-EQ", Exchange = "NSE", Name = "TECHM-EQ", Id = 451, SymbolToken = "13538" },
+        //        new Stock { Ticker = "TITAN-EQ", Exchange = "NSE", Name = "TITAN-EQ", Id = 459, SymbolToken = "3506" },
+        //        new Stock { Ticker = "TRENT-EQ", Exchange = "NSE", Name = "TRENT-EQ", Id = 462, SymbolToken = "1964" },
+        //        new Stock { Ticker = "ULTRACEMCO-EQ", Exchange = "NSE", Name = "ULTRACEMCO-EQ", Id = 472, SymbolToken = "11532" },
+        //        new Stock { Ticker = "WIPRO-EQ", Exchange = "NSE", Name = "WIPRO-EQ", Id = 493, SymbolToken = "3787" },
+
+
+
+
+        //    };
+        //}
+
+
+
     }
 }

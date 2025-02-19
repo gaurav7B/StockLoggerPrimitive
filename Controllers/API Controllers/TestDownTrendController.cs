@@ -457,77 +457,155 @@ namespace StockLogger.Controllers.API_Controllers
 
 
 
-        public decimal? CalculateLatestRSI(List<Candel> CandelBeforeTestCandel)
+        //public decimal? CalculateLatestRSI(List<Candel> CandelBeforeTestCandel)
+        //{
+        //    // Check for valid input
+        //    if (CandelBeforeTestCandel == null || CandelBeforeTestCandel.Count < 15)
+        //        return null;
+
+        //    List<decimal> closes = CandelBeforeTestCandel.Select(c => c.EndPrice).ToList();
+        //    List<decimal> deltas = new List<decimal>();
+
+        //    for (int i = 1; i < closes.Count; i++)
+        //    {
+        //        deltas.Add(closes[i] - closes[i - 1]);
+        //    }
+
+        //    List<decimal> gains = new List<decimal>();
+        //    List<decimal> losses = new List<decimal>();
+
+        //    foreach (decimal delta in deltas)
+        //    {
+        //        if (delta > 0)
+        //        {
+        //            gains.Add(delta);
+        //            losses.Add(0);
+        //        }
+        //        else if (delta < 0)
+        //        {
+        //            gains.Add(0);
+        //            losses.Add(-delta);
+        //        }
+        //        else
+        //        {
+        //            gains.Add(0);
+        //            losses.Add(0);
+        //        }
+        //    }
+
+        //    decimal avgGain = gains.Take(14).Average();
+        //    decimal avgLoss = losses.Take(14).Average();
+
+        //    decimal latestRSI = 0m;
+
+        //    if (avgLoss == 0)
+        //    {
+        //        latestRSI = 100m;
+        //    }
+        //    else
+        //    {
+        //        decimal rs = avgGain / avgLoss;
+        //        latestRSI = 100 - (100 / (1 + rs));
+        //    }
+
+        //    for (int i = 14; i < deltas.Count; i++)
+        //    {
+        //        decimal currentGain = gains[i];
+        //        decimal currentLoss = losses[i];
+
+        //        avgGain = (avgGain * 13 + currentGain) / 14;
+        //        avgLoss = (avgLoss * 13 + currentLoss) / 14;
+
+        //        if (avgLoss == 0)
+        //        {
+        //            latestRSI = 100m;
+        //        }
+        //        else
+        //        {
+        //            decimal rs = avgGain / avgLoss;
+        //            latestRSI = 100 - (100 / (1 + rs));
+        //        }
+        //    }
+
+        //    return latestRSI;
+        //}
+
+        public List<(decimal? Rsi, Candel Candel)> CalculateRSI(List<Candel> inputList, int period = 14)
         {
-            // Check for valid input
-            if (CandelBeforeTestCandel == null || CandelBeforeTestCandel.Count < 15)
-                return null;
+            List<(decimal? Rsi, Candel Candel)> result = new List<(decimal? Rsi, Candel Candel)>();
 
-            List<decimal> closes = CandelBeforeTestCandel.Select(c => c.EndPrice).ToList();
-            List<decimal> deltas = new List<decimal>();
-
-            for (int i = 1; i < closes.Count; i++)
+            if (inputList == null || inputList.Count < period + 1)
             {
-                deltas.Add(closes[i] - closes[i - 1]);
+                // Not enough data to calculate RSI
+                foreach (var candel in inputList)
+                {
+                    result.Add((null, candel));
+                }
+                return result;
             }
 
+            // Extract EndPrices
+            List<decimal> endPrices = inputList.Select(c => c.EndPrice).ToList();
+
+            // Calculate deltas
+            List<decimal> deltas = new List<decimal>();
+            for (int i = 1; i < endPrices.Count; i++)
+            {
+                deltas.Add(endPrices[i] - endPrices[i - 1]);
+            }
+
+            // Separate into gains and losses
             List<decimal> gains = new List<decimal>();
             List<decimal> losses = new List<decimal>();
-
             foreach (decimal delta in deltas)
             {
-                if (delta > 0)
-                {
-                    gains.Add(delta);
-                    losses.Add(0);
-                }
-                else if (delta < 0)
-                {
-                    gains.Add(0);
-                    losses.Add(-delta);
-                }
-                else
-                {
-                    gains.Add(0);
-                    losses.Add(0);
-                }
+                gains.Add(delta > 0 ? delta : 0);
+                losses.Add(delta < 0 ? -delta : 0);
             }
 
-            decimal avgGain = gains.Take(14).Average();
-            decimal avgLoss = losses.Take(14).Average();
+            // Calculate initial averages
+            decimal avgGain = gains.Take(period).Average();
+            decimal avgLoss = losses.Take(period).Average();
 
-            decimal latestRSI = 0m;
+            // Handle the case where avgLoss is zero to avoid division by zero
+            decimal rs = avgLoss == 0 ? 0 : avgGain / avgLoss;
+            decimal rsi = avgLoss == 0 ? 100m : 100m - (100m / (1 + rs));
 
-            if (avgLoss == 0)
+            // Add nulls for the first 'period' entries
+            for (int i = 0; i < period; i++)
             {
-                latestRSI = 100m;
+                result.Add((null, inputList[i]));
             }
-            else
-            {
-                decimal rs = avgGain / avgLoss;
-                latestRSI = 100 - (100 / (1 + rs));
-            }
 
-            for (int i = 14; i < deltas.Count; i++)
-            {
-                decimal currentGain = gains[i];
-                decimal currentLoss = losses[i];
+            // Add the first RSI for the (period)th Candel
+            result.Add((rsi, inputList[period]));
 
-                avgGain = (avgGain * 13 + currentGain) / 14;
-                avgLoss = (avgLoss * 13 + currentLoss) / 14;
+            // Calculate subsequent RSIs
+            for (int i = period; i < gains.Count; i++)
+            {
+                avgGain = (avgGain * (period - 1) + gains[i]) / period;
+                avgLoss = (avgLoss * (period - 1) + losses[i]) / period;
 
                 if (avgLoss == 0)
                 {
-                    latestRSI = 100m;
+                    rsi = 100m;
                 }
                 else
                 {
-                    decimal rs = avgGain / avgLoss;
-                    latestRSI = 100 - (100 / (1 + rs));
+                    rs = avgGain / avgLoss;
+                    rsi = 100m - (100m / (1 + rs));
                 }
+
+                result.Add((rsi, inputList[i + 1])); // Pair RSI with the next Candel
             }
 
-            return latestRSI;
+            // Fill the remaining entries with nulls if necessary
+            while (result.Count < inputList.Count)
+            {
+                result.Add((null, inputList[result.Count])); // Pair remaining nulls with Candels
+            }
+
+            return result;
         }
 
 
@@ -1095,10 +1173,16 @@ namespace StockLogger.Controllers.API_Controllers
                             foreach (Candel testCandel in CandelData)
                             {
 
-                                if (testCandel.OpenTime.TimeOfDay > new TimeSpan(15, 00, 0))
-                                {
-                                    break;
-                                }
+                                //if (testCandel.OpenTime.TimeOfDay > new TimeSpan(15, 00, 0))
+                                //{
+                                //    break;
+                                //}
+
+                                //if (testCandel.OpenTime.TimeOfDay < new TimeSpan(12, 00, 0))
+                                //{
+                                //    continue;
+                                //}
+
 
                                 List<Candel> TotalList = CandelData
                                                     .Where(candel => candel.OpenTime <= testCandel.OpenTime)
@@ -1108,7 +1192,7 @@ namespace StockLogger.Controllers.API_Controllers
                                 List<Candel> ListForRSI = CandelData
                                                     .Where(candel => candel.OpenTime <= testCandel.OpenTime)
                                                     .OrderByDescending(c => c.OpenTime)
-                                                    .Take(15)
+                                                    .Take(16)
                                                     .OrderBy(c => c.OpenTime)
                                                     .ToList();
 
@@ -1126,7 +1210,21 @@ namespace StockLogger.Controllers.API_Controllers
                                                     .OrderBy(c => c.OpenTime)
                                                     .ToList();
 
-                                decimal? RSI = CalculateLatestRSI(ListForRSI);
+                                List<(decimal? Rsi, Candel Candel)> RSIData = CalculateRSI(TotalList);
+
+                                decimal? CurrentRSI = null;
+
+                                if(RSIData != null)
+                                {
+                                    foreach (var data in RSIData)
+                                    {
+                                        if (data.Candel == testCandel)
+                                        {
+                                            CurrentRSI = data.Rsi;
+                                        }
+                                    }
+                                }
+
 
                                 decimal? MFI = CalculateMFI(ListForMFI);
 
@@ -1138,6 +1236,12 @@ namespace StockLogger.Controllers.API_Controllers
 
                                 decimal? VWPA = CalculateVWPA(TotalList);
 
+                                List<Candel> ListForDownTrend = CandelData
+                                            .Where(candel => candel.OpenTime <= testCandel.OpenTime)
+                                            .OrderByDescending(c => c.OpenTime)
+                                            .Take(5)
+                                            .OrderBy(c => c.OpenTime)
+                                            .ToList();
 
                                 // VALIDATE IF THIS HAS APPEARED EARLIER
 
@@ -1170,8 +1274,8 @@ namespace StockLogger.Controllers.API_Controllers
 
 
                                 //if (
-                                //   ((RSI != null) && (RSI > 90))
-                                //   && ((MFI != null) && (MFI > 80))
+                                //   ((CurrentRSI != null) && (CurrentRSI > 90))
+                                //   //&& ((MFI != null) && (MFI > 80))
                                 //   )
                                 //{
                                 //    TestCandelList.Add(testCandel);
@@ -1183,8 +1287,8 @@ namespace StockLogger.Controllers.API_Controllers
                                 //}
 
                                 //if (
-                                //   ((RSI != null) && (RSI > 90))
-                                //   && ((MFI != null) && (MFI > 80))
+                                //   ((CurrentRSI != null) && (CurrentRSI > 90))
+                                //   //&& ((MFI != null) && (MFI > 80))
                                 //   && thisIncidentHasOccured
                                 //    )
                                 //{
@@ -1195,7 +1299,7 @@ namespace StockLogger.Controllers.API_Controllers
                                 //}
 
                                 if (
-                                   ((RSI != null) && (RSI > 99))
+                                   ((CurrentRSI != null) && (CurrentRSI > 90))
                                     )
                                 {
                                     dragonFlyDojiCandles.Add(testCandel);
@@ -1306,10 +1410,10 @@ namespace StockLogger.Controllers.API_Controllers
                                 {
                                     //expectedPrice = firstCandel.EndPrice * 1.000595m;
                                     //expectedPrice = firstCandel.EndPrice * 1.00061m;
-                                    expectedPrice = firstCandel.EndPrice - (firstCandel.EndPrice * 0.00065m);
+                                    //expectedPrice = firstCandel.EndPrice - (firstCandel.EndPrice * 0.00065m);
                                     //firstCandel.EndPrice - (firstCandel.EndPrice * 0.01m); //  10 R profit on 1000 R //1995 on 2 lakh
                                     //expectedPrice = firstCandel.EndPrice - (firstCandel.EndPrice * 0.005m); //  5 R profit on 1000 R //997 on 2lakh
-                                    //expectedPrice = firstCandel.EndPrice - (firstCandel.EndPrice * 0.0025m); // 2.5 R profit on 1000 R //450 on 2Lakh
+                                    expectedPrice = firstCandel.EndPrice - (firstCandel.EndPrice * 0.0025m); // 2.5 R profit on 1000 R //450 on 2Lakh
 
                                     //expectedPrice = firstCandel.EndPrice * 1.0004953m; // 4 LAKH
 
@@ -1413,6 +1517,11 @@ namespace StockLogger.Controllers.API_Controllers
                                                         .OrderBy(c => c.OpenTime)
                                                         .ToList();
 
+                                    List<Candel> EntireList = CandelData
+                                                        .Where(candel => candel.OpenTime <= dojiCandle.OpenTime)
+                                                        .OrderBy(c => c.OpenTime)
+                                                        .ToList();
+
                                     List<Candel> ListForMFI = CandelData
                                                         .Where(candel => candel.OpenTime <= dojiCandle.OpenTime)
                                                         .OrderByDescending(c => c.OpenTime)
@@ -1427,7 +1536,20 @@ namespace StockLogger.Controllers.API_Controllers
                                                         .OrderBy(c => c.OpenTime)
                                                         .ToList();
 
-                                    decimal? RSI = CalculateLatestRSI(ListForRSI);
+                                    //decimal? RSI = CalculateLatestRSI(ListForRSI);
+
+                                    List<(decimal? Rsi, Candel Candel)> RSIData = CalculateRSI(EntireList);
+
+                                    decimal? CurrentRSI = null;
+
+                                    foreach (var data in RSIData)
+                                    {
+                                        if (data.Candel == dojiCandle)
+                                        {
+                                            CurrentRSI = data.Rsi;
+                                            break;
+                                        }
+                                    }
 
                                     decimal? MFI = CalculateMFI(ListForMFI);
 
@@ -1439,7 +1561,7 @@ namespace StockLogger.Controllers.API_Controllers
 
                                     dataRSI dataRSI = new dataRSI
                                     {
-                                        mainRSI = RSI,
+                                        mainRSI = CurrentRSI,
                                         mainMFI = MFI,
                                         mainCCI = CCI,
                                         mainSO = SO,
@@ -1466,6 +1588,11 @@ namespace StockLogger.Controllers.API_Controllers
                                                         .OrderBy(c => c.OpenTime)
                                                         .ToList();
 
+                                    List<Candel> EntireList = CandelData
+                                                        .Where(candel => candel.OpenTime <= dojiCandle.OpenTime)
+                                                        .OrderBy(c => c.OpenTime)
+                                                        .ToList();
+
                                     List<Candel> ListForMFI = CandelData
                                                         .Where(candel => candel.OpenTime <= dojiCandle.OpenTime)
                                                         .OrderByDescending(c => c.OpenTime)
@@ -1480,7 +1607,21 @@ namespace StockLogger.Controllers.API_Controllers
                                                         .OrderBy(c => c.OpenTime)
                                                         .ToList();
 
-                                    decimal? RSI = CalculateLatestRSI(ListForRSI);
+                                    //decimal? RSI = CalculateLatestRSI(ListForRSI);
+
+                                    List<(decimal? Rsi, Candel Candel)> RSIData = CalculateRSI(EntireList);
+
+                                    decimal? CurrentRSI = null;
+
+                                    foreach (var data in RSIData)
+                                    {
+                                        if (data.Candel == dojiCandle)
+                                        {
+                                            CurrentRSI = data.Rsi;
+                                            break;
+                                        }
+                                    }
+
 
                                     decimal? MFI = CalculateMFI(ListForMFI);
 
@@ -1492,7 +1633,7 @@ namespace StockLogger.Controllers.API_Controllers
 
                                     dataRSI dataRSI = new dataRSI
                                     {
-                                        mainRSI = RSI,
+                                        mainRSI = CurrentRSI,
                                         mainMFI = MFI,
                                         mainCCI = CCI,
                                         mainSO = SO,
