@@ -1173,16 +1173,10 @@ namespace StockLogger.Controllers.API_Controllers
                             foreach (Candel testCandel in CandelData)
                             {
 
-                                //if (testCandel.OpenTime.TimeOfDay > new TimeSpan(15, 00, 0))
-                                //{
-                                //    break;
-                                //}
-
-                                //if (testCandel.OpenTime.TimeOfDay < new TimeSpan(12, 00, 0))
-                                //{
-                                //    continue;
-                                //}
-
+                                if (testCandel.OpenTime.TimeOfDay > new TimeSpan(15, 00, 0))
+                                {
+                                    break;
+                                }
 
                                 List<Candel> TotalList = CandelData
                                                     .Where(candel => candel.OpenTime <= testCandel.OpenTime)

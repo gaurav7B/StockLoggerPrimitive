@@ -731,6 +731,73 @@ namespace StockLogger.Controllers.API_Controllers
             return bodySize <= thresholdValue;
         }
 
+        public static bool IsValidPattern(Candel candel1, Candel candel2, Candel candel3)
+        {
+
+
+            // 1. Check all candles are bullish
+            //if (!candel1.IsBullish.HasValue || !candel1.IsBullish.Value ||
+            //    !candel2.IsBullish.HasValue || !candel2.IsBullish.Value ||
+            //    !candel3.IsBullish.HasValue || !candel3.IsBullish.Value)
+            //{
+            //    return false;
+            //}
+            if(
+                (candel1.IsBearish == true)
+                           ||
+                (candel2.IsBearish == true)
+                           ||
+                (candel3.IsBearish == true) 
+                )
+            {
+                return false;
+            }
+
+            // 2. Check candle sizes are increasing
+            var size1 = candel1.EndPrice - candel1.StartPrice;
+            var size2 = candel2.EndPrice - candel2.StartPrice;
+            var size3 = candel3.EndPrice - candel3.StartPrice;
+
+            if (!(size2 > size1) || !(size3 > size2))
+            {
+                return false;
+            }
+
+
+            // Check if First candel is dragonfly doji
+            decimal bodyThreshold = 0.1m;  // Allow small variation in open and close
+            decimal shadowRatio = 2.5m;    // Lower shadow should be significantly longer than body
+
+            bool isSmallBody = Math.Abs(candel1.StartPrice - candel1.EndPrice) <= bodyThreshold;
+            bool hasLongLowerShadow = (candel1.StartPrice - candel1.LowestPrice) > shadowRatio * Math.Abs(candel1.StartPrice - candel1.EndPrice);
+            bool hasNoUpperShadow = (candel1.HighestPrice - Math.Max(candel1.StartPrice, candel1.EndPrice)) < bodyThreshold;
+
+            bool isFirstCandelDragonFlyDoji = false;
+
+            if(
+                isSmallBody
+                //&& hasLongLowerShadow
+                //&& hasNoUpperShadow
+                )
+            {
+                isFirstCandelDragonFlyDoji = true;
+            }
+
+            if(isFirstCandelDragonFlyDoji == false)
+            {
+                return false;
+            }
+
+            // 3. Check significant gaps between candles
+            // Gap between candle1 and candle2
+            var gap1 = candel2.StartPrice > candel1.HighestPrice;
+
+            // Gap between candle2 and candle3
+            var gap2 = candel3.StartPrice > candel2.HighestPrice;
+
+            return gap1 && gap2;
+        }
+
         //POST https://localhost:44364/api/Test/BulkTestMasterAPI
         [HttpPost("BulkTestMasterAPI")]
         public async Task<IActionResult> BulkTestMasterAPI([FromBody] BulkTestRequestModel request)
@@ -1649,35 +1716,80 @@ namespace StockLogger.Controllers.API_Controllers
                             //}
 
 
-                            // REDUCTION 3%
+                            //// REDUCTION 3%
+
+                            //foreach (Candel testCandel in CandelData)
+                            //{
+                            //    if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
+                            //    {
+                            //        break; // Skip the rest of this iteration and proceed to the next object
+                            //    }
+
+                            //    Candel previousDayCandel = CandelDataPrevious.LastOrDefault();
+
+                            //    Candel currentDataCandel = testCandel;
+
+                            //    if (previousDayCandel == null || currentDataCandel == null)
+                            //    {
+                            //        continue;
+                            //    }
+
+                            //    decimal expectedPrice = previousDayCandel.EndPrice - (previousDayCandel.EndPrice * 0.03m);
+
+                            //    if (currentDataCandel.LowestPrice <= expectedPrice)
+                            //    {
+                            //        //dragonFlyDojiCandles.Add(test);
+
+                            //        if (!dragonFlyDojiCandles.Any(candle => candle.Ticker == currentDataCandel.Ticker))
+                            //        {
+                            //            dragonFlyDojiCandles.Add(currentDataCandel);
+                            //        }
+                            //    }
+
+                            //}
+
 
                             foreach (Candel testCandel in CandelData)
                             {
-                                if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
-                                {
-                                    break; // Skip the rest of this iteration and proceed to the next object
-                                }
-
-                                Candel previousDayCandel = CandelDataPrevious.LastOrDefault();
-
-                                Candel currentDataCandel = testCandel;
-
-                                if (previousDayCandel == null || currentDataCandel == null)
+                                if (testCandel.OpenTime.TimeOfDay < new TimeSpan(9, 05, 0))
                                 {
                                     continue;
                                 }
 
-                                decimal expectedPrice = previousDayCandel.EndPrice - (previousDayCandel.EndPrice * 0.03m);
+                                //if (testCandel.OpenTime.TimeOfDay < new TimeSpan(15, 00, 0))
+                                //{
+                                //    break; 
+                                //}
 
-                                if (currentDataCandel.LowestPrice <= expectedPrice)
+                                Candel Candel1 = testCandel;
+
+                                Candel Candel2 = CandelData
+                                                   .Where(c => c.CloseTime > Candel1.CloseTime)
+                                                   .OrderBy(c => c.CloseTime)
+                                                   .FirstOrDefault();
+
+                                Candel Candel3 = null;
+
+                                if(Candel2 != null)
                                 {
-                                    //dragonFlyDojiCandles.Add(test);
+                                    Candel3 = CandelData
+                                                .Where(c => c.CloseTime > Candel2.CloseTime)
+                                                .OrderBy(c => c.CloseTime)
+                                                .FirstOrDefault();
+                                }
 
-                                    if (!dragonFlyDojiCandles.Any(candle => candle.Ticker == currentDataCandel.Ticker))
+
+                                if (Candel1 != null && Candel2 != null && Candel3 != null)
+                                {
+                                    bool isPatternValid = IsValidPattern(Candel1, Candel2, Candel3);
+
+                                    if (isPatternValid == true)
                                     {
-                                        dragonFlyDojiCandles.Add(currentDataCandel);
+                                        dragonFlyDojiCandles.Add(Candel3);
                                     }
                                 }
+
+
 
                             }
 
