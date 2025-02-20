@@ -1178,7 +1178,12 @@ namespace StockLogger.Controllers.API_Controllers
                                     continue;
                                 }
 
-                                if (testCandel.OpenTime.TimeOfDay > new TimeSpan(14, 00, 0))
+                                //if (testCandel.OpenTime.TimeOfDay > new TimeSpan(14, 00, 0))
+                                //{
+                                //    break;
+                                //}
+
+                                if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
                                 {
                                     break;
                                 }
@@ -1255,8 +1260,8 @@ namespace StockLogger.Controllers.API_Controllers
                                                 .OrderBy(c => c.OpenTime)
                                                 .ToList();
 
-                                    var expectedMatchingCandelPrice = matchingCandel.EndPrice - (matchingCandel.EndPrice * 0.00065m);
-                                    //var expectedMatchingCandelPrice = matchingCandel.EndPrice - (matchingCandel.EndPrice * 0.0025m);
+                                    //var expectedMatchingCandelPrice = matchingCandel.EndPrice - (matchingCandel.EndPrice * 0.00065m);
+                                    var expectedMatchingCandelPrice = matchingCandel.EndPrice - (matchingCandel.EndPrice * 0.0025m);
 
                                     if (CandelDataAfterMatchingCandel != null)
                                     {
@@ -1298,7 +1303,7 @@ namespace StockLogger.Controllers.API_Controllers
                                 //}
 
                                 if (
-                                   ((CurrentRSI != null) && (CurrentRSI > 90))
+                                   ((CurrentRSI != null) && (CurrentRSI > 70))
                                     )
                                 {
                                     dragonFlyDojiCandles.Add(testCandel);
