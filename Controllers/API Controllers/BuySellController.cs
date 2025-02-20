@@ -347,7 +347,8 @@ namespace StockLogger.Controllers.API_Controllers
             int ModifiedQuantity = (int)Quantity;
 
             //decimal expectedprice = sellData.CurrentPrice * 1.0025m;
-            decimal expectedprice = sellData.CurrentPrice - (sellData.CurrentPrice * 0.00065m);
+            //decimal expectedprice = sellData.CurrentPrice - (sellData.CurrentPrice * 0.00065m);
+            decimal expectedprice = sellData.CurrentPrice - (sellData.CurrentPrice * 0.0025m);
 
             int ModifiedExpectedPrice = (int)expectedprice;
 

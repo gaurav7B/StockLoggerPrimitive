@@ -27,7 +27,12 @@ namespace StockLogger.Controllers.API_Controllers
             _context = context;
 
             // Fetch stocks from StockList
-            _stocks = StockList.GetStocks();
+            //_stocks = StockList.GetStocks();
+
+            _stocks = StockList2.GetStocks()
+                     .Select(s => (s.Ticker, s.Exchange, s.Name, s.Id, s.SymbolToken))
+                     .ToList();
+
         }
 
         // POST api/angelcandel/login

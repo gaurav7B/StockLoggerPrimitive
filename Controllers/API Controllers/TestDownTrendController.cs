@@ -1173,7 +1173,12 @@ namespace StockLogger.Controllers.API_Controllers
                             foreach (Candel testCandel in CandelData)
                             {
 
-                                if (testCandel.OpenTime.TimeOfDay > new TimeSpan(15, 00, 0))
+                                if (testCandel.OpenTime.TimeOfDay < new TimeSpan(9, 45, 0))
+                                {
+                                    continue;
+                                }
+
+                                if (testCandel.OpenTime.TimeOfDay > new TimeSpan(14, 00, 0))
                                 {
                                     break;
                                 }
