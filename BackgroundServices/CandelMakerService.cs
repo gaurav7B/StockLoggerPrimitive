@@ -801,7 +801,6 @@ namespace StockLogger.BackgroundServices
 
                             ApiResponse ApiResponseData = JsonConvert.DeserializeObject<ApiResponse>(responsdata);
 
-                            //buyDataApiResponse.EnsureSuccessStatusCode();
 
                             // WHEN THE BUY API RUNS SUCCESSFULLY
                             // CALL THE SELL API

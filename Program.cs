@@ -14,8 +14,8 @@ builder.Services.AddDbContext<StockLoggerDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("StockLoggerDbConnection"),
     sqlServerOptions => sqlServerOptions.EnableRetryOnFailure()));
 
-builder.Services.AddHttpClient<CandelMakerService>();
-builder.Services.AddHostedService<CandelMakerService>();
+//builder.Services.AddHttpClient<CandelMakerService>();
+//builder.Services.AddHostedService<CandelMakerService>();
 
 //builder.Services.AddHttpClient<Uptrend_Service>();
 //builder.Services.AddHostedService<Uptrend_Service>();

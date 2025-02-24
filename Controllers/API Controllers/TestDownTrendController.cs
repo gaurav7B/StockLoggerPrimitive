@@ -1178,15 +1178,15 @@ namespace StockLogger.Controllers.API_Controllers
                                     continue;
                                 }
 
-                                //if (testCandel.OpenTime.TimeOfDay > new TimeSpan(14, 00, 0))
-                                //{
-                                //    break;
-                                //}
-
-                                if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
+                                if (testCandel.OpenTime.TimeOfDay > new TimeSpan(14, 00, 0))
                                 {
                                     break;
                                 }
+
+                                //if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
+                                //{
+                                //    break;
+                                //}
 
                                 List<Candel> TotalList = CandelData
                                                     .Where(candel => candel.OpenTime <= testCandel.OpenTime)
@@ -1303,7 +1303,7 @@ namespace StockLogger.Controllers.API_Controllers
                                 //}
 
                                 if (
-                                   ((CurrentRSI != null) && (CurrentRSI > 70))
+                                   ((CurrentRSI != null) && (CurrentRSI > 90))
                                     )
                                 {
                                     dragonFlyDojiCandles.Add(testCandel);
