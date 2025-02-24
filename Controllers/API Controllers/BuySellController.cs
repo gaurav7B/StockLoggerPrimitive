@@ -262,7 +262,7 @@ namespace StockLogger.Controllers.API_Controllers
             //}
 
 
-            decimal amount = 50000;
+            decimal amount = 5000;
 
             decimal Quantity = amount / buyData.CurrentPrice;
 
@@ -340,7 +340,7 @@ namespace StockLogger.Controllers.API_Controllers
 
             var client = new HttpClient();
 
-            decimal amount = 50000;
+            decimal amount = 5000;
 
             decimal Quantity = amount / sellData.CurrentPrice;
 

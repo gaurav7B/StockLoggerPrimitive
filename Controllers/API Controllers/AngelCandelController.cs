@@ -220,9 +220,9 @@ namespace StockLogger.Controllers.API_Controllers
             var matchingStock = _stocks.FirstOrDefault(s => s.symboltoken == stockRequest.SymbolToken);
 
 
-            // FOR_SPECIFIC_DAY_TESTING
-            var startDateWithTime900 = startDateOnly.Date.AddHours(9).AddMinutes(15);
-            var startDateWithTime330 = startDateOnly.Date.AddHours(15).AddMinutes(20);
+            //// FOR_SPECIFIC_DAY_TESTING
+            //var startDateWithTime900 = startDateOnly.Date.AddHours(9).AddMinutes(15);
+            //var startDateWithTime330 = startDateOnly.Date.AddHours(15).AddMinutes(20);
 
 
 
@@ -230,9 +230,9 @@ namespace StockLogger.Controllers.API_Controllers
             //var startDateWithTime900 = DateTime.Now.AddDays(-1).Date.AddHours(9).AddMinutes(15); // Previous days Candel
             //var startDateWithTime330 = DateTime.Now.AddDays(-1).Date.AddHours(15).AddMinutes(30);   // CurrentDays candel LTP
 
-            //////// CODE TO TEST THE POPULATED DATA
-            //var startDateWithTime900 = DateTime.Now.Date.AddHours(9).AddMinutes(15); // Previous days Candel
-            //var startDateWithTime330 = DateTime.Now;   // CurrentDays candel LTP
+            ////// CODE TO TEST THE POPULATED DATA
+            var startDateWithTime900 = DateTime.Now.Date.AddHours(9).AddMinutes(15); // Previous days Candel
+            var startDateWithTime330 = DateTime.Now;   // CurrentDays candel LTP
 
 
             ////// FOR_DAY_TO_DAY_TESTING
