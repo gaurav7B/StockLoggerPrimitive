@@ -780,7 +780,7 @@ namespace StockLogger.BackgroundServices
                         //  THIS PART COMPARES THE LATEST PRICE WITH THE EXPECTED PRICE
                         if (
                             testCandel != null
-                            && ((CurrentRSI != null) && (CurrentRSI > 70))
+                            && ((CurrentRSI != null) && (CurrentRSI > 90))
                             )
                         {
                             // BUY API HERE
