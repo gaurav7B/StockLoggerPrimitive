@@ -331,6 +331,48 @@ namespace StockLogger.Controllers.API_Controllers
             public decimal CurrentPrice { get; set; }
         }
 
+        public class StockOrder
+        {
+            public string Variety { get; set; }
+            public string OrderType { get; set; }
+            public string ProductType { get; set; }
+            public string Duration { get; set; }
+            public double Price { get; set; }
+            public double TriggerPrice { get; set; }
+            public int Quantity { get; set; }
+            public int DisclosedQuantity { get; set; }
+            public double SquareOff { get; set; }
+            public double StopLoss { get; set; }
+            public double TrailingStopLoss { get; set; }
+            public string TradingSymbol { get; set; }
+            public string TransactionType { get; set; }
+            public string Exchange { get; set; }
+            public string SymbolToken { get; set; }
+            public string OrderTag { get; set; }
+            public string InstrumentType { get; set; }
+            public double StrikePrice { get; set; }
+            public string OptionType { get; set; }
+            public string ExpiryDate { get; set; }
+            public int LotSize { get; set; }
+            public int CancelSize { get; set; }
+            public double AveragePrice { get; set; }
+            public int FilledShares { get; set; }
+            public int UnfilledShares { get; set; }
+            public string OrderId { get; set; }
+            public string Text { get; set; }
+            public string Status { get; set; }
+            public string OrderStatus { get; set; }
+            public string UpdateTime { get; set; }
+            public string ExchangeTime { get; set; }
+            public string ExchangeOrderUpdateTime { get; set; }
+            public string FillId { get; set; }
+            public string FillTime { get; set; }
+            public string ParentOrderId { get; set; }
+            public string UniqueOrderId { get; set; }
+            public string ExchangeOrderId { get; set; }
+        }
+
+
         //POST https://localhost:44364/api/BuySell/sell
         [HttpPost("sell")]
         public async Task<IActionResult> SellIntradayStock([FromBody] SellData sellData)
@@ -340,6 +382,92 @@ namespace StockLogger.Controllers.API_Controllers
 
             var client = new HttpClient();
 
+
+
+
+            var requestMessage2 = new HttpRequestMessage(HttpMethod.Get, "https://apiconnect.angelone.in/rest/secure/angelbroking/order/v1/getOrderBook");
+
+            requestMessage2.Headers.Add("Accept", "application/json");
+            requestMessage2.Headers.Add("X-SourceID", "WEB");
+            requestMessage2.Headers.Add("X-ClientLocalIP", "192.168.56.177");  // Your local IP from ipconfig
+            requestMessage2.Headers.Add("X-ClientPublicIP", await GetPublicIPAsync());  // Fetching the public IP dynamically
+            requestMessage2.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX"); // Replace with your actual MAC address
+            requestMessage2.Headers.Add("X-UserType", "USER");
+            requestMessage2.Headers.Add("Authorization", "Bearer " + authToken);
+            requestMessage2.Headers.Add("X-PrivateKey", "DcsJlRJp"); // Your actual API Key
+
+            HttpResponseMessage response2 = await client.SendAsync(requestMessage2);
+
+
+
+            string responseContent2 = await response2.Content.ReadAsStringAsync();
+            dynamic OrderData = JsonConvert.DeserializeObject(responseContent2);
+            var rawOrderData = OrderData.data;
+
+            List<StockOrder> stockOrders = new List<StockOrder>();
+
+            foreach (var item in rawOrderData)
+            {
+                StockOrder order = new StockOrder
+                {
+                    Variety = item.variety,
+                    OrderType = item.ordertype,
+                    ProductType = item.producttype,
+                    Duration = item.duration,
+                    Price = (double)item.price,
+                    TriggerPrice = (double)item.triggerprice,
+                    Quantity = int.Parse((string)item.quantity),
+                    DisclosedQuantity = int.Parse((string)item.disclosedquantity),
+                    SquareOff = (double)item.squareoff,
+                    StopLoss = (double)item.stoploss,
+                    TrailingStopLoss = (double)item.trailingstoploss,
+                    TradingSymbol = item.tradingsymbol,
+                    TransactionType = item.transactiontype,
+                    Exchange = item.exchange,
+                    SymbolToken = item.symboltoken,
+                    OrderTag = item.ordertag,
+                    InstrumentType = item.instrumenttype,
+                    StrikePrice = (double)item.strikeprice,
+                    OptionType = item.optiontype,
+                    ExpiryDate = item.expirydate,
+                    LotSize = int.Parse((string)item.lotsize),
+                    CancelSize = int.Parse((string)item.cancelsize),
+                    AveragePrice = (double)item.averageprice,
+                    FilledShares = int.Parse((string)item.filledshares),
+                    UnfilledShares = int.Parse((string)item.unfilledshares),
+                    OrderId = item.orderid,
+                    Text = item.text,
+                    Status = item.status,
+                    OrderStatus = item.orderstatus,
+                    UpdateTime = (item.updatetime.ToString()),
+                    ExchangeTime = (item.exchtime.ToString()),
+                    ExchangeOrderUpdateTime = (item.exchorderupdatetime.ToString()),
+                    FillId = item.fillid,
+                    FillTime = item.filltime,
+                    ParentOrderId = item.parentorderid,
+                    UniqueOrderId = item.uniqueorderid,
+                    ExchangeOrderId = item.exchangeorderid
+                };
+
+                stockOrders.Add(order);
+            }
+
+
+            // Filter list to include only "BUY" transactions with "complete" status
+            List<StockOrder> buyCompletedOrders = stockOrders
+                .Where(o => o.TransactionType == "BUY" && o.OrderStatus == "complete")
+                .ToList();
+
+
+            StockOrder SO = buyCompletedOrders.LastOrDefault();
+
+
+
+
+
+
+
+
             decimal amount = 5000;
 
             decimal Quantity = amount / sellData.CurrentPrice;
@@ -348,9 +476,12 @@ namespace StockLogger.Controllers.API_Controllers
 
             //decimal expectedprice = sellData.CurrentPrice * 1.0025m;
             //decimal expectedprice = sellData.CurrentPrice - (sellData.CurrentPrice * 0.00065m);
-            decimal expectedprice = sellData.CurrentPrice - (sellData.CurrentPrice * 0.0025m);
+            decimal expectedprice = (decimal)SO.AveragePrice - ((decimal)SO.AveragePrice * 0.0025m);
 
-            int ModifiedExpectedPrice = (int)expectedprice;
+            decimal roundedPrice = Math.Round(Math.Round(expectedprice / 0.05m, MidpointRounding.AwayFromZero) * 0.05m, 2, MidpointRounding.AwayFromZero);
+
+            //int ModifiedExpectedPrice = (int)expectedprice;
+            decimal ModifiedExpectedPrice = roundedPrice;
 
 
             var data = new
