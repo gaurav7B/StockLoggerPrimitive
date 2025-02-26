@@ -26,6 +26,7 @@ namespace StockLogger.Controllers.API_Controllers
         private readonly StockLoggerDbContext _context;
         private readonly List<(string ticker, string exchange, string name, long id, string symboltoken)> _stocks;
         private readonly IMemoryCache _cache;
+        private static readonly HttpClient _httpClient = new HttpClient();
 
 
         public AngelCandelController(StockLoggerDbContext context , IMemoryCache cache)
@@ -367,7 +368,7 @@ namespace StockLogger.Controllers.API_Controllers
             };
 
             var jsonData = JsonConvert.SerializeObject(data);
-            var client = new HttpClient();
+            var client = _httpClient;
 
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, "https://apiconnect.angelone.in/rest/secure/angelbroking/historical/v1/getCandleData")
             {
@@ -498,7 +499,7 @@ namespace StockLogger.Controllers.API_Controllers
                     Content = new StringContent(dataStringSession, Encoding.UTF8, "application/json")
                 };
 
-                var client = new HttpClient();
+                var client = _httpClient;
 
                 HttpResponseMessage response = await client.SendAsync(requestMessage);
 
@@ -534,7 +535,7 @@ namespace StockLogger.Controllers.API_Controllers
                     Content = new StringContent(dataStringSession, Encoding.UTF8, "application/json")
                 };
 
-                var client = new HttpClient();
+                var client = _httpClient;
 
                 HttpResponseMessage response = await client.SendAsync(requestMessage);
 
@@ -554,7 +555,6 @@ namespace StockLogger.Controllers.API_Controllers
 
         public string RequestToken;
         public string AccessToken;
-        private static readonly HttpClient _httpClient = new HttpClient();
 
         // POST https://localhost:44364/api/AngelCandel/getCandleDataForTest5Paisa
         [HttpPost("getCandleDataForTest5Paisa")]
@@ -704,7 +704,7 @@ namespace StockLogger.Controllers.API_Controllers
             };
 
             var jsonData = JsonConvert.SerializeObject(data);
-            var client = new HttpClient();
+            var client = _httpClient;
 
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, "https://apiconnect.angelone.in/rest/secure/angelbroking/historical/v1/getCandleData")
             {
@@ -809,7 +809,7 @@ namespace StockLogger.Controllers.API_Controllers
         [HttpGet("getFunds")]
         public async Task<IActionResult> GetFundDetails()
         {
-            var client = new HttpClient();
+            var client = _httpClient;
             var requestMessage = new HttpRequestMessage(HttpMethod.Get, "https://apiconnect.angelone.in/rest/secure/angelbroking/user/v1/getRMS");
 
             var token = await _context.Token.FirstOrDefaultAsync();
