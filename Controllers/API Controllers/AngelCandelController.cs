@@ -12,6 +12,10 @@ using System;
 using static StockLogger.Controllers.API_Controllers.BuySellController;
 using StockLogger.Models.Stratergic_Models.Hammer;
 using System.Runtime.Intrinsics.X86;
+using System.Net.WebSockets;
+using Azure.Core;
+using System.Net;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace StockLogger.Controllers.API_Controllers
 {
@@ -21,8 +25,10 @@ namespace StockLogger.Controllers.API_Controllers
     {
         private readonly StockLoggerDbContext _context;
         private readonly List<(string ticker, string exchange, string name, long id, string symboltoken)> _stocks;
+        private readonly IMemoryCache _cache;
 
-        public AngelCandelController(StockLoggerDbContext context)
+
+        public AngelCandelController(StockLoggerDbContext context , IMemoryCache cache)
         {
             _context = context;
 
@@ -32,6 +38,8 @@ namespace StockLogger.Controllers.API_Controllers
             _stocks = StockList2.GetStocks()
                      .Select(s => (s.Ticker, s.Exchange, s.Name, s.Id, s.SymbolToken))
                      .ToList();
+
+            _cache = cache;
 
         }
 
@@ -153,6 +161,7 @@ namespace StockLogger.Controllers.API_Controllers
                         // If a token exists, update it
                         existingToken.AuthToken = loginResponseJson.data.jwtToken;  // Assuming `AuthToken` is the property to update
                         existingToken.RefreshToken = loginResponseJson.data.refreshToken;
+                        existingToken.FeedToken = loginResponseJson.data.feedToken;
                         existingToken.AuthTokenCreationTime = DateTime.UtcNow;  // Update the creation time
 
                         // Mark the entry as modified
@@ -165,6 +174,7 @@ namespace StockLogger.Controllers.API_Controllers
                         {
                             AuthToken = loginResponseJson.data.jwtToken,
                             RefreshToken = loginResponseJson.data.refreshToken,
+                            FeedToken = loginResponseJson.data.feedToken,
                             AuthTokenCreationTime = DateTime.UtcNow, // Set creation time
                         };
 
@@ -190,7 +200,64 @@ namespace StockLogger.Controllers.API_Controllers
             return authorizationToken;
         }
 
+
+        private static async Task SubscribeToStock(ClientWebSocket ws, string token)
+        {
+            var request = new
+            {
+                correlationID = "abcde12345",
+                action = 1,  // 1 = Subscribe
+                @params = new
+                {
+                    mode = 1,  // 1 = LTP (Last Traded Price)
+                    tokenList = new[]
+                    {
+                    new { exchangeType = 1, tokens = new[] { token } }  // NSE = 1
+                }
+                }
+            };
+
+            string jsonRequest = JsonConvert.SerializeObject(request);
+            byte[] requestBytes = Encoding.UTF8.GetBytes(jsonRequest);
+
+            await ws.SendAsync(new ArraySegment<byte>(requestBytes), WebSocketMessageType.Text, true, CancellationToken.None);
+            Console.WriteLine($"Subscribed to stock {token}");
+        }
+
+        private static async Task ListenForMessages(ClientWebSocket ws)
+        {
+            byte[] buffer = new byte[1024];
+
+            while (ws.State == WebSocketState.Open)
+            {
+                var result = await ws.ReceiveAsync(new ArraySegment<byte>(buffer), CancellationToken.None);
+
+                if (result.MessageType == WebSocketMessageType.Close)
+                {
+                    Console.WriteLine("WebSocket connection closed.");
+                    break;
+                }
+
+                // Decode and print the received message
+                var message = result;
+                Console.WriteLine("Received: " + message);
+
+            }
+        }
+
+        private static async Task SendHeartbeat(ClientWebSocket ws)
+        {
+            byte[] heartbeatBytes = Encoding.UTF8.GetBytes("ping");
+            await ws.SendAsync(new ArraySegment<byte>(heartbeatBytes), WebSocketMessageType.Text, true, CancellationToken.None);
+            Console.WriteLine("Sent Heartbeat: ping");
+        }
+
+
         public int count;
+        private static string webSocketUrl = "wss://smartapisocket.angelone.in/smart-stream";
+        private static string clientId = "AAAF282130";
+        private static string apiKey = "DcsJlRJp";
+
 
         // POST https://localhost:44364/api/AngelCandel/getCandleDataForTest
         [HttpPost("getCandleDataForTest")]
@@ -212,6 +279,38 @@ namespace StockLogger.Controllers.API_Controllers
                 authtoken = token.AuthToken;
                 count++;
             }
+
+            var tokenData = await _context.Token.FirstOrDefaultAsync();
+            string feedToken = tokenData.FeedToken;
+
+
+            //using (ClientWebSocket ws = new ClientWebSocket())
+            //{
+            //    // Set request headers for authentication
+            //    ws.Options.SetRequestHeader("Authorization", "Bearer " + authtoken);
+            //    ws.Options.SetRequestHeader("x-api-key", apiKey);
+            //    ws.Options.SetRequestHeader("x-client-code", clientId);
+            //    ws.Options.SetRequestHeader("x-feed-token", feedToken);
+
+            //    // Connect to the WebSocket server
+            //    await ws.ConnectAsync(new Uri(webSocketUrl), CancellationToken.None);
+            //    Console.WriteLine("Connected to WebSocket!");
+
+            //    // Subscribe to ADANIENT-EQ (Token: 25, NSE: 1)
+            //    await SubscribeToStock(ws, "25");
+
+            //    // Start listening for messages
+            //    _ = Task.Run(() => ListenForMessages(ws));
+
+            //    // Maintain heartbeat every 30 seconds
+            //    while (ws.State == WebSocketState.Open)
+            //    {
+            //        await SendHeartbeat(ws);
+            //        await Task.Delay(30000);
+            //    }
+            //}
+
+
 
             // Extract only the date part from StartDate
             var startDateOnly = stockRequest.StartDate.Date;
@@ -294,7 +393,6 @@ namespace StockLogger.Controllers.API_Controllers
                 // Send request to get historical data
                 HttpResponseMessage response = await client.SendAsync(requestMessage);
 
-
                 if (!response.IsSuccessStatusCode)
                 {
                     //HttpResponseMessage tokenResponse = await client.PostAsync("https://localhost:44364/api/Token", null); //Creats new JWT token in database
@@ -356,6 +454,197 @@ namespace StockLogger.Controllers.API_Controllers
                         Exchange = matchingStock.exchange,
 
                         Volume = Convert.ToDecimal(rawCandel[5]),
+                    };
+                    newCandel.SetBullBearStatus();
+                    newCandel.SetPriceChange();
+
+                    if (newCandel.CloseTime < DateTime.Now)
+                    {
+                        ModifiedCandelDataList.Add(newCandel);
+                    }
+
+                }
+
+                return Ok(ModifiedCandelDataList);  // Return the fetched historical candle data
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = "Error fetching candle data: " + ex.Message });
+            }
+        }
+
+
+
+
+
+        public async Task<string> TOTP5PaisaLoginAsync(string _TOTP = "", string _EmailId = "bhoitegaurav7@gmail.com", string _Pin = "636663")
+        {
+            _TOTP = GenerateTOTP("GUZDAOBVGAZDKXZVKBDUWRKZ");
+
+            string RequestToken = "";
+
+            try
+            {
+                string URL = "https://Openapi.5paisa.com/VendorsAPI/Service1.svc/" + "TOTPLogin";
+                var dataStringSession = JsonConvert.SerializeObject(new
+                {
+                    head = new { Key = "GyMVwFkIedy5iFNZsSsQ6zVY56jJ31Zy" },
+                    body = new { Email_ID = _EmailId, TOTP = _TOTP, PIN = _Pin }
+
+                });
+
+                var requestMessage = new HttpRequestMessage(HttpMethod.Post, URL)
+                {
+                    Content = new StringContent(dataStringSession, Encoding.UTF8, "application/json")
+                };
+
+                var client = new HttpClient();
+
+                HttpResponseMessage response = await client.SendAsync(requestMessage);
+
+                string responseContent = await response.Content.ReadAsStringAsync();
+                dynamic responsData = JsonConvert.DeserializeObject(responseContent);
+                RequestToken = responsData.body.RequestToken;
+
+                return RequestToken;
+
+            }
+            catch (Exception ex)
+            {
+            }
+            return RequestToken;
+        }
+
+        public async Task<string> GetOuth5PaisaLoginAsync(string RequestToken)
+        {
+            string AccessToken = "";
+            try
+            {
+                string URL = "https://Openapi.5paisa.com/VendorsAPI/Service1.svc/" + "GetAccessToken";
+                var dataStringSession = JsonConvert.SerializeObject(new
+                {
+                    head = new { Key = "GyMVwFkIedy5iFNZsSsQ6zVY56jJ31Zy" },
+                    //body = new { ClientCode= ClientCode, JWTToken = Token, Key= VendorKey, AllowMap = Allowmap }
+                    body = new { RequestToken = RequestToken, EncryKey = "HmNw0CSQIHnV5b7HspQYLUbhlFE5WA4J", UserId = "VjxWPi3kv5f" }
+
+                });
+
+                var requestMessage = new HttpRequestMessage(HttpMethod.Post, URL)
+                {
+                    Content = new StringContent(dataStringSession, Encoding.UTF8, "application/json")
+                };
+
+                var client = new HttpClient();
+
+                HttpResponseMessage response = await client.SendAsync(requestMessage);
+
+                string responseContent = await response.Content.ReadAsStringAsync();
+                dynamic responsData = JsonConvert.DeserializeObject(responseContent);
+                AccessToken = responsData.body.AccessToken;
+
+                return AccessToken;
+
+            }
+            catch (Exception ex)
+            {
+            }
+            return AccessToken;
+        }
+
+
+        public string RequestToken;
+        public string AccessToken;
+
+        // POST https://localhost:44364/api/AngelCandel/getCandleDataForTest5Paisa
+        [HttpPost("getCandleDataForTest5Paisa")]
+        public async Task<IActionResult> GetCandleDataForTest5Paisa([FromBody] StockRequest stockRequest)
+        {
+            //if (RequestToken == null)
+            //{
+            //    RequestToken = await TOTP5PaisaLoginAsync();
+            //    AccessToken = await GetOuth5PaisaLoginAsync(RequestToken);
+            //}
+
+            //_cache.Remove("AccessToken");
+            //_cache.Remove("CreationTime");
+
+            bool existsAccessToken = _cache.Get("AccessToken") != null;
+
+            var cacheOptions = new MemoryCacheEntryOptions()
+                .SetAbsoluteExpiration(TimeSpan.FromMinutes(30)); // Adjust based on token expiry
+
+            if (existsAccessToken == false)
+            {
+                RequestToken = await TOTP5PaisaLoginAsync();
+                AccessToken = await GetOuth5PaisaLoginAsync(RequestToken);
+                // Store in cache with expiration
+
+                _cache.Set("AccessToken", AccessToken, cacheOptions);
+            }
+
+            AccessToken = _cache.Get<string>("AccessToken");
+
+
+            //string RequestToken = await TOTP5PaisaLoginAsync();
+            //string AccessToken = await GetOuth5PaisaLoginAsync(RequestToken);
+
+            // Extract only the date part from StartDate
+            var startDateOnly = stockRequest.StartDate.Date;
+            var EndDateOnly = stockRequest.EndDate.Date;
+
+            var matchingStock = _stocks.FirstOrDefault(s => s.symboltoken == stockRequest.SymbolToken);
+
+
+            // FOR_SPECIFIC_DAY_TESTING
+            var startDateWithTime900 = startDateOnly.Date.AddHours(9).AddMinutes(15);
+            var startDateWithTime330 = startDateOnly.Date.AddHours(15).AddMinutes(20);
+
+
+            var client = new HttpClient();
+
+            var requestMessage2 = new HttpRequestMessage(HttpMethod.Get,
+                $"https://openapi.5paisa.com/V2/historical/N/C/1630/1m?from={startDateWithTime900:yyyy-MM-dd}&end={startDateWithTime900:yyyy-MM-dd}");
+
+            requestMessage2.Headers.Add("Authorization", "Bearer " + AccessToken);
+            requestMessage2.Headers.Add("5Paisa-API-Uid", "nosniff");
+            requestMessage2.Headers.Add("Accept", "application/json");
+
+
+            try
+            {
+
+                HttpResponseMessage response2 = await client.SendAsync(requestMessage2);
+
+                string responseContent2 = await response2.Content.ReadAsStringAsync();
+                dynamic candleData2 = JsonConvert.DeserializeObject(responseContent2);
+                var rawCandelData2 = candleData2.data.candles;
+
+
+                List<Candel> ModifiedCandelDataList = new List<Candel>();
+
+                if (rawCandelData2 == null)
+                {
+                    return null;
+                }
+
+                foreach (var rawCandel2 in rawCandelData2)
+                {
+                    Candel newCandel = new Candel
+                    {
+                        OpenTime = DateTime.Parse(rawCandel2[0].ToString()),
+
+                        CloseTime = DateTime.Parse(rawCandel2[0].ToString()).AddMinutes(1),
+
+                        StartPrice = Convert.ToDecimal(rawCandel2[1]),
+                        HighestPrice = Convert.ToDecimal(rawCandel2[2]),
+                        LowestPrice = Convert.ToDecimal(rawCandel2[3]),
+                        EndPrice = Convert.ToDecimal(rawCandel2[4]),
+
+                        Ticker = matchingStock.ticker,
+                        TickerId = matchingStock.id,
+                        Exchange = matchingStock.exchange,
+
+                        Volume = Convert.ToDecimal(rawCandel2[5]),
                     };
                     newCandel.SetBullBearStatus();
                     newCandel.SetPriceChange();

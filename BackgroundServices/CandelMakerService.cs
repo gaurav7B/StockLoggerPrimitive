@@ -780,7 +780,7 @@ namespace StockLogger.BackgroundServices
                         //  THIS PART COMPARES THE LATEST PRICE WITH THE EXPECTED PRICE
                         if (
                             testCandel != null
-                            && ((CurrentRSI != null) && (CurrentRSI > 90))
+                            && ((CurrentRSI != null) && (CurrentRSI > 70))
                             )
                         {
                             // BUY API HERE
@@ -805,13 +805,14 @@ namespace StockLogger.BackgroundServices
                             // WHEN THE BUY API RUNS SUCCESSFULLY
                             // CALL THE SELL API
                             // SELL API HERE
-                            if (ApiResponseData.Status == true) // Ensures status is 200
+                            if (ApiResponseData.Message == "SUCCESS") // Ensures status is 200
                             {
                                 SellData sellData = new SellData
                                 {
                                     symboltoken = stock.symboltoken,
                                     tradingsymbol = stock.ticker,
-                                    CurrentPrice = testCandel.EndPrice
+                                    CurrentPrice = testCandel.EndPrice,
+                                    UniqueOrderId = ApiResponseData.Data.UniqueOrderId
                                 };
 
                                 var jsonRequestBodyForsellData = JsonConvert.SerializeObject(sellData);

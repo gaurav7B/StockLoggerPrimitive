@@ -329,6 +329,7 @@ namespace StockLogger.Controllers.API_Controllers
             public string tradingsymbol { get; set; }
             public string symboltoken { get; set; }
             public decimal CurrentPrice { get; set; }
+            public string UniqueOrderId { get; set; }
         }
 
         public class StockOrder
@@ -372,7 +373,6 @@ namespace StockLogger.Controllers.API_Controllers
             public string ExchangeOrderId { get; set; }
         }
 
-
         //POST https://localhost:44364/api/BuySell/sell
         [HttpPost("sell")]
         public async Task<IActionResult> SellIntradayStock([FromBody] SellData sellData)
@@ -394,7 +394,7 @@ namespace StockLogger.Controllers.API_Controllers
             requestMessage2.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX"); // Replace with your actual MAC address
             requestMessage2.Headers.Add("X-UserType", "USER");
             requestMessage2.Headers.Add("Authorization", "Bearer " + authToken);
-            requestMessage2.Headers.Add("X-PrivateKey", "DcsJlRJp"); // Your actual API Key
+            requestMessage2.Headers.Add("X-PrivateKey", "GmTkiYil"); // Your actual API Key
 
             HttpResponseMessage response2 = await client.SendAsync(requestMessage2);
 
@@ -453,18 +453,24 @@ namespace StockLogger.Controllers.API_Controllers
             }
 
 
-            // Filter list to include only "BUY" transactions with "complete" status
-            List<StockOrder> buyCompletedOrders = stockOrders
-                .Where(o => o.TransactionType == "BUY" && o.OrderStatus == "complete")
-                .ToList();
+            StockOrder LastOrder = stockOrders.LastOrDefault();
 
-
-            StockOrder SO = buyCompletedOrders.LastOrDefault();
-
-
+            StockOrder SO = stockOrders
+                .FirstOrDefault(o => o.TransactionType == "SELL"
+                                  && o.OrderStatus == "complete"
+                                  && o.UniqueOrderId == sellData.UniqueOrderId);
 
 
 
+            if (LastOrder.Status == "complete" && LastOrder.TradingSymbol == sellData.tradingsymbol && LastOrder.UniqueOrderId == sellData.UniqueOrderId)
+            {
+                SO = LastOrder;
+            }
+
+            if(SO == null)
+            {
+                return Ok();
+            }
 
 
 

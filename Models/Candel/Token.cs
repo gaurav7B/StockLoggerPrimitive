@@ -8,6 +8,7 @@ namespace StockLogger.Models.Candel
         public long Id { get; set; }
         public string AuthToken { get; set; }
         public string RefreshToken { get; set; }
+        public string FeedToken { get; set; }
         public DateTime AuthTokenCreationTime { get; set; }
     }
 }

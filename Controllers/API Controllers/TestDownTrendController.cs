@@ -857,7 +857,8 @@ namespace StockLogger.Controllers.API_Controllers
 
                 try
                 {
-                    var response = await client.PostAsync("https://localhost:44364/api/AngelCandel/getCandleDataForTest", content);
+                    //var response = await client.PostAsync("https://localhost:44364/api/AngelCandel/getCandleDataForTest", content);
+                    var response = await client.PostAsync("https://localhost:44364/api/AngelCandel/getCandleDataForTest5Paisa", content);
 
 
                     if (response.IsSuccessStatusCode)
@@ -1303,7 +1304,7 @@ namespace StockLogger.Controllers.API_Controllers
                                 //}
 
                                 if (
-                                   ((CurrentRSI != null) && (CurrentRSI > 90))
+                                   ((CurrentRSI != null) && (CurrentRSI > 80))
                                     )
                                 {
                                     dragonFlyDojiCandles.Add(testCandel);
@@ -1414,10 +1415,10 @@ namespace StockLogger.Controllers.API_Controllers
                                 {
                                     //expectedPrice = firstCandel.EndPrice * 1.000595m;
                                     //expectedPrice = firstCandel.EndPrice * 1.00061m;
-                                    //expectedPrice = firstCandel.EndPrice - (firstCandel.EndPrice * 0.00065m);
+                                    expectedPrice = firstCandel.EndPrice - (firstCandel.EndPrice * 0.00065m);
                                     //firstCandel.EndPrice - (firstCandel.EndPrice * 0.01m); //  10 R profit on 1000 R //1995 on 2 lakh
                                     //expectedPrice = firstCandel.EndPrice - (firstCandel.EndPrice * 0.005m); //  5 R profit on 1000 R //997 on 2lakh
-                                    expectedPrice = firstCandel.EndPrice - (firstCandel.EndPrice * 0.0025m); // 2.5 R profit on 1000 R //450 on 2Lakh
+                                    //expectedPrice = firstCandel.EndPrice - (firstCandel.EndPrice * 0.0025m); // 2.5 R profit on 1000 R //450 on 2Lakh
 
                                     //expectedPrice = firstCandel.EndPrice * 1.0004953m; // 4 LAKH
 
