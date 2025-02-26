@@ -554,6 +554,7 @@ namespace StockLogger.Controllers.API_Controllers
 
         public string RequestToken;
         public string AccessToken;
+        private static readonly HttpClient _httpClient = new HttpClient();
 
         // POST https://localhost:44364/api/AngelCandel/getCandleDataForTest5Paisa
         [HttpPost("getCandleDataForTest5Paisa")]
@@ -612,7 +613,7 @@ namespace StockLogger.Controllers.API_Controllers
             var todate = startDateWithTime330.ToString("yyyy-MM-dd");
 
 
-            var client = new HttpClient();
+            var client = _httpClient;
 
             var requestMessage2 = new HttpRequestMessage(HttpMethod.Get,
                 $"https://openapi.5paisa.com/V2/historical/N/C/{stockRequest.SymbolToken}/1m?from={fromdate}&end={fromdate}");
