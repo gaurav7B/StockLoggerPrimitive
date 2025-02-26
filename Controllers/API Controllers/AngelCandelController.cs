@@ -569,9 +569,7 @@ namespace StockLogger.Controllers.API_Controllers
             //_cache.Remove("CreationTime");
 
             bool existsAccessToken = _cache.Get("AccessToken") != null;
-
-            var cacheOptions = new MemoryCacheEntryOptions()
-                .SetAbsoluteExpiration(TimeSpan.FromMinutes(30)); // Adjust based on token expiry
+            bool existsCreationTime = _cache.Get("CreationTime") != null;
 
             if (existsAccessToken == false)
             {
@@ -579,11 +577,22 @@ namespace StockLogger.Controllers.API_Controllers
                 AccessToken = await GetOuth5PaisaLoginAsync(RequestToken);
                 // Store in cache with expiration
 
-                _cache.Set("AccessToken", AccessToken, cacheOptions);
+                _cache.Set("AccessToken", AccessToken);
+                _cache.Set("CreationTime", DateTime.Now);
             }
 
             AccessToken = _cache.Get<string>("AccessToken");
+            DateTime CreationTime = _cache.Get<DateTime>("CreationTime");
 
+            if ((DateTime.Now - CreationTime).TotalMinutes > 20)
+            {
+                RequestToken = await TOTP5PaisaLoginAsync();
+                AccessToken = await GetOuth5PaisaLoginAsync(RequestToken);
+                // Store in cache with expiration
+
+                _cache.Set("AccessToken", AccessToken);
+                _cache.Set("CreationTime", DateTime.Now);
+            }
 
             //string RequestToken = await TOTP5PaisaLoginAsync();
             //string AccessToken = await GetOuth5PaisaLoginAsync(RequestToken);
@@ -599,11 +608,14 @@ namespace StockLogger.Controllers.API_Controllers
             var startDateWithTime900 = startDateOnly.Date.AddHours(9).AddMinutes(15);
             var startDateWithTime330 = startDateOnly.Date.AddHours(15).AddMinutes(20);
 
+            var fromdate = startDateWithTime900.ToString("yyyy-MM-dd");
+            var todate = startDateWithTime330.ToString("yyyy-MM-dd");
+
 
             var client = new HttpClient();
 
             var requestMessage2 = new HttpRequestMessage(HttpMethod.Get,
-                $"https://openapi.5paisa.com/V2/historical/N/C/1630/1m?from={startDateWithTime900:yyyy-MM-dd}&end={startDateWithTime900:yyyy-MM-dd}");
+                $"https://openapi.5paisa.com/V2/historical/N/C/{stockRequest.SymbolToken}/1m?from={fromdate}&end={fromdate}");
 
             requestMessage2.Headers.Add("Authorization", "Bearer " + AccessToken);
             requestMessage2.Headers.Add("5Paisa-API-Uid", "nosniff");
