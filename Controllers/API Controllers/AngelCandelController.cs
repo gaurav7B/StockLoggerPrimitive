@@ -259,6 +259,19 @@ namespace StockLogger.Controllers.API_Controllers
         private static string clientId = "AAAF282130";
         private static string apiKey = "DcsJlRJp";
 
+        // GET https://localhost:44364/api/AngelCandel/GetFeedTokenForAngelWebSocket
+        [HttpGet("GetFeedTokenForAngelWebSocket")]
+        public async Task<IActionResult> GetFeedTokenForAngelWebSocket()
+        {
+            string authtoken = await GetRefreshedAuthorizationTokenAsync();
+            var tokenData = await _context.Token.FirstOrDefaultAsync();
+
+            return Ok(new
+            {
+                AuthToken = authtoken,
+                FeedToken = tokenData.FeedToken
+            });
+        }
 
         // POST https://localhost:44364/api/AngelCandel/getCandleDataForTest
         [HttpPost("getCandleDataForTest")]
@@ -482,7 +495,7 @@ namespace StockLogger.Controllers.API_Controllers
         {
             _TOTP = GenerateTOTP("GUZDAOBVGAZDKXZVKBDUWRKZ");
 
-            string RequestToken = "";
+            string RequestToken = null;
 
             try
             {

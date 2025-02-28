@@ -23,6 +23,7 @@ namespace StockLogger.Controllers.API_Controllers
     {
         private readonly StockLoggerDbContext _context;
         private readonly List<(string ticker, string exchange, string name, long id, string symboltoken)> _stocks;
+        private static readonly HttpClient _httpClient = new HttpClient();
 
         public BuySellController(StockLoggerDbContext context)
         {
@@ -61,7 +62,7 @@ namespace StockLogger.Controllers.API_Controllers
             // Fetch the authorization token (assuming this is a string)
             string authToken = await GetAuthorizationTokenAsync();
 
-            var client = new HttpClient();
+            var client = _httpClient;
 
 
             var LTPData = new
@@ -146,7 +147,7 @@ namespace StockLogger.Controllers.API_Controllers
             // Fetch the authorization token (assuming this is a string)
             string authToken = await GetAuthorizationTokenAsync();
 
-            var client = new HttpClient();
+            var client = _httpClient;
 
             var LTPrequestMessage = new HttpRequestMessage(HttpMethod.Get, "https://apiconnect.angelone.in/rest/secure/angelbroking/order/v1/getTradeBook");
 
@@ -197,7 +198,7 @@ namespace StockLogger.Controllers.API_Controllers
             // Fetch the authorization token (assuming this is a string)
             string authToken = await GetAuthorizationTokenAsync();
 
-            var client = new HttpClient();
+            var client = _httpClient;
 
             //string LTP = "";
             //string ExpectedPrice = "";
@@ -380,9 +381,7 @@ namespace StockLogger.Controllers.API_Controllers
             // Fetch the authorization token (assuming this is a string)
             string authToken = await GetAuthorizationTokenAsync();
 
-            var client = new HttpClient();
-
-
+            var client = _httpClient;
 
 
             var requestMessage2 = new HttpRequestMessage(HttpMethod.Get, "https://apiconnect.angelone.in/rest/secure/angelbroking/order/v1/getOrderBook");

@@ -745,7 +745,8 @@ namespace StockLogger.BackgroundServices
                         var contentForCurrentDaysData = new StringContent(jsonRequestBodyForCurrentDaysData, Encoding.UTF8, "application/json");
 
 
-                        var responseCurrent = await _httpClient.PostAsync("https://localhost:44364/api/AngelCandel/getCandleDataForTest", contentForCurrentDaysData);
+                        //var responseCurrent = await _httpClient.PostAsync("https://localhost:44364/api/AngelCandel/getCandleDataForTest", contentForCurrentDaysData);
+                        var responseCurrent = await _httpClient.PostAsync("https://localhost:44364/api/AngelCandel/getCandleDataForTest5Paisa", contentForCurrentDaysData);
 
                         string responseCurrentData = await responseCurrent.Content.ReadAsStringAsync(stoppingToken);
 
@@ -780,7 +781,7 @@ namespace StockLogger.BackgroundServices
                         //  THIS PART COMPARES THE LATEST PRICE WITH THE EXPECTED PRICE
                         if (
                             testCandel != null
-                            && ((CurrentRSI != null) && (CurrentRSI > 70))
+                            && ((CurrentRSI != null) && (CurrentRSI > 90))
                             )
                         {
                             // BUY API HERE
