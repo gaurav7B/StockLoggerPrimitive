@@ -520,13 +520,18 @@ namespace StockLogger.Controllers.API_Controllers
                 dynamic responsData = JsonConvert.DeserializeObject(responseContent);
                 RequestToken = responsData.body.RequestToken;
 
+                if(RequestToken == "")
+                {
+                    RequestToken = await TOTP5PaisaLoginAsync();
+                }
+
                 return RequestToken;
 
             }
             catch (Exception ex)
             {
+                return null;
             }
-            return RequestToken;
         }
 
         public async Task<string> GetOuth5PaisaLoginAsync(string RequestToken)
@@ -585,7 +590,9 @@ namespace StockLogger.Controllers.API_Controllers
             bool existsAccessToken = _cache.Get("AccessToken") != null;
             bool existsCreationTime = _cache.Get("CreationTime") != null;
 
-            if (existsAccessToken == false)
+            var Atoken = _cache.Get("AccessToken");
+
+            if (existsAccessToken == false || Atoken == null || Atoken == "")
             {
                 RequestToken = await TOTP5PaisaLoginAsync();
                 AccessToken = await GetOuth5PaisaLoginAsync(RequestToken);
@@ -604,8 +611,8 @@ namespace StockLogger.Controllers.API_Controllers
                 AccessToken = await GetOuth5PaisaLoginAsync(RequestToken);
                 // Store in cache with expiration
 
-                _cache.Set("AccessToken", AccessToken);
-                _cache.Set("CreationTime", DateTime.Now);
+                _cache.Remove("AccessToken");
+                _cache.Remove("CreationTime");
             }
 
             //string RequestToken = await TOTP5PaisaLoginAsync();

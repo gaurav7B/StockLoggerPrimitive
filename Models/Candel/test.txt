@@ -12,24 +12,29 @@
                                                                              |
                Kissht--       2746-2746-2746-2746-2746-----8MARCH---13730----|     6  FEBRUARY REMIANING LOAN TO BE PAID IN MARCH
                                                                              |
-               Olyv--          2100-2100------22MARCH--------------4200------|
-                                                                             |----------72043                   
+               Olyv--          5315-5315-5315-5315------20MARCH-----21260----|
+                                                                             |----------89103                   
                Branch--         2262-2262-2262---6MARCH-------------6786-----|                                         
                                                                              |                                         
                Pocketly--      3536-3536-3536---16MARCH------------10608-----|                                  
                                                                              |
-               TrueBalance--          2475-2475-2475-2525----20FEB----9900---|
+               TrueBalance--          2475-2475-2475-2525----20MARCH--9900---|
                                                                              |
                RupeeReady--              2971---23FEB---------------2971-----/
 
 
                BELOW TO BE DONE AFTER MARCH PAYMENT
 
+               I have 9000
+               Salary - 40000
+               ---------------
+               Total = 49000
+
                MPocket - 10768
                Kissht - 2746
-               Olyv - 2100
+               Olyv - 5315
                Branch - 2262
-               Pocketly - 3536
+               Pocketly - 10608
                TrueBalance - 2475
                RupeeReady - 2971
                ------------------
