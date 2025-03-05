@@ -461,10 +461,10 @@ namespace StockLogger.Controllers.API_Controllers
 
 
 
-            if (LastOrder.Status == "complete" && LastOrder.TradingSymbol == sellData.tradingsymbol && LastOrder.UniqueOrderId == sellData.UniqueOrderId)
-            {
-                SO = LastOrder;
-            }
+            //if (LastOrder.Status == "complete" && LastOrder.TradingSymbol == sellData.tradingsymbol && LastOrder.UniqueOrderId == sellData.UniqueOrderId)
+            //{
+            //    SO = LastOrder;
+            //}
 
             if(SO == null)
             {
@@ -479,9 +479,8 @@ namespace StockLogger.Controllers.API_Controllers
 
             int ModifiedQuantity = (int)Quantity;
 
-            //decimal expectedprice = sellData.CurrentPrice * 1.0025m;
-            //decimal expectedprice = sellData.CurrentPrice - (sellData.CurrentPrice * 0.00065m);
             decimal expectedprice = (decimal)SO.AveragePrice - ((decimal)SO.AveragePrice * 0.0025m);
+            //decimal expectedprice = (decimal)SO.AveragePrice - ((decimal)SO.AveragePrice * 0.00065m);
 
             decimal roundedPrice = Math.Round(Math.Round(expectedprice / 0.05m, MidpointRounding.AwayFromZero) * 0.05m, 2, MidpointRounding.AwayFromZero);
 

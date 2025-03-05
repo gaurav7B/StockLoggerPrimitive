@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Newtonsoft.Json;
 using OtpNet;
+using Skender.Stock.Indicators;
 using StockLogger.BackgroundServices.BackgroundStratergyServices;
 using StockLogger.Data;
 using StockLogger.Models.Candel;
@@ -16,6 +18,9 @@ using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Channels;
+using System.Web.WebPages;
+using static System.Net.Mime.MediaTypeNames;
+using Talib.Indicators;
 
 namespace StockLogger.Controllers.API_Controllers
 {
@@ -798,6 +803,85 @@ namespace StockLogger.Controllers.API_Controllers
             return gap1 && gap2;
         }
 
+        public List<(decimal? Rsi, Candel Candel)> CalculateRSI(List<Candel> inputList, int period = 14)
+        {
+            List<(decimal? Rsi, Candel Candel)> result = new List<(decimal? Rsi, Candel Candel)>();
+
+            if (inputList == null || inputList.Count < period + 1)
+            {
+                // Not enough data to calculate RSI
+                foreach (var candel in inputList)
+                {
+                    result.Add((null, candel));
+                }
+                return result;
+            }
+
+            // Extract EndPrices
+            List<decimal> endPrices = inputList.Select(c => c.EndPrice).ToList();
+
+            // Calculate deltas
+            List<decimal> deltas = new List<decimal>();
+            for (int i = 1; i < endPrices.Count; i++)
+            {
+                deltas.Add(endPrices[i] - endPrices[i - 1]);
+            }
+
+            // Separate into gains and losses
+            List<decimal> gains = new List<decimal>();
+            List<decimal> losses = new List<decimal>();
+            foreach (decimal delta in deltas)
+            {
+                gains.Add(delta > 0 ? delta : 0);
+                losses.Add(delta < 0 ? -delta : 0);
+            }
+
+            // Calculate initial averages
+            decimal avgGain = gains.Take(period).Average();
+            decimal avgLoss = losses.Take(period).Average();
+
+            // Handle the case where avgLoss is zero to avoid division by zero
+            decimal rs = avgLoss == 0 ? 0 : avgGain / avgLoss;
+            decimal rsi = avgLoss == 0 ? 100m : 100m - (100m / (1 + rs));
+
+            // Add nulls for the first 'period' entries
+            for (int i = 0; i < period; i++)
+            {
+                result.Add((null, inputList[i]));
+            }
+
+            // Add the first RSI for the (period)th Candel
+            result.Add((rsi, inputList[period]));
+
+            // Calculate subsequent RSIs
+            for (int i = period; i < gains.Count; i++)
+            {
+                avgGain = (avgGain * (period - 1) + gains[i]) / period;
+                avgLoss = (avgLoss * (period - 1) + losses[i]) / period;
+
+                if (avgLoss == 0)
+                {
+                    rsi = 100m;
+                }
+                else
+                {
+                    rs = avgGain / avgLoss;
+                    rsi = 100m - (100m / (1 + rs));
+                }
+
+                result.Add((rsi, inputList[i + 1])); // Pair RSI with the next Candel
+            }
+
+            // Fill the remaining entries with nulls if necessary
+            while (result.Count < inputList.Count)
+            {
+                result.Add((null, inputList[result.Count])); // Pair remaining nulls with Candels
+            }
+
+            return result;
+        }
+
+
         //POST https://localhost:44364/api/Test/BulkTestMasterAPI
         [HttpPost("BulkTestMasterAPI")]
         public async Task<IActionResult> BulkTestMasterAPI([FromBody] BulkTestRequestModel request)
@@ -891,7 +975,8 @@ namespace StockLogger.Controllers.API_Controllers
 
                 try
                 {
-                    var response = await client.PostAsync("https://localhost:44364/api/AngelCandel/getCandleDataForTest", content);
+                    //var response = await client.PostAsync("https://localhost:44364/api/AngelCandel/getCandleDataForTest", content);
+                    var response = await client.PostAsync("https://localhost:44364/api/AngelCandel/getCandleDataForTest5Paisa", content);
 
                     //var responsePrevious = await client.PostAsync("https://localhost:44364/api/AngelCandel/getCandleDataForTest", contentForPreviousDaysData);
 
@@ -1749,49 +1834,49 @@ namespace StockLogger.Controllers.API_Controllers
                             //}
 
 
-                            foreach (Candel testCandel in CandelData)
-                            {
-                                if (testCandel.OpenTime.TimeOfDay < new TimeSpan(9, 05, 0))
-                                {
-                                    continue;
-                                }
+                            //foreach (Candel testCandel in CandelData)
+                            //{
+                            //    if (testCandel.OpenTime.TimeOfDay < new TimeSpan(9, 05, 0))
+                            //    {
+                            //        continue;
+                            //    }
 
-                                //if (testCandel.OpenTime.TimeOfDay < new TimeSpan(15, 00, 0))
-                                //{
-                                //    break; 
-                                //}
+                            //    //if (testCandel.OpenTime.TimeOfDay < new TimeSpan(15, 00, 0))
+                            //    //{
+                            //    //    break; 
+                            //    //}
 
-                                Candel Candel1 = testCandel;
+                            //    Candel Candel1 = testCandel;
 
-                                Candel Candel2 = CandelData
-                                                   .Where(c => c.CloseTime > Candel1.CloseTime)
-                                                   .OrderBy(c => c.CloseTime)
-                                                   .FirstOrDefault();
+                            //    Candel Candel2 = CandelData
+                            //                       .Where(c => c.CloseTime > Candel1.CloseTime)
+                            //                       .OrderBy(c => c.CloseTime)
+                            //                       .FirstOrDefault();
 
-                                Candel Candel3 = null;
+                            //    Candel Candel3 = null;
 
-                                if(Candel2 != null)
-                                {
-                                    Candel3 = CandelData
-                                                .Where(c => c.CloseTime > Candel2.CloseTime)
-                                                .OrderBy(c => c.CloseTime)
-                                                .FirstOrDefault();
-                                }
-
-
-                                if (Candel1 != null && Candel2 != null && Candel3 != null)
-                                {
-                                    bool isPatternValid = IsValidPattern(Candel1, Candel2, Candel3);
-
-                                    if (isPatternValid == true)
-                                    {
-                                        dragonFlyDojiCandles.Add(Candel3);
-                                    }
-                                }
+                            //    if(Candel2 != null)
+                            //    {
+                            //        Candel3 = CandelData
+                            //                    .Where(c => c.CloseTime > Candel2.CloseTime)
+                            //                    .OrderBy(c => c.CloseTime)
+                            //                    .FirstOrDefault();
+                            //    }
 
 
+                            //    if (Candel1 != null && Candel2 != null && Candel3 != null)
+                            //    {
+                            //        bool isPatternValid = IsValidPattern(Candel1, Candel2, Candel3);
 
-                            }
+                            //        if (isPatternValid == true)
+                            //        {
+                            //            dragonFlyDojiCandles.Add(Candel3);
+                            //        }
+                            //    }
+
+
+
+                            //}
 
 
                             // INSTANT REDUCTION
@@ -2233,6 +2318,144 @@ namespace StockLogger.Controllers.API_Controllers
 
 
 
+                            foreach (Candel testCandel in CandelData)
+                            {
+
+                                if (testCandel.OpenTime.TimeOfDay > new TimeSpan(14, 00, 0))
+                                {
+                                    break;
+                                }
+
+                                List<Candel> TotalList = CandelData
+                                                    .Where(candel => candel.OpenTime <= testCandel.OpenTime)
+                                                    .OrderBy(c => c.OpenTime)
+                                                    .ToList();
+
+                                List<(decimal? Rsi, Candel Candel)> RSIData = CalculateRSI(TotalList);
+
+                                decimal? CurrentRSI = null;
+
+                                if (RSIData != null)
+                                {
+                                    foreach (var data in RSIData)
+                                    {
+                                        if (data.Candel == testCandel)
+                                        {
+                                            CurrentRSI = data.Rsi;
+                                        }
+                                    }
+                                }
+
+
+                                List<Candel> PreviousData = CandelData
+                                                  .Where(candel => candel.OpenTime < testCandel.OpenTime)
+                                                  .OrderBy(c => c.OpenTime)
+                                                  .ToList();
+
+                                bool isAnyHigher = PreviousData.Any(candel => candel.HighestPrice > testCandel.EndPrice);
+
+
+
+                                List<Quote> stockData = new List<Quote>();
+
+                                foreach (var candel in TotalList)
+                                {
+                                    Quote quote = new Quote
+                                    {
+                                        Date = candel.CloseTime,
+                                        Open = candel.StartPrice,
+                                        High = candel.HighestPrice,
+                                        Low = candel.LowestPrice,
+                                        Close = candel.EndPrice,
+                                        Volume = candel.Volume,
+                                    };
+
+                                    stockData.Add(quote);
+
+
+                                }
+
+                                IEnumerable<ObvResult> obvResults = stockData.GetObv();
+
+                                bool isOBVBreakoutDetected = false;
+
+                                // Detect sudden spikes
+                                const double threshold = 2.5; // Define your OBV breakout threshold (e.g., 1.5x previous OBV)
+                                ObvResult? prevObv = null;
+
+                                prevObv = obvResults.Reverse().Skip(1).FirstOrDefault();
+                                ObvResult obv = obvResults.LastOrDefault();
+
+                                if (prevObv != null)
+                                {
+                                    double changeRatio = prevObv.Obv != 0 ? (double)obv.Obv / prevObv.Obv : 0;
+                                    if (changeRatio > threshold)
+                                    {
+                                        isOBVBreakoutDetected = true;
+                                    }
+                                }
+
+                                // Compute CMF using Skender.Stock.Indicators
+                                IEnumerable<CmfResult> cmfResults = stockData.GetCmf(TotalList.Count);
+
+                                // Compute VWMA using Skender.Stock.Indicators
+                                IEnumerable<VwmaResult> vwmaResults = stockData.GetVwma(TotalList.Count);
+                                bool isVMABelowPrice = (decimal)vwmaResults.LastOrDefault().Vwma < testCandel.EndPrice;
+
+                                bool isVMASignificantlyBelowPrice = ((decimal)vwmaResults.LastOrDefault().Vwma < testCandel.EndPrice) 
+                                                                    && ((testCandel.EndPrice - (decimal)vwmaResults.LastOrDefault().Vwma) / testCandel.EndPrice * 100 >= 2);
+
+                                IEnumerable<AtrResult> ATRResults = stockData.GetAtr(TotalList.Count);
+
+                                IEnumerable<VwapResult> VWAPResults = stockData.GetVwap(TotalList.FirstOrDefault().OpenTime);
+
+
+                                  //🔹 Long Trade(Buy Entry)
+                                  
+                                  //RSI drops below 30(oversold zone).
+                                  //Wait for RSI to cross above 30.
+                                  //Price should be near or above VWAP.
+
+
+                                decimal averageVolume = PreviousData.Any() ? PreviousData.Average(c => c.Volume) : 0;
+
+                                double PercentPriceIncrease = (double)((testCandel.EndPrice - testCandel.StartPrice) / testCandel.StartPrice) * 100;
+
+
+                                //if (
+                                //    //((CurrentRSI != null) && (CurrentRSI < 30))
+                                //    //&&
+
+                                //    //(testCandel.Volume >= averageVolume * 20)
+                                //    //&& 
+                                //    (testCandel.IsBullish != null)
+                                //    && (testCandel.IsBullish == true)
+                                //    //&& (testCandel.EndPrice == testCandel.HighestPrice)
+                                //    && (PercentPriceIncrease > 1)
+                                //    //&&
+                                //    //(isOBVBreakoutDetected == true)
+                                //    //&& (cmfResults.LastOrDefault().Cmf > 0.2)
+                                //    //&&
+                                //    //(isVMASignificantlyBelowPrice == true)
+                                //    &&
+                                //    (isVMABelowPrice == true)
+                                //    )
+                                //{
+                                //    dragonFlyDojiCandles.Add(testCandel);
+                                //}
+
+
+                                if (
+                                    (testCandel.IsBullish == true)
+                                    &&
+                                    (PercentPriceIncrease > 2)
+                                    )
+                                {
+                                    dragonFlyDojiCandles.Add(testCandel);
+                                }
+
+                            }
+
                         }
 
                         MasterList = CandelData;
@@ -2257,11 +2480,11 @@ namespace StockLogger.Controllers.API_Controllers
                                 {
                                     //expectedPrice = firstCandel.EndPrice * 1.000595m;
                                     //expectedPrice = firstCandel.EndPrice * 1.00061m;
-                                    //expectedPrice = firstCandel.EndPrice * 1.00065m;
                                     //expectedPrice = firstCandel.EndPrice * 1.01m; //  10 R profit on 1000 R //1995 on 2 lakh
                                     //expectedPrice = firstCandel.EndPrice * 1.005m; //  5 R profit on 1000 R //997 on 2lakh
                                     //expectedPrice = firstCandel.LowestPrice * 1.0025m; // 2.5 R profit on 1000 R //450 on 2Lakh
                                     expectedPrice = firstCandel.EndPrice * 1.0025m; // 2.5 R profit on 1000 R //450 on 2Lakh
+                                    //expectedPrice = firstCandel.EndPrice * 1.00065m;
 
                                     //expectedPrice = firstCandel.EndPrice * 1.0004953m; // 4 LAKH
 

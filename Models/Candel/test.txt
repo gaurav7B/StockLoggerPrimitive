@@ -26,81 +26,69 @@
                BELOW TO BE DONE AFTER MARCH PAYMENT
 
                I have 9000
-               Salary - 40000
+               Salary - 41667
                ---------------
-               Total = 49000
+               Total = 50667
 
                MPocket - 10768
                Kissht - 2746
                Olyv - 5315
-               Branch - 2262
-               Pocketly - 10608
+               Branch - 6786
+               Pocketly - 3536
                TrueBalance - 2475
                RupeeReady - 2971
                ------------------
-                            26858
+                            34597
                Rent -        6500 
-               IDFC EMI -    6050
                ------------------
-                            39408
+                            41097
 
                             ||
                             \/
 
 
-               MPocket--                2616------------19MARCH---\
-                                        2616------------19MARCH---|
-                                        2616-----------17MARCH----|---13080--\
-                                        2616---------8MARCH-------|          |
-                                        2616---------8MARCH-------/          |
+               MPocket--                2616------------19APRIL---\
+                                        2616------------19APRIL---|
+                                        2616-----------17APRIL----|---13080--\
+                                        2616---------8APRIL-------|          |
+                                        2616---------8APRIL-------/          |
                                                                              |
                                                                              |
-               Kissht--            2746-2746-2746-2746-----8MARCH---10984----|     6  MARCH REMIANING LOAN TO BE PAID IN APRIL
+               Kissht--            2746-2746-2746-2746-----8APRIL---10984----|     6  MARCH REMIANING LOAN TO BE PAID IN APRIL
                                                                              |
-               Olyv--               2100------22FEB----------------2100------|
-                                                                             |----------45185                   
-               Branch--              2262-2262---6MARCH-------------4524-----|                                         
-                                                                             |                                         
-               Pocketly--           3536-3536---16MARCH------------7072------|                                  
+               Olyv--               5315-5315-5315------20APRIL-----15945----|
+                                                                             |----------54556                   
+               Pocketly--           3536-3536---16APRIL------------7072------|                                  
                                                                              |
-               TrueBalance--               2475-2475-2525----20FEB----7425---/
+               TrueBalance--               2475-2475-2525----20APRIL--7475---/
 
 
 
                BELOW TO BE DONE AFTER APRIL PAYMENT
 
-               MPocket - 2760
+               MPocket - 13080
                Kissht - 2746
-               Olyv - 2100
-               Branch - 2262
+               Olyv - 5315
                Pocketly - 3536
                TrueBalance - 2475
                ------------------
-                            15879
+                            27152
                Rent -        6500 
                IDFC EMI -    6050
                ------------------
-                            28429                 41666-28429 = 13237  REMAINING SO CLOSE OLYV , POCKETLY
-               Pocketly -   7072
-               ------------------
-                           35501                 41666 - 35501 = 6165 REMAINING FOR MONTHLY EXPENSE
+                            39702       
 
                             ||
                             \/
 
 
-               MPocket--                2064------------19MARCH---\
-                                        2064------------19MARCH---|
-                                        2064-----------17MARCH----|---10320--\
-                                        2064---------8MARCH-------|          |
-                                        2064---------8MARCH-------/          |
-                                                                             |      6  APRIL REMIANING LOAN
-                                                                             |      
-               Kissht--                 2746-2746-2746-----8MARCH----8238----|     
-                                                                             |----------25820                      
-               Branch--                   2262---6MARCH-------------2262-----|                                         
-                                                                             |                                         
-               TrueBalance--                    2475-2525----20FEB----5000---/
+               Kissht--                 2746-2746-2746-----8APRIL---8238-----\     6  APRIL REMIANING LOAN TO BE PAID IN MAY
+                                                                             |
+               Olyv--                    5315-5315------20APRIL-----10630----|
+                                                                             |----------27404                   
+               Pocketly--                3536---16APRIL------------3536------|                                  
+                                                                             |
+               TrueBalance--                    2475-2525----20APRIL--5000---/
 
 
                
