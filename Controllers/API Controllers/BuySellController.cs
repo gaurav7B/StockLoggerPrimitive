@@ -14,6 +14,7 @@ using System.Text;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using System.Web.Helpers;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace StockLogger.Controllers.API_Controllers
 {
@@ -24,8 +25,9 @@ namespace StockLogger.Controllers.API_Controllers
         private readonly StockLoggerDbContext _context;
         private readonly List<(string ticker, string exchange, string name, long id, string symboltoken)> _stocks;
         private static readonly HttpClient _httpClient = new HttpClient();
+        private readonly IMemoryCache _cache;
 
-        public BuySellController(StockLoggerDbContext context)
+        public BuySellController(StockLoggerDbContext context , IMemoryCache cache)
         {
             _context = context;
 
@@ -33,6 +35,8 @@ namespace StockLogger.Controllers.API_Controllers
             _stocks = StockList2.GetStocks()
                 .Select(stock => (stock.Ticker, stock.Exchange, stock.Name, stock.Id, stock.SymbolToken))
                 .ToList();
+
+            _cache = cache;
         }
 
         public class LTPData
@@ -196,7 +200,36 @@ namespace StockLogger.Controllers.API_Controllers
         public async Task<IActionResult> BuyIntradayStock([FromBody] BuyData buyData)
         {
             // Fetch the authorization token (assuming this is a string)
-            string authToken = await GetAuthorizationTokenAsync();
+            //string authToken = await GetAuthorizationTokenAsync();
+
+            string authToken = null;
+
+            bool existsAuthToken = _cache.Get("AuthTokenBuySell") != null;
+            bool existsCreationTime = _cache.Get("CreationTimeAuthTokenBuySell") != null;
+
+            var Atoken = _cache.Get("AuthTokenBuySell");
+
+            if (existsAuthToken == false || Atoken == null || Atoken == "")
+            {
+                authToken = await GetAuthorizationTokenAsync();
+
+                _cache.Set("AuthTokenBuySell", authToken);
+                _cache.Set("CreationTimeAuthTokenBuySell", DateTime.Now);
+            }
+
+            authToken = _cache.Get<string>("AuthTokenBuySell");
+            DateTime CreationTime = _cache.Get<DateTime>("CreationTimeAuthTokenBuySell");
+
+            if ((DateTime.Now - CreationTime).TotalMinutes > 20)
+            {
+                _cache.Remove("AuthTokenBuySell");
+                _cache.Remove("CreationTimeAuthTokenBuySell");
+
+                authToken = await GetAuthorizationTokenAsync();
+
+                _cache.Set("AuthTokenBuySell", authToken);
+                _cache.Set("CreationTimeAuthTokenBuySell", DateTime.Now);
+            }
 
             var client = _httpClient;
 
@@ -379,7 +412,37 @@ namespace StockLogger.Controllers.API_Controllers
         public async Task<IActionResult> SellIntradayStock([FromBody] SellData sellData)
         {
             // Fetch the authorization token (assuming this is a string)
-            string authToken = await GetAuthorizationTokenAsync();
+            //string authToken = await GetAuthorizationTokenAsync();
+
+            string authToken = null;
+
+            bool existsAuthToken = _cache.Get("AuthTokenBuySell") != null;
+            bool existsCreationTime = _cache.Get("CreationTimeAuthTokenBuySell") != null;
+
+            var Atoken = _cache.Get("AuthTokenBuySell");
+
+            if (existsAuthToken == false || Atoken == null || Atoken == "")
+            {
+                authToken = await GetAuthorizationTokenAsync();
+                // Store in cache with expiration
+
+                _cache.Set("AuthTokenBuySell", authToken);
+                _cache.Set("CreationTimeAuthTokenBuySell", DateTime.Now);
+            }
+
+            authToken = _cache.Get<string>("AuthTokenBuySell");
+            DateTime CreationTime = _cache.Get<DateTime>("CreationTimeAuthTokenBuySell");
+
+            if ((DateTime.Now - CreationTime).TotalMinutes > 20)
+            {
+                _cache.Remove("AuthTokenBuySell");
+                _cache.Remove("CreationTimeAuthTokenBuySell");
+
+                authToken = await GetAuthorizationTokenAsync();
+
+                _cache.Set("AuthTokenBuySell", authToken);
+                _cache.Set("CreationTimeAuthTokenBuySell", DateTime.Now);
+            }
 
             var client = _httpClient;
 

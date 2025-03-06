@@ -749,10 +749,10 @@ namespace StockLogger.BackgroundServices
 
                         List<Candel> CandelData = JsonConvert.DeserializeObject<List<Candel>>(responseCurrentData);
 
-                        List<Candel> TotalList = CandelData
-                                            .OrderBy(c => c.OpenTime)
-                                            .ToList();
+                        List<Candel> TotalList = CandelData.OrderBy(c => c.OpenTime).ToList();
 
+
+                        // MAIN LOGIC
                         Candel testCandel = TotalList.LastOrDefault();
 
                         decimal startPrice = testCandel.StartPrice;
@@ -760,11 +760,10 @@ namespace StockLogger.BackgroundServices
 
                         decimal percentageChange = ((highestPrice - startPrice) / startPrice) * 100;
 
-                        //  THIS PART COMPARES THE LATEST PRICE WITH THE EXPECTED PRICE
+                        //  THIS PART EXECUTES SELL AND BUY API IF CONDITIONS ARE MET
                         if (
                             testCandel != null
-                            && (testCandel.IsBullish.HasValue == true)
-                            && (testCandel.IsBullish == true)
+                            && (testCandel.EndPrice > testCandel.StartPrice)
                             && (percentageChange * 100 > 90)
                             )
                         {
