@@ -31,15 +31,16 @@
                Total = 50667
 
                MPocket - 10768
-               Kissht - 2746
+               Kissht - 2746--------DONE
+               Branch - 6786--------DONE
                Olyv - 5315
-               Branch - 6786
                Pocketly - 3536
                TrueBalance - 2475
                RupeeReady - 2971
                ------------------
                             34597
                Rent -        6500 
+               IDFC EMI -    6050---DONE
                ------------------
                             41097
 
