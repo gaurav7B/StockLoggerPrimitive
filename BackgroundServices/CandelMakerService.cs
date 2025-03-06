@@ -599,13 +599,133 @@ namespace StockLogger.BackgroundServices
 
             //}
 
-            List<double> iterationTimes = new();
+            //List<double> iterationTimes = new();
+
+            //while (!stoppingToken.IsCancellationRequested)
+            //{
+            //    var stopwatch = Stopwatch.StartNew();
+
+            //    var tasks = _stocks.Select(stock => Task.Run(async () =>
+            //    {
+            //        try
+            //        {
+
+            //            // THIS PART FETCHES THE LATEST PRICE OF THE STOCK
+            //            var requestBodyforCurrentDayData = new
+            //            {
+            //                SymbolToken = stock.symboltoken,
+            //                AuthorizationToken = "",
+            //                StartDate = DateTime.Now.AddHours(9).AddMinutes(15).ToString("o"), // Final adjusted date
+            //                EndDate = DateTime.Now.ToString("o")     // Final adjusted date
+            //            };
+
+            //            var jsonRequestBodyForCurrentDaysData = JsonConvert.SerializeObject(requestBodyforCurrentDayData);
+            //            var contentForCurrentDaysData = new StringContent(jsonRequestBodyForCurrentDaysData, Encoding.UTF8, "application/json");
+
+
+            //            var responseCurrent = await _httpClient.PostAsync("https://localhost:44364/api/AngelCandel/getCandleDataForTest", contentForCurrentDaysData);
+
+            //            string responseCurrentData = await responseCurrent.Content.ReadAsStringAsync(stoppingToken);
+
+            //            List<Candel> CandelData = JsonConvert.DeserializeObject<List<Candel>>(responseCurrentData);
+
+            //            List<Candel> TotalList = CandelData
+            //                                .OrderBy(c => c.OpenTime)
+            //                                .ToList();
+
+            //            Candel testCandel = TotalList.LastOrDefault();
+
+
+            //            List<(decimal? Rsi, Candel Candel)> RSIData = CalculateRSI(TotalList);
+
+            //            decimal? CurrentRSI = null;
+
+            //            if (RSIData != null)
+            //            {
+            //                foreach (var data in RSIData)
+            //                {
+            //                    if (data.Candel == testCandel)
+            //                    {
+            //                        CurrentRSI = data.Rsi;
+            //                    }
+            //                }
+            //            }
+
+            //            //  THIS PART COMPARES THE LATEST PRICE WITH THE EXPECTED PRICE
+            //            if (
+            //                testCandel != null
+            //                && ((CurrentRSI != null) && (CurrentRSI > 90))
+            //                )
+            //            {
+            //                // BUY API HERE
+            //                BuyData buyData = new BuyData
+            //                {
+            //                    symboltoken = stock.symboltoken,
+            //                    tradingsymbol = stock.ticker,
+            //                    CurrentPrice = testCandel.EndPrice,
+            //                    PreviousDaayEndPrice = testCandel.EndPrice,
+            //                };
+
+            //                var jsonRequestBodyForbuyData = JsonConvert.SerializeObject(buyData);
+            //                var contentForbuyData = new StringContent(jsonRequestBodyForbuyData, Encoding.UTF8, "application/json");
+
+            //                var buyDataApiResponse = await _httpClient.PostAsync("https://localhost:44364/api/BuySell/buy", contentForbuyData);
+
+            //                string responsdata = await buyDataApiResponse.Content.ReadAsStringAsync(stoppingToken);
+
+            //                ApiResponse ApiResponseData = JsonConvert.DeserializeObject<ApiResponse>(responsdata);
+
+
+            //                //buyDataApiResponse.EnsureSuccessStatusCode();
+
+            //                // WHEN THE BUY API RUNS SUCCESSFULLY
+            //                // CALL THE SELL API
+            //                // SELL API HERE
+            //                if (ApiResponseData.Status != false) // Ensures status is 200
+            //                {
+            //                    SellData sellData = new SellData
+            //                    {
+            //                        symboltoken = stock.symboltoken,
+            //                        tradingsymbol = stock.ticker,
+            //                        CurrentPrice = testCandel.EndPrice
+            //                    };
+
+            //                    var jsonRequestBodyForsellData = JsonConvert.SerializeObject(sellData);
+            //                    var contentForsellData = new StringContent(jsonRequestBodyForsellData, Encoding.UTF8, "application/json");
+
+            //                    var sellDataApiResponse = await _httpClient.PostAsync("https://localhost:44364/api/BuySell/sell", contentForsellData);
+            //                }
+
+            //            }
+
+            //        }
+            //        catch (Exception ex)
+            //        {
+            //            Console.WriteLine(ex.ToString());
+            //        }
+            //    }, stoppingToken));
+
+
+
+            //    // Wait for all tasks to complete.
+            //    await Task.WhenAll(tasks);
+
+            //    stopwatch.Stop();
+            //    iterationTimes.Add(stopwatch.Elapsed.TotalMilliseconds);
+
+            //    // Trigger garbage collection periodically
+            //    GC.Collect();
+            //    GC.WaitForPendingFinalizers();
+
+            //}
+
+
+////// PERCENT PRICE CHANGE STRATERGY > 90 ////////////////////
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                var stopwatch = Stopwatch.StartNew();
 
-                var tasks = _stocks.Select(stock => Task.Run(async () =>
+                foreach (var stock in _stocks)
                 {
                     try
                     {
@@ -623,7 +743,7 @@ namespace StockLogger.BackgroundServices
                         var contentForCurrentDaysData = new StringContent(jsonRequestBodyForCurrentDaysData, Encoding.UTF8, "application/json");
 
 
-                        var responseCurrent = await _httpClient.PostAsync("https://localhost:44364/api/AngelCandel/getCandleDataForTest", contentForCurrentDaysData);
+                        var responseCurrent = await _httpClient.PostAsync("https://localhost:44364/api/AngelCandel/getCandleDataForTest5Paisa", contentForCurrentDaysData);
 
                         string responseCurrentData = await responseCurrent.Content.ReadAsStringAsync(stoppingToken);
 
@@ -635,26 +755,17 @@ namespace StockLogger.BackgroundServices
 
                         Candel testCandel = TotalList.LastOrDefault();
 
+                        decimal startPrice = testCandel.StartPrice;
+                        decimal highestPrice = testCandel.EndPrice;
 
-                        List<(decimal? Rsi, Candel Candel)> RSIData = CalculateRSI(TotalList);
-
-                        decimal? CurrentRSI = null;
-
-                        if (RSIData != null)
-                        {
-                            foreach (var data in RSIData)
-                            {
-                                if (data.Candel == testCandel)
-                                {
-                                    CurrentRSI = data.Rsi;
-                                }
-                            }
-                        }
+                        decimal percentageChange = ((highestPrice - startPrice) / startPrice) * 100;
 
                         //  THIS PART COMPARES THE LATEST PRICE WITH THE EXPECTED PRICE
                         if (
                             testCandel != null
-                            && ((CurrentRSI != null) && (CurrentRSI > 90))
+                            && (testCandel.IsBullish.HasValue == true)
+                            && (testCandel.IsBullish == true)
+                            && (percentageChange * 100 > 90)
                             )
                         {
                             // BUY API HERE
@@ -676,18 +787,17 @@ namespace StockLogger.BackgroundServices
                             ApiResponse ApiResponseData = JsonConvert.DeserializeObject<ApiResponse>(responsdata);
 
 
-                            //buyDataApiResponse.EnsureSuccessStatusCode();
-
                             // WHEN THE BUY API RUNS SUCCESSFULLY
                             // CALL THE SELL API
                             // SELL API HERE
-                            if (ApiResponseData.Status != false) // Ensures status is 200
+                            if (ApiResponseData.Message == "SUCCESS") // Ensures status is 200
                             {
                                 SellData sellData = new SellData
                                 {
                                     symboltoken = stock.symboltoken,
                                     tradingsymbol = stock.ticker,
-                                    CurrentPrice = testCandel.EndPrice
+                                    CurrentPrice = testCandel.EndPrice,
+                                    UniqueOrderId = ApiResponseData.Data.UniqueOrderId
                                 };
 
                                 var jsonRequestBodyForsellData = JsonConvert.SerializeObject(sellData);
@@ -701,22 +811,13 @@ namespace StockLogger.BackgroundServices
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine(ex.ToString());
+                        Console.Write(ex);
                     }
-                }, stoppingToken));
 
 
 
-                // Wait for all tasks to complete.
-                await Task.WhenAll(tasks);
 
-                stopwatch.Stop();
-                iterationTimes.Add(stopwatch.Elapsed.TotalMilliseconds);
-
-                // Trigger garbage collection periodically
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-
+                }
             }
 
 
