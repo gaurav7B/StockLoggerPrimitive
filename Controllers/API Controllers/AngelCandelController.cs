@@ -607,12 +607,14 @@ namespace StockLogger.Controllers.API_Controllers
 
             if ((DateTime.Now - CreationTime).TotalMinutes > 20)
             {
-                RequestToken = await TOTP5PaisaLoginAsync();
-                AccessToken = await GetOuth5PaisaLoginAsync(RequestToken);
-                // Store in cache with expiration
-
                 _cache.Remove("AccessToken");
                 _cache.Remove("CreationTime");
+
+                RequestToken = await TOTP5PaisaLoginAsync();
+                AccessToken = await GetOuth5PaisaLoginAsync(RequestToken);
+
+                _cache.Set("AccessToken", AccessToken);
+                _cache.Set("CreationTime", DateTime.Now);
             }
 
             //string RequestToken = await TOTP5PaisaLoginAsync();
