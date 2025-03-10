@@ -222,13 +222,10 @@ namespace StockLogger.Controllers.API_Controllers
 
             if ((DateTime.Now - CreationTime).TotalMinutes > 20)
             {
-                _cache.Remove("AuthTokenBuySell");
-                _cache.Remove("CreationTimeAuthTokenBuySell");
-
                 authToken = await GetAuthorizationTokenAsync();
 
-                _cache.Set("AuthTokenBuySell", authToken);
-                _cache.Set("CreationTimeAuthTokenBuySell", DateTime.Now);
+                _cache.Remove("AuthTokenBuySell");
+                _cache.Remove("CreationTimeAuthTokenBuySell");
             }
 
             var client = _httpClient;
@@ -435,13 +432,10 @@ namespace StockLogger.Controllers.API_Controllers
 
             if ((DateTime.Now - CreationTime).TotalMinutes > 20)
             {
-                _cache.Remove("AuthTokenBuySell");
-                _cache.Remove("CreationTimeAuthTokenBuySell");
-
                 authToken = await GetAuthorizationTokenAsync();
 
-                _cache.Set("AuthTokenBuySell", authToken);
-                _cache.Set("CreationTimeAuthTokenBuySell", DateTime.Now);
+                _cache.Remove("AuthTokenBuySell");
+                _cache.Remove("CreationTimeAuthTokenBuySell");
             }
 
             var client = _httpClient;

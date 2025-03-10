@@ -488,8 +488,43 @@ namespace StockLogger.Controllers.API_Controllers
         }
 
 
+        public async Task<string> TOTP5PaisaLoginAsyncRecurssion(string _TOTP = "", string _EmailId = "bhoitegaurav7@gmail.com", string _Pin = "636663")
+        {
+            _TOTP = GenerateTOTP("GUZDAOBVGAZDKXZVKBDUWRKZ");
 
+            string RequestToken = null;
 
+            try
+            {
+                string URL = "https://Openapi.5paisa.com/VendorsAPI/Service1.svc/" + "TOTPLogin";
+                var dataStringSession = JsonConvert.SerializeObject(new
+                {
+                    head = new { Key = "GyMVwFkIedy5iFNZsSsQ6zVY56jJ31Zy" },
+                    body = new { Email_ID = _EmailId, TOTP = _TOTP, PIN = _Pin }
+
+                });
+
+                var requestMessage = new HttpRequestMessage(HttpMethod.Post, URL)
+                {
+                    Content = new StringContent(dataStringSession, Encoding.UTF8, "application/json")
+                };
+
+                var client = _httpClient;
+
+                HttpResponseMessage response = await client.SendAsync(requestMessage);
+
+                string responseContent = await response.Content.ReadAsStringAsync();
+                dynamic responsData = JsonConvert.DeserializeObject(responseContent);
+                RequestToken = responsData.body.RequestToken;
+
+                return RequestToken;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+
+        }
 
         public async Task<string> TOTP5PaisaLoginAsync(string _TOTP = "", string _EmailId = "bhoitegaurav7@gmail.com", string _Pin = "636663")
         {
@@ -520,10 +555,15 @@ namespace StockLogger.Controllers.API_Controllers
                 dynamic responsData = JsonConvert.DeserializeObject(responseContent);
                 RequestToken = responsData.body.RequestToken;
 
-                if(RequestToken == "")
-                {
-                    RequestToken = await TOTP5PaisaLoginAsync();
-                }
+                //while(RequestToken == "")
+                //{
+                //    RequestToken = await TOTP5PaisaLoginAsyncRecurssion();
+                //}
+
+                //while(RequestToken == null)
+                //{
+                //    RequestToken = await TOTP5PaisaLoginAsyncRecurssion();
+                //}
 
                 return RequestToken;
 
@@ -543,7 +583,6 @@ namespace StockLogger.Controllers.API_Controllers
                 var dataStringSession = JsonConvert.SerializeObject(new
                 {
                     head = new { Key = "GyMVwFkIedy5iFNZsSsQ6zVY56jJ31Zy" },
-                    //body = new { ClientCode= ClientCode, JWTToken = Token, Key= VendorKey, AllowMap = Allowmap }
                     body = new { RequestToken = RequestToken, EncryKey = "HmNw0CSQIHnV5b7HspQYLUbhlFE5WA4J", UserId = "VjxWPi3kv5f" }
 
                 });
@@ -607,11 +646,9 @@ namespace StockLogger.Controllers.API_Controllers
 
             if ((DateTime.Now - CreationTime).TotalMinutes > 20)
             {
-                _cache.Remove("AccessToken");
-                _cache.Remove("CreationTime");
-
                 RequestToken = await TOTP5PaisaLoginAsync();
                 AccessToken = await GetOuth5PaisaLoginAsync(RequestToken);
+                // Store in cache with expiration
 
                 _cache.Set("AccessToken", AccessToken);
                 _cache.Set("CreationTime", DateTime.Now);
