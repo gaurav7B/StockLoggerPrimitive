@@ -1,13 +1,17 @@
-﻿using Azure.Core;
+﻿using Azure;
+using Azure.Core;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Skender.Stock.Indicators;
 using StockLogger.Data;
 using StockLogger.Models.Candel;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Diagnostics.SymbolStore;
 using System.Text;
 using static StockLogger.Controllers.API_Controllers.BuySellController;
+using static StockLogger.Controllers.API_Controllers.TestDownTrendController;
 
 namespace StockLogger.BackgroundServices
 {
@@ -445,6 +449,29 @@ namespace StockLogger.BackgroundServices
             return result;
         }
 
+        public List<RSICandel> ConvertToRSICandelList(List<(decimal? Rsi, Candel Candel)> rsiCandelList)
+        {
+            return rsiCandelList.Select(item => new RSICandel
+            {
+                Id = item.Candel.Id,
+                StartPrice = item.Candel.StartPrice,
+                HighestPrice = item.Candel.HighestPrice,
+                LowestPrice = item.Candel.LowestPrice,
+                EndPrice = item.Candel.EndPrice,
+                OpenTime = item.Candel.OpenTime,
+                CloseTime = item.Candel.CloseTime,
+                IsBullish = item.Candel.IsBullish,
+                IsBearish = item.Candel.IsBearish,
+                Ticker = item.Candel.Ticker,
+                TickerId = item.Candel.TickerId,
+                Exchange = item.Candel.Exchange,
+                PriceChange = item.Candel.PriceChange,
+                PriceChangePercentage = item.Candel.PriceChangePercentage,
+                Volume = item.Candel.Volume,
+                RSI = item.Rsi // Assign the RSI value
+            }).ToList();
+        }
+
         public class ApiResponse
         {
             public bool Status { get; set; }
@@ -720,7 +747,106 @@ namespace StockLogger.BackgroundServices
             //}
 
 
-////// PERCENT PRICE CHANGE STRATERGY > 90 ////////////////////
+            ////// PERCENT PRICE CHANGE STRATERGY > 90 ////////////////////
+
+            //while (!stoppingToken.IsCancellationRequested)
+            //{
+
+            //    foreach (var stock in _stocks)
+            //    {
+            //        try
+            //        {
+
+            //            // THIS PART FETCHES THE LATEST PRICE OF THE STOCK
+            //            var requestBodyforCurrentDayData = new
+            //            {
+            //                SymbolToken = stock.symboltoken,
+            //                AuthorizationToken = "",
+            //                StartDate = DateTime.Now.AddHours(9).AddMinutes(15).ToString("o"), // Final adjusted date
+            //                EndDate = DateTime.Now.ToString("o")     // Final adjusted date
+            //            };
+
+            //            var jsonRequestBodyForCurrentDaysData = JsonConvert.SerializeObject(requestBodyforCurrentDayData);
+            //            var contentForCurrentDaysData = new StringContent(jsonRequestBodyForCurrentDaysData, Encoding.UTF8, "application/json");
+
+
+            //            var responseCurrent = await _httpClient.PostAsync("https://localhost:44364/api/AngelCandel/getCandleDataForTest5Paisa", contentForCurrentDaysData);
+
+            //            string responseCurrentData = await responseCurrent.Content.ReadAsStringAsync(stoppingToken);
+
+            //            List<Candel> CandelData = JsonConvert.DeserializeObject<List<Candel>>(responseCurrentData);
+
+            //            List<Candel> TotalList = CandelData.OrderBy(c => c.OpenTime).ToList();
+
+
+            //            // MAIN LOGIC
+            //            Candel testCandel = TotalList.LastOrDefault();
+
+            //            decimal startPrice = testCandel.StartPrice;
+            //            decimal highestPrice = testCandel.EndPrice;
+
+            //            decimal percentageChange = ((highestPrice - startPrice) / startPrice) * 100;
+
+            //            //  THIS PART EXECUTES SELL AND BUY API IF CONDITIONS ARE MET
+            //            if (
+            //                testCandel != null
+            //                && (testCandel.EndPrice > testCandel.StartPrice)
+            //                && (percentageChange * 100 > 90)
+            //                )
+            //            {
+            //                // BUY API HERE
+            //                BuyData buyData = new BuyData
+            //                {
+            //                    symboltoken = stock.symboltoken,
+            //                    tradingsymbol = stock.ticker,
+            //                    CurrentPrice = testCandel.EndPrice,
+            //                    PreviousDaayEndPrice = testCandel.EndPrice,
+            //                };
+
+            //                var jsonRequestBodyForbuyData = JsonConvert.SerializeObject(buyData);
+            //                var contentForbuyData = new StringContent(jsonRequestBodyForbuyData, Encoding.UTF8, "application/json");
+
+            //                var buyDataApiResponse = await _httpClient.PostAsync("https://localhost:44364/api/BuySell/buy", contentForbuyData);
+
+            //                string responsdata = await buyDataApiResponse.Content.ReadAsStringAsync(stoppingToken);
+
+            //                ApiResponse ApiResponseData = JsonConvert.DeserializeObject<ApiResponse>(responsdata);
+
+
+            //                // WHEN THE BUY API RUNS SUCCESSFULLY
+            //                // CALL THE SELL API
+            //                // SELL API HERE
+            //                if (ApiResponseData.Message == "SUCCESS") // Ensures status is 200
+            //                {
+            //                    SellData sellData = new SellData
+            //                    {
+            //                        symboltoken = stock.symboltoken,
+            //                        tradingsymbol = stock.ticker,
+            //                        CurrentPrice = testCandel.EndPrice,
+            //                        UniqueOrderId = ApiResponseData.Data.UniqueOrderId
+            //                    };
+
+            //                    var jsonRequestBodyForsellData = JsonConvert.SerializeObject(sellData);
+            //                    var contentForsellData = new StringContent(jsonRequestBodyForsellData, Encoding.UTF8, "application/json");
+
+            //                    var sellDataApiResponse = await _httpClient.PostAsync("https://localhost:44364/api/BuySell/sell", contentForsellData);
+            //                }
+
+            //            }
+
+            //        }
+            //        catch (Exception ex)
+            //        {
+            //            Console.Write(ex);
+            //        }
+
+
+
+
+            //    }
+            //}
+
+
 
             while (!stoppingToken.IsCancellationRequested)
             {
@@ -751,20 +877,54 @@ namespace StockLogger.BackgroundServices
 
                         List<Candel> TotalList = CandelData.OrderBy(c => c.OpenTime).ToList();
 
-
-                        // MAIN LOGIC
                         Candel testCandel = TotalList.LastOrDefault();
 
-                        decimal startPrice = testCandel.StartPrice;
-                        decimal highestPrice = testCandel.EndPrice;
+                        //List<(decimal? Rsi, Candel Candel)> RSIData = CalculateRSI(TotalList);
 
-                        decimal percentageChange = ((highestPrice - startPrice) / startPrice) * 100;
+                        //decimal? CurrentRSI = null;
 
-                        //  THIS PART EXECUTES SELL AND BUY API IF CONDITIONS ARE MET
+                        //if (RSIData != null)
+                        //{
+                        //    foreach (var data in RSIData)
+                        //    {
+                        //        if (data.Candel == testCandel)
+                        //        {
+                        //            CurrentRSI = data.Rsi;
+                        //        }
+                        //    }
+                        //}
+
+                        //List<RSICandel> RsiCandelList = ConvertToRSICandelList(RSIData);
+
+                        //RSICandel secondLastRSICandel = RsiCandelList.OrderByDescending(c => c.OpenTime).Skip(1).First();
+                        //RSICandel currentRSICandel = RsiCandelList.LastOrDefault();
+
+
+
+
+                        // Sample stock data
+                        List<Quote> stockData = new List<Quote>();
+                        foreach (var candel in TotalList)
+                        {
+                            Quote quote = new Quote
+                            {
+                                Date = candel.OpenTime,
+                                Open = candel.StartPrice,
+                                High = candel.HighestPrice,
+                                Low = candel.LowestPrice,
+                                Close = candel.EndPrice,
+                                Volume = candel.Volume,
+                            };
+                            stockData.Add(quote);
+                        }
+
+                        IEnumerable<BollingerBandsResult> bollingerBandsResult = stockData.GetBollingerBands(TotalList.Count, 4);
+                        BollingerBandsResult currentBollingerBandsResult = bollingerBandsResult.LastOrDefault();
+
+
                         if (
-                            testCandel != null
-                            && (testCandel.EndPrice > testCandel.StartPrice)
-                            && (percentageChange * 100 > 90)
+                            //(CurrentRSI > 90)
+                            (testCandel.EndPrice > (decimal)currentBollingerBandsResult.UpperBand)
                             )
                         {
                             // BUY API HERE
@@ -818,7 +978,6 @@ namespace StockLogger.BackgroundServices
 
                 }
             }
-
 
 
             ////// 3% REDUCTION

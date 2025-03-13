@@ -16,12 +16,17 @@
                                                                              |----------89103                   
                Branch--         2262-2262-2262---6MARCH-------------6786-----|                                         
                                                                              |                                         
-               Pocketly--      3536-3536-3536---16MARCH------------10608-----|                                  
+               Pocketly--      3536-3536-3536---18MARCH------------10608-----|                                  
                                                                              |
-               TrueBalance--          2475-2475-2475-2525----20MARCH--9900---|
-                                                                             |
-               RupeeReady--              2971---23FEB---------------2971-----/
+               TrueBalance--          2475-2475-2475-2525----20MARCH--9900---/
 
+
+
+               MAH = 8000
+               AU = 4800
+               Angel = 4800
+               -------------
+               17600
 
                BELOW TO BE DONE AFTER MARCH PAYMENT
 
@@ -30,16 +35,16 @@
                ---------------
                Total = 50667
 
-               MPocket - 10768
+               MPocket - 10768------DONE----REMAINING(5160)
                Kissht - 2746--------DONE
                Branch - 6786--------DONE
                Olyv - 5315
                Pocketly - 3536
                TrueBalance - 2475
-               RupeeReady - 2971
+               RupeeReady - 2971----DONE
                ------------------
                             34597
-               Rent -        6500 
+               Rent -        6500---DONE
                IDFC EMI -    6050---DONE
                ------------------
                             41097
@@ -48,18 +53,19 @@
                             \/
 
 
+
                MPocket--                2616------------19APRIL---\
                                         2616------------19APRIL---|
                                         2616-----------17APRIL----|---13080--\
                                         2616---------8APRIL-------|          |
-                                        2616---------8APRIL-------/          |
+                             4336 -1720-2616---------11APRIL------/          |
                                                                              |
                                                                              |
                Kissht--            2746-2746-2746-2746-----8APRIL---10984----|     6  MARCH REMIANING LOAN TO BE PAID IN APRIL
                                                                              |
                Olyv--               5315-5315-5315------20APRIL-----15945----|
-                                                                             |----------54556                   
-               Pocketly--           3536-3536---16APRIL------------7072------|                                  
+                                                                             |----------59080                   
+               Pocketly--           3536-3536---16APRIL------------7072------|                                        
                                                                              |
                TrueBalance--               2475-2475-2525----20APRIL--7475---/
 
@@ -158,6 +164,37 @@
 
 
 
+Isabgol
+2 Anda Bhurji without Pav Daily - 610kcal perday
 
 
+How Much Weight Can You Lose?
+Your daily calorie deficit is ~2000 kcal/day.
+Estimated weight loss: 8–12 kg in a month (similar to before)
+
+
+
+===============================
+    DAILY NUTRIENT INTAKE
+===============================
+
+1️⃣ **Calories Breakdown**
+------------------------------------------
+| Ingredient    | Quantity   | Calories  |
+|---------------|------------|-----------|
+| Eggs          | 4          | 280 kcal  |
+| Palm Oil      | 2 tbsp     | 240 kcal  |
+| Tomatoes      | 4 (medium) | 88 kcal   |
+| Spices        | As needed  | ~5 kcal   |
+| **Total**     | -          | ~610 kcal |
+------------------------------------------
+
+2️⃣ **Macronutrient Breakdown**
+----------------------------------
+| Macronutrient | Amount per day |
+|---------------|----------------|
+| **Protein**   | ~28g 🥚        |
+| **Fat**       | ~48g 🥑        |
+| **Carbs**     | ~12g 🍅        |
+----------------------------------
 

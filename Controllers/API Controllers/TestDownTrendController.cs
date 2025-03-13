@@ -1398,30 +1398,30 @@ namespace StockLogger.Controllers.API_Controllers
 
                             //////////////////////////////////////////// IMPLEMENT THIS MAKE IT LIVE ////////////////////////////////////////////////////////
 
-                            //foreach (Candel testCandel in CandelData)
-                            //{
+                            foreach (Candel testCandel in CandelData)
+                            {
 
-                            //    if (testCandel.OpenTime.TimeOfDay > new TimeSpan(14, 00, 0))
-                            //    {
-                            //        break;
-                            //    }
+                                if (testCandel.OpenTime.TimeOfDay > new TimeSpan(14, 00, 0))
+                                {
+                                    break;
+                                }
 
-                            //    decimal startPrice = testCandel.StartPrice;
-                            //    decimal highestPrice = testCandel.HighestPrice;
+                                decimal startPrice = testCandel.StartPrice;
+                                decimal highestPrice = testCandel.HighestPrice;
 
-                            //    decimal percentageChange = ((highestPrice - startPrice) / startPrice) * 100;
+                                decimal percentageChange = ((highestPrice - startPrice) / startPrice) * 100;
 
 
-                            //    if (
-                            //        (testCandel.IsBullish.HasValue == true)
-                            //        && (testCandel.IsBullish == true)
-                            //        && (percentageChange * 100 > 90)
-                            //        )
-                            //    {
-                            //        dragonFlyDojiCandles.Add(testCandel);
-                            //    }
+                                if (
+                                    (testCandel.IsBullish.HasValue == true)
+                                    && (testCandel.IsBullish == true)
+                                    && (percentageChange * 100 > 90)
+                                    )
+                                {
+                                    dragonFlyDojiCandles.Add(testCandel);
+                                }
 
-                            //}
+                            }
 
                             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1476,60 +1476,6 @@ namespace StockLogger.Controllers.API_Controllers
 
                             //}
 
-
-                            foreach (Candel testCandel in CandelData)
-                            {
-
-                                if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
-                                {
-                                    break;
-                                }
-
-                                if (testCandel.OpenTime.TimeOfDay < new TimeSpan(9, 36, 0))
-                                {
-                                    continue;
-                                }
-
-                                List<Candel> TotalList = CandelData
-                                                    .Where(candel => candel.OpenTime <= testCandel.OpenTime)
-                                                    .OrderBy(c => c.OpenTime)
-                                                    .ToList();
-
-                                // Sample stock data
-                                List<Quote> stockData = new List<Quote>();
-                                foreach (var candel in TotalList)
-                                {
-                                    Quote quote = new Quote
-                                    {
-                                        Date = candel.OpenTime,
-                                        Open = candel.StartPrice,
-                                        High = candel.HighestPrice,
-                                        Low = candel.LowestPrice,
-                                        Close = candel.EndPrice,
-                                        Volume = candel.Volume,
-                                    };
-                                    stockData.Add(quote);
-                                }
-
-                                IEnumerable<BollingerBandsResult> bollingerBandsResult = stockData.GetBollingerBands(TotalList.Count, 3);
-                                BollingerBandsResult currentBollingerBandsResult = bollingerBandsResult.LastOrDefault();
-
-
-                                if (currentBollingerBandsResult != null)
-                                {
-                                    if (
-                                        (testCandel.HighestPrice > (decimal)currentBollingerBandsResult.UpperBand)
-                                        )
-                                    {
-                                        dragonFlyDojiCandles.Add(testCandel);
-                                    }
-                                }
-
-
-                            }
-
-
-
                         }
 
                         MasterList = CandelData;
@@ -1556,6 +1502,7 @@ namespace StockLogger.Controllers.API_Controllers
                                     //expectedPrice = firstCandel.EndPrice - (firstCandel.EndPrice * 0.01m);
 
                                     expectedPrice = firstCandel.HighestPrice - (firstCandel.HighestPrice * 0.0025m); // 2.5 R profit on 1000 R //450 on 2Lakh
+                                    //expectedPrice = firstCandel.HighestPrice - (firstCandel.HighestPrice * 0.00065m); // 2.5 R profit on 1000 R //450 on 2Lakh
                                     //expectedPrice = firstCandel.EndPrice - (firstCandel.EndPrice * 0.0025m); // 2.5 R profit on 1000 R //450 on 2Lakh
 
                                     //expectedPrice = firstCandel.EndPrice * 1.0004953m; // 4 LAKH
@@ -1564,7 +1511,8 @@ namespace StockLogger.Controllers.API_Controllers
 
                                 decimal profitMargin = 0;
 
-                                if (expectedPrice == firstCandel.EndPrice - (firstCandel.EndPrice * 0.00065m))
+                                if (expectedPrice == firstCandel.HighestPrice - (firstCandel.HighestPrice * 0.00065m))
+                                //if (expectedPrice == firstCandel.EndPrice - (firstCandel.EndPrice * 0.00065m))
                                 {
                                     profitMargin = 130 - 117;
                                 }
