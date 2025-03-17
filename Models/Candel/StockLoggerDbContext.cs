@@ -33,6 +33,7 @@ namespace StockLogger.Data
 
         //CANDELS
         public DbSet<Candel> Candel { get; set; } //For 1 minute candel
+        public DbSet<LTP> LTP { get; set; } //LTP
         public DbSet<Candel5min> Candel5min { get; set; } // For 5 minute candel
         public DbSet<Candel10min> Candel10min { get; set; } // For 10 minute candel
         public DbSet<Candel15min> Candel15min { get; set; } // For 15 minute candel

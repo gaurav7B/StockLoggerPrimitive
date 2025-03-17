@@ -30,12 +30,86 @@ namespace StockLogger.Controllers.API_Controllers
             var token = await _context.Token.FirstOrDefaultAsync();
             if (token == null)
             {
-                return NotFound();  // Return NotFound if no entry exists
+                // Fetch the authorization token (assuming this is a string)
+                var (authToken, refreshToken, feedToken) = await GetAuthorizationTokenAsync();
+
+                // Create a new token
+                var postToken = new Token
+                {
+                    AuthToken = authToken,
+                    RefreshToken = refreshToken,
+                    FeedToken = feedToken,
+                    AuthTokenCreationTime = DateTime.UtcNow, // Set creation time
+                };
+
+                // Add the new token to the context
+                _context.Token.Add(postToken);
+                _cache.Set("AngelOneauthToken", postToken.AuthToken);
+                _cache.Set("AngelOneRefreshToken", postToken.RefreshToken);
+                _cache.Set("AngelOneFeedToken", postToken.FeedToken);
+                _cache.Set("AngelOneAuthTokenCreationTime", DateTime.UtcNow);
+
+
+                // Save changes to the context (whether adding or updating)
+                await _context.SaveChangesAsync();
+
+                // Return the token (either newly created or updated)
+                return Ok(new Token { AuthToken = authToken, RefreshToken = refreshToken, FeedToken = feedToken, AuthTokenCreationTime = DateTime.UtcNow });
+
+
             }
 
-            _cache.Set("AngelOneauthToken", token.AuthToken);
-            _cache.Set("AngelOneRefreshToken", token.RefreshToken);
-            _cache.Set("AngelOneFeedToken", token.FeedToken);
+            DateTime AngelOneAuthTokenCreationTime = token.AuthTokenCreationTime;
+
+            if((DateTime.Now - AngelOneAuthTokenCreationTime).TotalMinutes > 20)
+            {
+                // Fetch the authorization token (assuming this is a string)
+                var (authToken, refreshToken, feedToken) = await GetAuthorizationTokenAsync();
+
+                // Look for an existing token
+                var existingToken = await _context.Token.FirstOrDefaultAsync();
+
+                if (existingToken != null)
+                {
+                    // If a token exists, update it
+                    existingToken.AuthToken = authToken;  // Assuming `AuthToken` is the property to update
+                    existingToken.RefreshToken = refreshToken;
+                    existingToken.FeedToken = feedToken;
+                    existingToken.AuthTokenCreationTime = DateTime.UtcNow;  // Update the creation time
+
+                    // Mark the entry as modified
+                    _context.Entry(existingToken).State = EntityState.Modified;
+                    _cache.Set("AngelOneauthToken", authToken);
+                    _cache.Set("AngelOneRefreshToken", refreshToken);
+                    _cache.Set("AngelOneFeedToken", feedToken);
+                    _cache.Set("AngelOneAuthTokenCreationTime", DateTime.UtcNow);
+                }
+                else
+                {
+                    // Otherwise, create a new token
+                    var postToken = new Token
+                    {
+                        AuthToken = authToken,
+                        RefreshToken = refreshToken,
+                        FeedToken = feedToken,
+                        AuthTokenCreationTime = DateTime.UtcNow, // Set creation time
+                    };
+
+                    // Add the new token to the context
+                    _context.Token.Add(postToken);
+                    _cache.Set("AngelOneauthToken", postToken.AuthToken);
+                    _cache.Set("AngelOneRefreshToken", postToken.RefreshToken);
+                    _cache.Set("AngelOneFeedToken", postToken.FeedToken);
+                    _cache.Set("AngelOneAuthTokenCreationTime", DateTime.UtcNow);
+                }
+
+                // Save changes to the context (whether adding or updating)
+                await _context.SaveChangesAsync();
+
+                // Return the token (either newly created or updated)
+                return Ok(existingToken ?? new Token { AuthToken = authToken, RefreshToken = refreshToken, FeedToken = feedToken, AuthTokenCreationTime = DateTime.UtcNow });
+
+            }
 
             return Ok(token);  // Return the token if found
         }

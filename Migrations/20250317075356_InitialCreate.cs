@@ -262,6 +262,24 @@ namespace StockLogger.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "LTP",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    SymbolToken = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Ticker = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Exchange = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Time = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LTP", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "MarubozuDb",
                 columns: table => new
                 {
@@ -1083,6 +1101,9 @@ namespace StockLogger.Migrations
 
             migrationBuilder.DropTable(
                 name: "InvertedHammerCandels");
+
+            migrationBuilder.DropTable(
+                name: "LTP");
 
             migrationBuilder.DropTable(
                 name: "MarubozuCandels");
