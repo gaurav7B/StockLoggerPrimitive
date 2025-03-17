@@ -22,10 +22,10 @@
 
 
 
-               AU = 6150
+               AU = 4319
                Angel = 1400
                -------------
-               13300
+               5719
 
                BELOW TO BE DONE AFTER MARCH PAYMENT
 
@@ -38,9 +38,9 @@
                Kissht - 2746--------DONE
                Branch - 6786--------DONE
                Olyv - 5315
-               Pocketly - 3536--------DONE
+               Pocketly - 3536------DONE
                TrueBalance - 2475
-               LazyPay - 2000
+               LazyPay - 2000-------DONE
                RupeeReady - 2971----DONE
                ------------------
                             34597
