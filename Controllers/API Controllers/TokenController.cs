@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using OtpNet;
 using StockLogger.Data;
@@ -13,10 +15,12 @@ namespace StockLogger.Controllers.API_Controllers
     public class TokenController : ControllerBase
     {
         private readonly StockLoggerDbContext _context;
+        private readonly IMemoryCache _cache;
 
-        public TokenController(StockLoggerDbContext context)
+        public TokenController(StockLoggerDbContext context , IMemoryCache cache)
         {
             _context = context;
+            _cache = cache;
         }
 
         // GET: https://localhost:44364/api/Token
@@ -28,6 +32,11 @@ namespace StockLogger.Controllers.API_Controllers
             {
                 return NotFound();  // Return NotFound if no entry exists
             }
+
+            _cache.Set("AngelOneauthToken", token.AuthToken);
+            _cache.Set("AngelOneRefreshToken", token.RefreshToken);
+            _cache.Set("AngelOneFeedToken", token.FeedToken);
+
             return Ok(token);  // Return the token if found
         }
 
@@ -65,6 +74,10 @@ namespace StockLogger.Controllers.API_Controllers
 
                 // Mark the entry as modified
                 _context.Entry(existingToken).State = EntityState.Modified;
+                _cache.Set("AngelOneauthToken", authToken);
+                _cache.Set("AngelOneRefreshToken", refreshToken);
+                _cache.Set("AngelOneFeedToken", feedToken);
+                _cache.Set("AngelOneAuthTokenCreationTime", DateTime.UtcNow);
             }
             else
             {
@@ -79,6 +92,10 @@ namespace StockLogger.Controllers.API_Controllers
 
                 // Add the new token to the context
                 _context.Token.Add(token);
+                _cache.Set("AngelOneauthToken", token.AuthToken);
+                _cache.Set("AngelOneRefreshToken", token.RefreshToken);
+                _cache.Set("AngelOneFeedToken", token.FeedToken);
+                _cache.Set("AngelOneAuthTokenCreationTime", DateTime.UtcNow);
             }
 
             // Save changes to the context (whether adding or updating)
