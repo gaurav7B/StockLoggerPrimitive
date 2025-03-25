@@ -76,18 +76,18 @@
                BELOW TO BE DONE AFTER APRIL PAYMENT
 
                MPocket - 8432
-               Kissht - 2746
-               Olyv - 5315
-               Pocketly - 3536
-               LoanFront - 2455
-               TrueBalance - 2475
-               ------------------
-                            24959
-               Rent -        6500 
-               IDFC EMI -    6050
-               ------------------
-                            37509       
-
+               Kissht - 2746                                                                     
+               Olyv - 5315                                         ---------------------                             
+               Pocketly - 3536                                     |                   |                              
+               LoanFront - 2455                                    |                   |                              
+               TrueBalance - 2475                                  |                   |                              
+               ------------------                      7APRIL------|-------------------|------7MAY                             
+                            24959                      69249       |                   |     44290                                
+               Rent -        6500                     -24959       |                   |    -41667                               
+               IDFC EMI -    6050                    -------       |___________________|    ------                           
+               ------------------                     44290                                  3000
+                            37509                                                                          
+                                                                                                    
                             ||
                             \/
 
@@ -110,7 +110,7 @@
 
 
                
-
+               ---7MAY THE END OF LOANS---
 
 
 DIET STRATERGY =>
