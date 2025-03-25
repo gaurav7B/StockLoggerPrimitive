@@ -43,7 +43,12 @@ namespace StockLogger.BackgroundServices
             _authToken = TokenData.AuthToken;
             _feedToken = TokenData.FeedToken;
 
-            await ConnectWebSocket(stoppingToken);
+            //await ConnectWebSocket(stoppingToken);
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                await ConnectWebSocket(stoppingToken);
+                await Task.Delay(TimeSpan.FromSeconds(1), stoppingToken); // 1-second delay
+            }
         }
 
         private async Task ConnectWebSocket(CancellationToken stoppingToken)
@@ -143,7 +148,6 @@ namespace StockLogger.BackgroundServices
 
             HttpResponseMessage postResponse = await _httpClient.PostAsync("https://localhost:44364/api/LTP",
                       new StringContent(JsonConvert.SerializeObject(LTP), Encoding.UTF8, "application/json"));
-
         }
 
         private async Task SendHeartbeat(CancellationToken stoppingToken)
