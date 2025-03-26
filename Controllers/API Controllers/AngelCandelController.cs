@@ -526,7 +526,7 @@ namespace StockLogger.Controllers.API_Controllers
 
         }
 
-        public async Task<string> TOTP5PaisaLoginAsync(string _TOTP = "", string _EmailId = "bhoitegaurav7@gmail.com", string _Pin = "636663")
+        public async Task<string> TOTP5PaisaLoginAsync(string _TOTP = "", string _EmailId = "bhoitegaurav7@gmail.com", string _Pin = "777777")
         {
             _TOTP = GenerateTOTP("GUZDAOBVGAZDKXZVKBDUWRKZ");
 

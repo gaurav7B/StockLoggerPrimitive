@@ -879,20 +879,20 @@ namespace StockLogger.BackgroundServices
 
                         Candel testCandel = TotalList.LastOrDefault();
 
-                        //List<(decimal? Rsi, Candel Candel)> RSIData = CalculateRSI(TotalList);
+                        List<(decimal? Rsi, Candel Candel)> RSIData = CalculateRSI(TotalList);
 
-                        //decimal? CurrentRSI = null;
+                        decimal? CurrentRSI = null;
 
-                        //if (RSIData != null)
-                        //{
-                        //    foreach (var data in RSIData)
-                        //    {
-                        //        if (data.Candel == testCandel)
-                        //        {
-                        //            CurrentRSI = data.Rsi;
-                        //        }
-                        //    }
-                        //}
+                        if (RSIData != null)
+                        {
+                            foreach (var data in RSIData)
+                            {
+                                if (data.Candel == testCandel)
+                                {
+                                    CurrentRSI = data.Rsi;
+                                }
+                            }
+                        }
 
                         //List<RSICandel> RsiCandelList = ConvertToRSICandelList(RSIData);
 
@@ -923,8 +923,8 @@ namespace StockLogger.BackgroundServices
 
 
                         if (
-                            //(CurrentRSI > 90)
-                            (testCandel.EndPrice > (decimal)currentBollingerBandsResult.UpperBand)
+                            (CurrentRSI > 70)
+                            //(testCandel.EndPrice > (decimal)currentBollingerBandsResult.UpperBand)
                             )
                         {
                             // BUY API HERE
