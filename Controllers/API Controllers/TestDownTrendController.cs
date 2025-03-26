@@ -1398,83 +1398,87 @@ namespace StockLogger.Controllers.API_Controllers
 
                             //////////////////////////////////////////// IMPLEMENT THIS MAKE IT LIVE ////////////////////////////////////////////////////////
 
-                            foreach (Candel testCandel in CandelData)
-                            {
-
-                                if (testCandel.OpenTime.TimeOfDay > new TimeSpan(14, 00, 0))
-                                {
-                                    break;
-                                }
-
-                                decimal startPrice = testCandel.StartPrice;
-                                decimal highestPrice = testCandel.HighestPrice;
-
-                                decimal percentageChange = ((highestPrice - startPrice) / startPrice) * 100;
-
-
-                                if (
-                                    (testCandel.IsBullish.HasValue == true)
-                                    && (testCandel.IsBullish == true)
-                                    && (percentageChange * 100 > 90)
-                                    )
-                                {
-                                    dragonFlyDojiCandles.Add(testCandel);
-                                }
-
-                            }
-
-                            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
                             //foreach (Candel testCandel in CandelData)
                             //{
 
-                            //    if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
+                            //    if (testCandel.OpenTime.TimeOfDay > new TimeSpan(14, 00, 0))
                             //    {
                             //        break;
                             //    }
 
-                            //    if (testCandel.OpenTime.TimeOfDay < new TimeSpan(9, 36, 0))
+                            //    decimal startPrice = testCandel.StartPrice;
+                            //    decimal highestPrice = testCandel.HighestPrice;
+
+                            //    decimal percentageChange = ((highestPrice - startPrice) / startPrice) * 100;
+
+
+                            //    if (
+                            //        (testCandel.IsBullish.HasValue == true)
+                            //        && (testCandel.IsBullish == true)
+                            //        && (percentageChange * 100 > 90)
+                            //        )
                             //    {
-                            //        continue;
+                            //        dragonFlyDojiCandles.Add(testCandel);
                             //    }
-
-                            //    List<Candel> TotalList = CandelData
-                            //                        .Where(candel => candel.OpenTime <= testCandel.OpenTime)
-                            //                        .OrderBy(c => c.OpenTime)
-                            //                        .ToList();
-
-                            //    // Sample stock data
-                            //    List<Quote> stockData = new List<Quote>();
-                            //    foreach (var candel in TotalList)
-                            //    {
-                            //        Quote quote = new Quote
-                            //        {
-                            //            Date = candel.OpenTime,
-                            //            Open = candel.StartPrice,
-                            //            High = candel.HighestPrice,
-                            //            Low = candel.LowestPrice,
-                            //            Close = candel.EndPrice,
-                            //            Volume = candel.Volume,
-                            //        };
-                            //        stockData.Add(quote);
-                            //    }
-
-                            //    IEnumerable<BollingerBandsResult> bollingerBandsResult = stockData.GetBollingerBands(TotalList.Count, 4);
-                            //    BollingerBandsResult currentBollingerBandsResult = bollingerBandsResult.LastOrDefault();
-
-
-                            //    if (currentBollingerBandsResult != null)
-                            //    {
-                            //        if (
-                            //            (testCandel.HighestPrice > (decimal)currentBollingerBandsResult.UpperBand)
-                            //            )
-                            //        {
-                            //            dragonFlyDojiCandles.Add(testCandel);
-                            //        }
-                            //    }
-
 
                             //}
+
+                            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+                            foreach (Candel testCandel in CandelData)
+                            {
+
+                                if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
+                                {
+                                    break;
+                                }
+
+                                if (testCandel.OpenTime.TimeOfDay < new TimeSpan(9, 36, 0))
+                                {
+                                    continue;
+                                }
+
+                                List<Candel> TotalList = CandelData
+                                                    .Where(candel => candel.OpenTime <= testCandel.OpenTime)
+                                                    .OrderBy(c => c.OpenTime)
+                                                    .ToList();
+
+                                // Sample stock data
+                                List<Quote> stockData = new List<Quote>();
+                                foreach (var candel in TotalList)
+                                {
+                                    Quote quote = new Quote
+                                    {
+                                        Date = candel.OpenTime,
+                                        Open = candel.StartPrice,
+                                        High = candel.HighestPrice,
+                                        Low = candel.LowestPrice,
+                                        Close = candel.EndPrice,
+                                        Volume = candel.Volume,
+                                    };
+                                    stockData.Add(quote);
+                                }
+
+                                IEnumerable<BollingerBandsResult> bollingerBandsResult = stockData.GetBollingerBands(TotalList.Count, 4);
+                                BollingerBandsResult currentBollingerBandsResult = bollingerBandsResult.LastOrDefault();
+
+
+                                if (currentBollingerBandsResult != null)
+                                {
+                                    if (
+                                        (testCandel.HighestPrice > (decimal)currentBollingerBandsResult.UpperBand)
+                                        )
+                                    {
+                                        //dragonFlyDojiCandles.Add(testCandel);
+                                        if (!dragonFlyDojiCandles.Any(candle => candle.Ticker == testCandel.Ticker))
+                                        {
+                                            dragonFlyDojiCandles.Add(testCandel);
+                                        }
+                                    }
+                                }
+
+
+                            }
 
                         }
 
