@@ -793,6 +793,9 @@ namespace StockLogger.Controllers.API_Controllers
             int maxRuns = 4;
             foreach (var stock in _stocks)
             {
+                if (counter >= maxRuns)
+                  break;
+
                 List<Candel> MasterList = new List<Candel>();
 
                 List<Candel> DrafonFlyDojiCandels = new List<Candel>();
@@ -863,7 +866,7 @@ namespace StockLogger.Controllers.API_Controllers
                         var responseData = await response.Content.ReadAsStringAsync();
                         CandelData = JsonConvert.DeserializeObject<List<Candel>>(responseData);
 
-                        Candel EndCandel = CandelData.FirstOrDefault(c => c.OpenTime.TimeOfDay == new TimeSpan(11, 30, 0));
+                        Candel EndCandel = CandelData.FirstOrDefault(c => c.OpenTime.TimeOfDay == new TimeSpan(15, 20, 0));
 
                         List<Candel>? dragonFlyDojiCandles = new List<Candel>();
 
@@ -1429,10 +1432,10 @@ namespace StockLogger.Controllers.API_Controllers
                             foreach (Candel testCandel in CandelData)
                             {
 
-                                if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
-                                {
-                                    break;
-                                }
+                                //if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
+                                //{
+                                //    break;
+                                //}
 
                                 if (testCandel.OpenTime.TimeOfDay < new TimeSpan(9, 36, 0))
                                 {
@@ -1466,18 +1469,34 @@ namespace StockLogger.Controllers.API_Controllers
                                 if (currentBollingerBandsResult != null)
                                 {
                                   if (counter >= maxRuns)
-                                    break;
+                                      break;
 
-                                    if (
-                                        (testCandel.HighestPrice > (decimal)currentBollingerBandsResult.UpperBand)
-                                        )
+                                    if ((testCandel.HighestPrice > (decimal)currentBollingerBandsResult.UpperBand))
                                     {
-                                        dragonFlyDojiCandles.Add(testCandel);
+                                       Candel lastdragonFlyDojiCandles = null;
+                                       lastdragonFlyDojiCandles = dragonFlyDojiCandles.LastOrDefault();
+
+                                       if(dragonFlyDojiCandles.Count == 0)
+                                       {
+                                         dragonFlyDojiCandles.Add(testCandel);
+                                         counter++;
+
+                                       }
+                                       else
+                                       {
+                                         if(testCandel.OpenTime > lastdragonFlyDojiCandles.CloseTime)
+                                         {
+                                           dragonFlyDojiCandles.Add(testCandel);
+                                           counter++;
+
+                                         }
+                                       }
+
+                                        
                                         //if (!dragonFlyDojiCandles.Any(candle => candle.Ticker == testCandel.Ticker))
                                         //{
                                         //    dragonFlyDojiCandles.Add(testCandel);
                                         //}
-                                        counter++;
                                     }
                                 }
 
@@ -1523,41 +1542,35 @@ namespace StockLogger.Controllers.API_Controllers
                                 //if (expectedPrice == firstCandel.EndPrice - (firstCandel.EndPrice * 0.00065m))
                                 {
                                     profitMargin = 130 - 117;
-                                    //profitMargin = (decimal)(130 - 2.5);
                                 }
                                 else if (expectedPrice == firstCandel.EndPrice * 1.0008014m)
                                 {
                                     profitMargin = 160 - 117;
-                                    //profitMargin = (decimal)(160 - 2.5);
                                 }
                                 else if (expectedPrice == firstCandel.HighestPrice - (firstCandel.HighestPrice * 0.0025m))
                                 //else if (expectedPrice == firstCandel.EndPrice - (firstCandel.EndPrice * 0.0025m))
-                                        {
+                                {
                                     profitMargin = 450 - 117;
-                                    //profitMargin = (decimal)(12.5 - 2.5);
                                 }
                                 else if (expectedPrice == firstCandel.EndPrice * 1.01m)
                                 {
                                     profitMargin = 1995 - 117;
-                                    //profitMargin = (decimal)(1995 - 2.5);
                                 }
                                 else if (expectedPrice == firstCandel.EndPrice * 1.005m)
                                 {
                                     profitMargin = 997 - 117;
-                                    //profitMargin = (decimal)(997 - 2.5);
                                 }
                                 else if (expectedPrice == firstCandel.EndPrice * 1.001429m)
                                 {
                                     profitMargin = 285 - 117;
-                                    //profitMargin = (decimal)(285 - 2.5);
                                 }
 
 
                                 ConstForProfit = profitMargin;
 
                                 List<Candel> CandelDataAfterFirstCandel = CandelData
-                                           //.Where(candel => candel.OpenTime > firstCandel.OpenTime)
-                                           .Where(candel => candel.OpenTime > firstCandel.OpenTime && (EndCandel != null ? candel.OpenTime < EndCandel.OpenTime : true))
+                                           .Where(candel => candel.OpenTime > firstCandel.OpenTime)
+                                           //.Where(candel => candel.OpenTime > firstCandel.OpenTime && (EndCandel != null ? candel.OpenTime < EndCandel.OpenTime : true))
                                            .OrderBy(c => c.OpenTime)
                                            .ToList();
                    
