@@ -205,6 +205,18 @@
                     if (response.ok) {
                         const data = await response.json();
                         console.log('API Response:', data);
+
+                        var Loss = 0;
+
+                        data.extractedListWrongPredictions.forEach((item, index) => 
+                        {
+                         Loss = Loss + 2.5 + ((item[1].endPrice - item[0].highestPrice)*5);
+                        });
+
+                       console.log('Profit', data.net);
+                       console.log('Loss', Loss)
+                       console.log('Profit - Loss', data.net - Loss)
+
                     } else {
                         console.error('API Call Failed:', response.statusText);
                     }
