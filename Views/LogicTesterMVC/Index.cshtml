@@ -210,7 +210,11 @@
 
                         data.extractedListWrongPredictions.forEach((item, index) => 
                         {
-                         Loss = Loss + 2.5 + ((item[1].endPrice - item[0].highestPrice)*5);
+                         // Loss = Loss + 2.5 + ((item[1].endPrice - item[0].highestPrice)*5);
+
+                          if (item && item[1] && item[0]) {  // Check if item and both indices exist
+                              Loss = Loss + 117 + ((item[1].endPrice - item[0].highestPrice) * 5);
+                          }
                         });
 
                        console.log('Profit', data.net);
