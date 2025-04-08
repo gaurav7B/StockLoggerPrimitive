@@ -74,21 +74,21 @@
                TrueBalance--               2475-2475-2525----20APRIL--7475---/
 
 
-               AU = 15485 - 5500 = 10000
-               MB = 17264
+               AU = 13478 - 6500 = 6978
+               MB = 12306
                -------------------------
-                   27264
+                   19284
 
                BELOW TO BE DONE AFTER APRIL PAYMENT
 
                MPocket - 6708
                Kissht - 2746--------DONE  
                Branch - 5250
-               LazyPay - 2000
+               LazyPay - 2000-------DONE 
                Olyv - 5315                                         ---------------------                             
                Pocketly - 3536------DONE                           |                   |                              
-               LoanFront - 2455                                    |                   |                              
-               TrueBalance - 2475                                  |                   |                              
+               LoanFront - 2455-----DONE                           |                   |                              
+               TrueBalance - 2475---DONE                           |                   |                              
                ------------------                      7APRIL------|-------------------|------7MAY                             
                             24959                      69249       |                   |     44290                                
                Rent -        6500                     -24959       |                   |    -41667                               
