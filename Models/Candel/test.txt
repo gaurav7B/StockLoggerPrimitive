@@ -74,10 +74,10 @@
                TrueBalance--               2475-2475-2525----20APRIL--7475---/
 
 
-               AU = 6649
-               MB = 8771
+               AU = 6627
+               MB = 3402
                -------------------------
-                   15420
+                   10029
 
                BELOW TO BE DONE AFTER APRIL PAYMENT
 
@@ -85,7 +85,7 @@
                Kissht - 2746--------DONE  
                Branch - 5250
                LazyPay - 2000-------DONE 
-               Olyv - 5315                                         ---------------------                   ---------------------               
+               Olyv - 5315----------DONE                           ---------------------                   ---------------------               
                Pocketly - 3536------DONE--(Loan closed)            |                   |                   |                   |          
                LoanFront - 2455-----DONE                           |                   |                   |                   |          
                TrueBalance - 2475---DONE                           |                   |                   |                   |          
