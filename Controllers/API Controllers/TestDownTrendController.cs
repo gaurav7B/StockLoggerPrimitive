@@ -504,7 +504,11 @@ namespace StockLogger.Controllers.API_Controllers
             }
 
             // Extract EndPrices
-            List<decimal> endPrices = inputList.Select(c => c.EndPrice).ToList();
+            //List<decimal> endPrices = inputList.Select(c => c.EndPrice).ToList();
+            List<decimal> endPrices = inputList
+                         .Select((c, index) => index == inputList.Count - 1 ? c.HighestPrice : c.EndPrice)
+                         .ToList();
+            //List<decimal> endPrices = inputList.Select(c => c.HighestPrice).ToList();
 
             // Calculate deltas
             List<decimal> deltas = new List<decimal>();
@@ -728,9 +732,7 @@ namespace StockLogger.Controllers.API_Controllers
         public class dataRSI
         {
             public decimal? mainRSI { get; set; }
-            public decimal? mainMFI { get; set; }
-            public decimal? mainCCI { get; set; }
-            public decimal? mainSO { get; set; }
+            public string stockName { get; set; }
             public DateTime ExecutedDate { get; set; }
         }
 
@@ -793,8 +795,8 @@ namespace StockLogger.Controllers.API_Controllers
             int maxRuns = 4;
             foreach (var stock in _stocks)
             {
-                if (counter >= maxRuns)
-                  break;
+                //if (counter >= maxRuns)
+                //  break;
 
                 List<Candel> MasterList = new List<Candel>();
 
@@ -1429,13 +1431,98 @@ namespace StockLogger.Controllers.API_Controllers
                             //}
 
                             /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                            //foreach (Candel testCandel in CandelData)
+                            //{
+
+                            //    if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
+                            //    {
+                            //        break;
+                            //    }
+
+                            //    if (testCandel.OpenTime.TimeOfDay < new TimeSpan(9, 36, 0))
+                            //    {
+                            //        continue;
+                            //    }
+
+                            //    List<Candel> TotalList = CandelData
+                            //                        .Where(candel => candel.OpenTime <= testCandel.OpenTime)
+                            //                        .OrderBy(c => c.OpenTime)
+                            //                        .ToList();
+
+                            //    // Sample stock data
+                            //    List<Quote> stockData = new List<Quote>();
+                            //    foreach (var candel in TotalList)
+                            //    {
+                            //        Quote quote = new Quote
+                            //        {
+                            //            Date = candel.OpenTime,
+                            //            Open = candel.StartPrice,
+                            //            High = candel.HighestPrice,
+                            //            Low = candel.LowestPrice,
+                            //            Close = candel.EndPrice,
+                            //            Volume = candel.Volume,
+                            //        };
+                            //        stockData.Add(quote);
+                            //    }
+
+                            //    IEnumerable<BollingerBandsResult> bollingerBandsResult = stockData.GetBollingerBands(TotalList.Count, 2);
+                            //    BollingerBandsResult currentBollingerBandsResult = bollingerBandsResult.LastOrDefault();
+
+                            //    if (currentBollingerBandsResult != null)
+                            //    {
+                            //        //if ((testCandel.HighestPrice > (decimal)currentBollingerBandsResult.UpperBand))
+                            //        //{
+                            //        //  dragonFlyDojiCandles.Add(testCandel);
+                            //        //}
+
+                            //      if (counter >= maxRuns)
+                            //          break;
+
+                            //        if ((testCandel.HighestPrice > (decimal)currentBollingerBandsResult.UpperBand))
+                            //        {
+                            //           Candel lastdragonFlyDojiCandles = null;
+                            //           lastdragonFlyDojiCandles = dragonFlyDojiCandles.LastOrDefault();
+
+                            //           if(dragonFlyDojiCandles.Count == 0)
+                            //           {
+                            //             dragonFlyDojiCandles.Add(testCandel);
+                            //             counter++;
+
+                            //           }
+                            //           else
+                            //           {
+                            //             if(testCandel.OpenTime > lastdragonFlyDojiCandles.CloseTime)
+                            //             {
+                            //               dragonFlyDojiCandles.Add(testCandel);
+                            //               counter++;
+
+                            //             }
+                            //           }
+
+                                        
+                            //            //if (!dragonFlyDojiCandles.Any(candle => candle.Ticker == testCandel.Ticker))
+                            //            //{
+                            //            //    dragonFlyDojiCandles.Add(testCandel);
+                            //            //}
+
+
+
+
+                            //        }
+                                
+                            //    }
+
+
+                            //}
+
+////////////////////////////////////////////////////////////////////////////////////
                             foreach (Candel testCandel in CandelData)
                             {
 
-                                //if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
-                                //{
-                                //    break;
-                                //}
+                                if (testCandel.OpenTime.TimeOfDay > new TimeSpan(11, 00, 0))
+                                {
+                                    break;
+                                }
 
                                 if (testCandel.OpenTime.TimeOfDay < new TimeSpan(9, 36, 0))
                                 {
@@ -1447,61 +1534,69 @@ namespace StockLogger.Controllers.API_Controllers
                                                     .OrderBy(c => c.OpenTime)
                                                     .ToList();
 
-                                // Sample stock data
-                                List<Quote> stockData = new List<Quote>();
-                                foreach (var candel in TotalList)
+                                List<(decimal? Rsi, Candel Candel)> RSIData = CalculateRSI(TotalList);
+
+                                decimal? CurrentRSI = null;
+
+                                if (RSIData != null)
                                 {
-                                    Quote quote = new Quote
+                                    foreach (var data in RSIData)
                                     {
-                                        Date = candel.OpenTime,
-                                        Open = candel.StartPrice,
-                                        High = candel.HighestPrice,
-                                        Low = candel.LowestPrice,
-                                        Close = candel.EndPrice,
-                                        Volume = candel.Volume,
-                                    };
-                                    stockData.Add(quote);
+                                        if (data.Candel == testCandel)
+                                        {
+                                            CurrentRSI = data.Rsi;
+                                        }
+                                    }
                                 }
 
-                                IEnumerable<BollingerBandsResult> bollingerBandsResult = stockData.GetBollingerBands(TotalList.Count, 4);
-                                BollingerBandsResult currentBollingerBandsResult = bollingerBandsResult.LastOrDefault();
-
-                                if (currentBollingerBandsResult != null)
+                                if (CurrentRSI != null)
                                 {
-                                  if (counter >= maxRuns)
-                                      break;
-
-                                    if ((testCandel.HighestPrice > (decimal)currentBollingerBandsResult.UpperBand))
+                                    if (CurrentRSI > 90)
                                     {
-                                       Candel lastdragonFlyDojiCandles = null;
-                                       lastdragonFlyDojiCandles = dragonFlyDojiCandles.LastOrDefault();
+                                      dragonFlyDojiCandles.Add(testCandel);
+                                    }
 
-                                       if(dragonFlyDojiCandles.Count == 0)
-                                       {
-                                         dragonFlyDojiCandles.Add(testCandel);
-                                         counter++;
+                                  //if (counter >= maxRuns)
+                                  //    break;
 
-                                       }
-                                       else
-                                       {
-                                         if(testCandel.OpenTime > lastdragonFlyDojiCandles.CloseTime)
-                                         {
-                                           dragonFlyDojiCandles.Add(testCandel);
-                                           counter++;
+                                    //if (CurrentRSI > 90)
+                                    //{
+                                    //   Candel lastdragonFlyDojiCandles = null;
+                                    //   lastdragonFlyDojiCandles = dragonFlyDojiCandles.LastOrDefault();
 
-                                         }
-                                       }
+                                    //   if(dragonFlyDojiCandles.Count == 0)
+                                    //   {
+                                    //     dragonFlyDojiCandles.Add(testCandel);
+                                    //     counter++;
+
+                                    //   }
+                                    //   else
+                                    //   {
+                                    //     if(testCandel.OpenTime > lastdragonFlyDojiCandles.CloseTime)
+                                    //     {
+                                    //       dragonFlyDojiCandles.Add(testCandel);
+                                    //       counter++;
+
+                                    //     }
+                                    //   }
 
                                         
-                                        //if (!dragonFlyDojiCandles.Any(candle => candle.Ticker == testCandel.Ticker))
-                                        //{
-                                        //    dragonFlyDojiCandles.Add(testCandel);
-                                        //}
-                                    }
+                                    //    //if (!dragonFlyDojiCandles.Any(candle => candle.Ticker == testCandel.Ticker))
+                                    //    //{
+                                    //    //    dragonFlyDojiCandles.Add(testCandel);
+                                    //    //}
+
+
+
+
+                                    //}
+                                
                                 }
 
 
                             }
+                       
+
 
                         }
 
@@ -1528,7 +1623,9 @@ namespace StockLogger.Controllers.API_Controllers
                                     //expectedPrice = firstCandel.EndPrice - (firstCandel.EndPrice * 0.00065m);
                                     //expectedPrice = firstCandel.EndPrice - (firstCandel.EndPrice * 0.01m);
 
-                                    expectedPrice = firstCandel.HighestPrice - (firstCandel.HighestPrice * 0.0025m); // 2.5 R profit on 1000 R //450 on 2Lakh
+                                    //expectedPrice = firstCandel.HighestPrice - (firstCandel.HighestPrice * 0.0025m); // 2.5 R profit on 1000 R //450 on 2Lakh
+                                    //expectedPrice = firstCandel.HighestPrice - (firstCandel.HighestPrice * 0.005m); // 2.5 R profit on 1000 R //450 on 2Lakh
+                                    expectedPrice = firstCandel.HighestPrice - (firstCandel.HighestPrice * 0.01m); // 2.5 R profit on 1000 R //450 on 2Lakh
                                     //expectedPrice = firstCandel.HighestPrice - (firstCandel.HighestPrice * 0.00065m); // 2.5 R profit on 1000 R //450 on 2Lakh
                                     //expectedPrice = firstCandel.EndPrice - (firstCandel.EndPrice * 0.0025m); // 2.5 R profit on 1000 R //450 on 2Lakh
 
@@ -1551,12 +1648,17 @@ namespace StockLogger.Controllers.API_Controllers
                                 //else if (expectedPrice == firstCandel.EndPrice - (firstCandel.EndPrice * 0.0025m))
                                 {
                                     profitMargin = 450 - 117;
+                                    //profitMargin = 125;
+                                    //profitMargin = 10;
                                 }
-                                else if (expectedPrice == firstCandel.EndPrice * 1.01m)
+                                //else if (expectedPrice == firstCandel.EndPrice * 1.01m)
+                                else if (expectedPrice == firstCandel.HighestPrice - (firstCandel.HighestPrice * 0.01m))
                                 {
-                                    profitMargin = 1995 - 117;
+                                    //profitMargin = 1995 - 117;
+                                    profitMargin = 500;
                                 }
-                                else if (expectedPrice == firstCandel.EndPrice * 1.005m)
+                                //else if (expectedPrice == firstCandel.EndPrice * 1.005m)
+                                else if (expectedPrice == firstCandel.HighestPrice - (firstCandel.HighestPrice * 0.005m))
                                 {
                                     profitMargin = 997 - 117;
                                 }
@@ -1682,9 +1784,7 @@ namespace StockLogger.Controllers.API_Controllers
                                     dataRSI dataRSI = new dataRSI
                                     {
                                         mainRSI = CurrentRSI,
-                                        mainMFI = MFI,
-                                        mainCCI = CCI,
-                                        mainSO = SO,
+                                        stockName = dojiCandle.Ticker,
                                         ExecutedDate = dojiCandle.OpenTime
                                     };
 
@@ -1754,9 +1854,7 @@ namespace StockLogger.Controllers.API_Controllers
                                     dataRSI dataRSI = new dataRSI
                                     {
                                         mainRSI = CurrentRSI,
-                                        mainMFI = MFI,
-                                        mainCCI = CCI,
-                                        mainSO = SO,
+                                        stockName = dojiCandle.Ticker,
                                         ExecutedDate = dojiCandle.OpenTime
                                     };
 

@@ -212,8 +212,10 @@
                         {
                          // Loss = Loss + 2.5 + ((item[1].endPrice - item[0].highestPrice)*5);
 
+                          var numberOfStocks = (10000*5)/item[0].highestPrice
+
                           if (item && item[1] && item[0]) {  // Check if item and both indices exist
-                              Loss = Loss + 117 + ((item[1].endPrice - item[0].highestPrice) * 5);
+                          Loss = Loss + 2.5 + ((item[1].endPrice - item[0].highestPrice) * numberOfStocks);
                           }
                         });
 
