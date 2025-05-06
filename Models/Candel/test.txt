@@ -143,8 +143,6 @@
      Pay IDFC EMI 6100 
      Remaining 3959
 
-
-
                                          2616-----------21APRIL----\
                                          2050-----------13APRIL----|
                 MPocket--                2616-----------10APRIL----|
@@ -169,34 +167,36 @@
 ----------PREVIOUS
 
 
-                              4336 -1720-2616-----------13APRIL----\
-                MPocket--                2616-----------10APRIL----|
-                                         2616---------16APRIL------|--12184--\
-                                         2616---------21APRIL------/         |
+                                         2616-----------10MAY------\
+                MPocket--                2154-----------22MAY------|
+                              4308 -1720-2616-----------21MAY------|
+                              4308 -1720-2616-----------13MAY------|
+                                         2616---------21MAY--------|--18618--\
+                                         2616---------16MAY--------/         |
                                                                              |
                                                                              |
                Kissht--                 2746-2746-2746-----8MAY-----8238-----|     6  APRIL REMIANING LOAN TO BE PAID IN APRIL
                                                                              |
                Olyv--                    5315-5315------20MAY-------10630----|
-                                                                             |----------56820                  
-               Branch--                  5250---27APRIL------------5250------|
+                                                                             |----------74806                  
+               Branch--             6594-6594---23MAY--------------13188-----|
                                                                              |
                Pocketly--      3536-3536-3536---16APRIL-----------10608------|
                                                                              |
-               LoanFront--                2455-2455--19MAY----------4910-----|
+               LoanFront--     2131-2131-2131-2131---19MAY----------8524-----|
                                                                              |
                TrueBalance--                    2475-2525----20MAY----5000---/
 
 
-     MPocket - 1720+550+550+550 = 3370
+     MPocket - 550+2154+1720+1720+550+550 = 7244
      Kissht -  2746
      Olyv  -   5315
-     Branch -  5250
+     Branch -  6594
      Pocketly - 3536
-     LoanFront - 2455
+     LoanFront - 2131
      TrueBalance - 2475
      --------------------
-     Total - 25147
+     Total - 30041
 
                ||
                \/
@@ -233,13 +233,13 @@ DIET STRATERGY =>
            |      30-DAY SCHEDULE     |
            +---------------------------+
            
-           Day 1   | [ ] Anda Bhurji (Morning)  | [ ] 2L LEMONADE  | [ ] Anda Bhurji (Evening)  | Weight Lost: ~0.3 kg  
+           Day 1   | [ ] Anda Bhurji (Morning)  | [ ] 2L LEMONADE  | [ ] Anda Bhurji (Evening)  | Weight Lost: ~0.3 kg  ----110kg
            Day 2   | [ ] Anda Bhurji (Morning)  | [ ] 2L LEMONADE  | [ ] Anda Bhurji (Evening)  | Weight Lost: ~0.6 kg  
            Day 3   | [ ] Anda Bhurji (Morning)  | [ ] 2L LEMONADE  | [ ] Anda Bhurji (Evening)  | Weight Lost: ~0.9 kg  
            Day 4   | [ ] Anda Bhurji (Morning)  | [ ] 2L LEMONADE  | [ ] Anda Bhurji (Evening)  | Weight Lost: ~1.2 kg  
            Day 5   | [ ] Anda Bhurji (Morning)  | [ ] 2L LEMONADE  | [ ] Anda Bhurji (Evening)  | Weight Lost: ~1.5 kg  
            Day 6   | [ ] Anda Bhurji (Morning)  | [ ] 2L LEMONADE  | [ ] Anda Bhurji (Evening)  | Weight Lost: ~1.8 kg  
-           Day 7   | [ ] Anda Bhurji (Morning)  | [ ] 2L LEMONADE  | [ ] Anda Bhurji (Evening)  | Weight Lost: ~2.1 kg  
+           Day 7   | [ ] Anda Bhurji (Morning)  | [ ] 2L LEMONADE  | [ ] Anda Bhurji (Evening)  | Weight Lost: ~2.1 kg ----107.9kg 
            +-----------------------------------------------------------+
            |                   WEEK 1 COMPLETE ✅                      |
            +-----------------------------------------------------------+
@@ -250,7 +250,7 @@ DIET STRATERGY =>
            Day 11  | [ ] Anda Bhurji (Morning)  | [ ] 2L LEMONADE  | [ ] Anda Bhurji (Evening)  | Weight Lost: ~3.3 kg  
            Day 12  | [ ] Anda Bhurji (Morning)  | [ ] 2L LEMONADE  | [ ] Anda Bhurji (Evening)  | Weight Lost: ~3.6 kg  
            Day 13  | [ ] Anda Bhurji (Morning)  | [ ] 2L LEMONADE  | [ ] Anda Bhurji (Evening)  | Weight Lost: ~3.9 kg  
-           Day 14  | [ ] Anda Bhurji (Morning)  | [ ] 2L LEMONADE  | [ ] Anda Bhurji (Evening)  | Weight Lost: ~4.2 kg  
+           Day 14  | [ ] Anda Bhurji (Morning)  | [ ] 2L LEMONADE  | [ ] Anda Bhurji (Evening)  | Weight Lost: ~4.2 kg ----105.8kg 
            +-----------------------------------------------------------+
            |                   WEEK 2 COMPLETE ✅                      |
            +-----------------------------------------------------------+
@@ -261,7 +261,7 @@ DIET STRATERGY =>
            Day 18  | [ ] Anda Bhurji (Morning)  | [ ] 2L LEMONADE  | [ ] Anda Bhurji (Evening)  | Weight Lost: ~5.4 kg  
            Day 19  | [ ] Anda Bhurji (Morning)  | [ ] 2L LEMONADE  | [ ] Anda Bhurji (Evening)  | Weight Lost: ~5.7 kg  
            Day 20  | [ ] Anda Bhurji (Morning)  | [ ] 2L LEMONADE  | [ ] Anda Bhurji (Evening)  | Weight Lost: ~6.0 kg  
-           Day 21  | [ ] Anda Bhurji (Morning)  | [ ] 2L LEMONADE  | [ ] Anda Bhurji (Evening)  | Weight Lost: ~6.3 kg  
+           Day 21  | [ ] Anda Bhurji (Morning)  | [ ] 2L LEMONADE  | [ ] Anda Bhurji (Evening)  | Weight Lost: ~6.3 kg ----103.7kg  
            +-----------------------------------------------------------+
            |                   WEEK 3 COMPLETE ✅                      |
            +-----------------------------------------------------------+
@@ -272,13 +272,13 @@ DIET STRATERGY =>
            Day 25  | [ ] Anda Bhurji (Morning)  | [ ] 2L LEMONADE  | [ ] Anda Bhurji (Evening)  | Weight Lost: ~7.5 kg  
            Day 26  | [ ] Anda Bhurji (Morning)  | [ ] 2L LEMONADE  | [ ] Anda Bhurji (Evening)  | Weight Lost: ~7.8 kg  
            Day 27  | [ ] Anda Bhurji (Morning)  | [ ] 2L LEMONADE  | [ ] Anda Bhurji (Evening)  | Weight Lost: ~8.1 kg  
-           Day 28  | [ ] Anda Bhurji (Morning)  | [ ] 2L LEMONADE  | [ ] Anda Bhurji (Evening)  | Weight Lost: ~8.4 kg  
+           Day 28  | [ ] Anda Bhurji (Morning)  | [ ] 2L LEMONADE  | [ ] Anda Bhurji (Evening)  | Weight Lost: ~8.4 kg ----101.6kg   
            +-----------------------------------------------------------+
            |                   WEEK 4 COMPLETE ✅                      |
            +-----------------------------------------------------------+
            
            Day 29  | [ ] Anda Bhurji (Morning)  | [ ] 2L LEMONADE  | [ ] Anda Bhurji (Evening)  | Weight Lost: ~8.7 kg  
-           Day 30  | [ ] Anda Bhurji (Morning)  | [ ] 2L LEMONADE  | [ ] Anda Bhurji (Evening)  | Weight Lost: ~9-11 kg  
+           Day 30  | [ ] Anda Bhurji (Morning)  | [ ] 2L LEMONADE  | [ ] Anda Bhurji (Evening)  | Weight Lost: ~9-11 kg ----101kg   
            +-----------------------------------------------------------+
            |             30-DAY KETO CHALLENGE COMPLETED ✅🎉          |
            |  **TOTAL WEIGHT LOSS ESTIMATE:** **9-11 KG**             |
