@@ -201,7 +201,7 @@
                ||
                \/
 
-        10600 - 5500 = 5100
+        9966 - 5500 = 4466
                                          2064-----------10MAY------\
                 MPocket--                2616-----------21MAY------|
                                          2616-----------13MAY------|
@@ -338,4 +338,18 @@ Estimated weight loss: 8–12 kg in a month (similar to before)
 | 8     | 2,448,880            | 1,959,104          | 4,407,984          |
 | 9     | 4,407,984            | 3,526,387          | 7,934,371          |
 | 10    | 7,934,371            | 6,347,497          | 14,281,868         |
+
+
+
+
+| **Event**                               | **Expected Timeline**    |   |
+| --------------------------------------- | ------------------------ | - |
+| **Online Application Period**           | October – November 2025  |   |
+| **Preliminary Exam Date**               | February 2026            |   |
+| **Mains Exam Date**                     | June – July 2026         |   |
+| **Mains Result Declaration**            | August – September 2026  |   |
+| **Final Result Declaration**            | November – December 2026 |   |
+
+
+
 
