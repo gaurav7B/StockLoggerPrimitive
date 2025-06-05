@@ -223,15 +223,19 @@
                TrueBalance--                         2525----20MAY----2525---/
 
 
+        MaharashtrBank = 14426
+        AU Bank        = 562
+        -----------------------
+                        14988
 
         MPocket - 250+550+550+250+250+2064 = 3914
-        Kissht -  2746
-        Olyv  -   5601
-        Branch -  6594
-        Pocketly - 3536
-        LoanFront - 2131
-        TrueBalance - 2525
-        ---------------------
+        Kissht -  2746 -PAID
+        Olyv  -   5601 -PAID
+        Branch -  6594 -PAID
+        Pocketly - 3536 -PAID
+        LoanFront - 2131 -PAID
+        TrueBalance - 2525 -PAID
+        -------------------------
         Total - 27074
 
                ||
