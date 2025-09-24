@@ -208,16 +208,16 @@
 
                         var Loss = 0;
 
-                        // data.extractedListWrongPredictions.forEach((item, index) => 
-                        // {
-                        //  Loss = Loss + 2.5 + ((item[1].endPrice - item[0].highestPrice)*5);
+                        data.extractedListWrongPredictions.forEach((item, index) => 
+                        {
+                         Loss = Loss + 2.5 + ((item[1].endPrice - item[0].highestPrice)*5);
 
-                        //   var numberOfStocks = (10000*5)/item[0].highestPrice
+                          var numberOfStocks = (10000*5)/item[0].highestPrice
 
-                        //   if (item && item[1] && item[0]) {  Check if item and both indices exist
-                        //   Loss = Loss + 2.5 + ((item[1].endPrice - item[0].highestPrice) * numberOfStocks);
-                        //   }
-                        // });
+                          if (item && item[1] && item[0]) {  //Check if item and both indices exist
+                          Loss = Loss + 2.5 + ((item[1].endPrice - item[0].highestPrice) * numberOfStocks);
+                          }
+                        });
 
                        console.log('Profit - Loss', data.net - Loss , 'Profit' , data.net , 'Loss', Loss)
 

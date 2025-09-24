@@ -504,14 +504,14 @@ namespace StockLogger.Controllers.API_Controllers
       }
 
       // Extract EndPrices
-      //List<decimal> endPrices = inputList.Select(c => c.EndPrice).ToList();
-      List<decimal> endPrices = inputList
-                   .Select((c, index) => index == inputList.Count - 1 ? c.HighestPrice : c.EndPrice)
-                   .ToList();
-      //List<decimal> endPrices = inputList.Select(c => c.HighestPrice).ToList();
+      List<decimal> endPrices = inputList.Select(c => c.EndPrice).ToList();
+            //List<decimal> endPrices = inputList
+            //             .Select((c, index) => index == inputList.Count - 1 ? c.HighestPrice : c.EndPrice)
+            //             .ToList();
+            //List<decimal> endPrices = inputList.Select(c => c.HighestPrice).ToList();
 
-      // Calculate deltas
-      List<decimal> deltas = new List<decimal>();
+            // Calculate deltas
+            List<decimal> deltas = new List<decimal>();
       for (int i = 1; i < endPrices.Count; i++)
       {
         deltas.Add(endPrices[i] - endPrices[i - 1]);
@@ -1623,9 +1623,9 @@ namespace StockLogger.Controllers.API_Controllers
                   //expectedPrice = firstCandel.EndPrice - (firstCandel.EndPrice * 0.00065m);
                   //expectedPrice = firstCandel.EndPrice - (firstCandel.EndPrice * 0.01m);
 
-                  //expectedPrice = firstCandel.HighestPrice - (firstCandel.HighestPrice * 0.0025m); // 2.5 R profit on 1000 R //450 on 2Lakh
+                  expectedPrice = firstCandel.HighestPrice - (firstCandel.HighestPrice * 0.0025m); // 2.5 R profit on 1000 R //450 on 2Lakh
                   //expectedPrice = firstCandel.HighestPrice - (firstCandel.HighestPrice * 0.005m); // 2.5 R profit on 1000 R //450 on 2Lakh
-                  expectedPrice = firstCandel.HighestPrice - (firstCandel.HighestPrice * 0.01m); // 2.5 R profit on 1000 R //450 on 2Lakh
+                  //expectedPrice = firstCandel.HighestPrice - (firstCandel.HighestPrice * 0.01m); // 2.5 R profit on 1000 R //450 on 2Lakh
                                                                                                  //expectedPrice = firstCandel.HighestPrice - (firstCandel.HighestPrice * 0.00065m); // 2.5 R profit on 1000 R //450 on 2Lakh
                                                                                                  //expectedPrice = firstCandel.EndPrice - (firstCandel.EndPrice * 0.0025m); // 2.5 R profit on 1000 R //450 on 2Lakh
 

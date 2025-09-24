@@ -14,6 +14,17 @@ builder.Services.AddDbContext<StockLoggerDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("StockLoggerDbConnection"),
     sqlServerOptions => sqlServerOptions.EnableRetryOnFailure()));
 
+//StoreDataService
+
+//builder.Services.AddHttpClient<StoreDataService>();
+//builder.Services.AddHostedService<StoreDataService>();
+
+builder.Services.AddHttpClient<TokenMakerService>();
+builder.Services.AddHostedService<TokenMakerService>();
+
+builder.Services.AddHttpClient<RateLimitTestService>();
+builder.Services.AddHostedService<RateLimitTestService>();
+
 //builder.Services.AddHttpClient<CandelMakerService>();
 //builder.Services.AddHostedService<CandelMakerService>();
 

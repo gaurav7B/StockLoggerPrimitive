@@ -30,6 +30,17 @@ namespace StockLogger.Controllers.API_Controllers
             return Ok();
         }
 
+        // POST https://localhost:44364/api/Candel/CandelList
+        [HttpPost("CandelList")]
+        public async Task<ActionResult> CreateMultipleCandels([FromBody] List<Candel> candels)
+        {
+            // Add all candels to the context
+            _context.Candel.AddRange(candels);
+            await _context.SaveChangesAsync();
+            return Ok();
+        }
+
+
         ////POST https://localhost:44364/api/Candel
         //[HttpPost]
         //public async Task<ActionResult> CreateCandel(Candel candel)

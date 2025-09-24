@@ -613,6 +613,102 @@ namespace StockLogger.Controllers.API_Controllers
         public string RequestToken;
         public string AccessToken;
 
+        // POST https://localhost:44364/api/AngelCandel/getAccessToken5Paisa
+        [HttpPost("getAccessToken5Paisa")]
+        public async Task<IActionResult> GetAccessToken5Paisa()
+        {
+            try
+            {
+                RequestToken = await TOTP5PaisaLoginAsync();
+                AccessToken = await GetOuth5PaisaLoginAsync(RequestToken);
+
+                // Store in cache
+                _cache.Set("AccessToken", AccessToken);
+                _cache.Set("CreationTime", DateTime.Now);
+
+                return Ok(new
+                {
+                    AccessToken = AccessToken,
+                    CreationTime = DateTime.Now
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = "Error generating access token: " + ex.Message });
+            }
+        }
+
+        // POST https://localhost:44364/api/AngelCandel/getCandleDataForTest5PaisaSeprated
+        [HttpPost("getCandleDataForTest5PaisaSeprated")]
+        public async Task<IActionResult> GetCandleDataForTest5PaisaSeprated([FromBody] StockRequest stockRequest)
+        {
+            try
+            {
+                // Get AccessToken from cache
+                var AccessToken = _cache.Get<string>("AccessToken");
+
+                if (string.IsNullOrEmpty(AccessToken))
+                {
+                    return BadRequest(new { Message = "Access token not found. Please generate it first using getAccessToken5Paisa API." });
+                }
+
+                var matchingStock = _stocks.FirstOrDefault(s => s.symboltoken == stockRequest.SymbolToken);
+
+                var startDateOnly = stockRequest.StartDate.Date;
+                var startDateWithTime900 = startDateOnly.AddHours(9).AddMinutes(15);
+                var startDateWithTime330 = startDateOnly.AddHours(15).AddMinutes(20);
+
+                var fromdate = startDateWithTime900.ToString("yyyy-MM-dd");
+                var todate = startDateWithTime330.ToString("yyyy-MM-dd");
+
+                var client = _httpClient;
+                var requestMessage = new HttpRequestMessage(HttpMethod.Get,
+                    $"https://openapi.5paisa.com/V2/historical/N/C/{stockRequest.SymbolToken}/1m?from={fromdate}&end={fromdate}");
+
+                requestMessage.Headers.Add("Authorization", "Bearer " + AccessToken);
+                requestMessage.Headers.Add("5Paisa-API-Uid", "nosniff");
+                requestMessage.Headers.Add("Accept", "application/json");
+
+                HttpResponseMessage response = await client.SendAsync(requestMessage);
+                string responseContent = await response.Content.ReadAsStringAsync();
+
+                dynamic candleData = JsonConvert.DeserializeObject(responseContent);
+                var rawCandelData = candleData.data.candles;
+
+                if (rawCandelData == null) return Ok(new List<Candel>());
+
+                List<Candel> ModifiedCandelDataList = new List<Candel>();
+                foreach (var rawCandel in rawCandelData)
+                {
+                    Candel newCandel = new Candel
+                    {
+                        OpenTime = DateTime.Parse(rawCandel[0].ToString()),
+                        CloseTime = DateTime.Parse(rawCandel[0].ToString()).AddMinutes(1),
+                        StartPrice = Convert.ToDecimal(rawCandel[1]),
+                        HighestPrice = Convert.ToDecimal(rawCandel[2]),
+                        LowestPrice = Convert.ToDecimal(rawCandel[3]),
+                        EndPrice = Convert.ToDecimal(rawCandel[4]),
+                        Ticker = matchingStock.ticker,
+                        TickerId = matchingStock.id,
+                        Exchange = matchingStock.exchange,
+                        Volume = Convert.ToDecimal(rawCandel[5]),
+                    };
+                    newCandel.SetBullBearStatus();
+                    newCandel.SetPriceChange();
+
+                    if (newCandel.CloseTime < DateTime.Now)
+                        ModifiedCandelDataList.Add(newCandel);
+                }
+
+                return Ok(ModifiedCandelDataList);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { Message = "Error fetching candle data: " + ex.Message });
+            }
+        }
+
+
         // POST https://localhost:44364/api/AngelCandel/getCandleDataForTest5Paisa
         [HttpPost("getCandleDataForTest5Paisa")]
         public async Task<IActionResult> GetCandleDataForTest5Paisa([FromBody] StockRequest stockRequest)
