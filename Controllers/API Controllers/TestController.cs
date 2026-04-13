@@ -2847,7 +2847,8 @@ namespace StockLogger.Controllers.API_Controllers
 
             var loginJsonData = JsonConvert.SerializeObject(loginData);
             var loginClient = new HttpClient();
-            var loginRequestMessage = new HttpRequestMessage(HttpMethod.Post, "https://apiconnect.angelone.in/rest/auth/angelbroking/user/v1/loginByPassword")
+            //var loginRequestMessage = new HttpRequestMessage(HttpMethod.Post, "https://apiconnect.angelone.in/rest/auth/angelbroking/user/v1/loginByPassword")
+            var loginRequestMessage = new HttpRequestMessage(HttpMethod.Post, "")
             {
                 Content = new StringContent(loginJsonData, Encoding.UTF8, "application/json")
             };

@@ -29,7 +29,7 @@ namespace StockLogger.Controllers.API_Controllers
         private static readonly HttpClient _httpClient = new HttpClient();
 
 
-        public AngelCandelController(StockLoggerDbContext context , IMemoryCache cache)
+        public AngelCandelController(StockLoggerDbContext context, IMemoryCache cache)
         {
             _context = context;
 
@@ -44,8 +44,8 @@ namespace StockLogger.Controllers.API_Controllers
 
         }
 
-        // POST api/angelcandel/login
-        [HttpPost("login")]
+        // POST api/angelcandel/login2
+        [HttpPost("login2")]
         public async Task<IActionResult> Login()
         {
             string authorizationToken = string.Empty;
@@ -75,7 +75,7 @@ namespace StockLogger.Controllers.API_Controllers
             loginRequestMessage.Headers.Add("X-ClientLocalIP", "192.168.56.177");  // Your local IP from ipconfig
             loginRequestMessage.Headers.Add("X-ClientPublicIP", publicIp);
             loginRequestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX"); // Replace with your MAC address
-            loginRequestMessage.Headers.Add("X-PrivateKey", "DcsJlRJp");          // Your actual API Key
+            loginRequestMessage.Headers.Add("X-PrivateKey", "n4uJPQNK");          // Your actual API Key
 
             try
             {
@@ -89,6 +89,7 @@ namespace StockLogger.Controllers.API_Controllers
                 if (loginResponseJson.status == true)
                 {
                     authorizationToken = loginResponseJson.data.jwtToken;  // Assuming the token is present here
+                    _cache.Set("AccessTokenAngelOne", authorizationToken);
                     return Ok(new { Token = authorizationToken });  // Return the JWT token
                 }
                 else
@@ -138,7 +139,7 @@ namespace StockLogger.Controllers.API_Controllers
             loginRequestMessage.Headers.Add("X-ClientLocalIP", "192.168.56.177");  // Your local IP from ipconfig
             loginRequestMessage.Headers.Add("X-ClientPublicIP", publicIp);
             loginRequestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX"); // Replace with your MAC address
-            loginRequestMessage.Headers.Add("X-PrivateKey", "DcsJlRJp");          // Your actual API Key
+            loginRequestMessage.Headers.Add("X-PrivateKey", "n4uJPQNK");          // Your actual API Key
 
             try
             {
@@ -257,7 +258,7 @@ namespace StockLogger.Controllers.API_Controllers
         public int count;
         private static string webSocketUrl = "wss://smartapisocket.angelone.in/smart-stream";
         private static string clientId = "AAAF282130";
-        private static string apiKey = "DcsJlRJp";
+        private static string apiKey = "n4uJPQNK";
 
         // GET https://localhost:44364/api/AngelCandel/GetFeedTokenForAngelWebSocket
         [HttpGet("GetFeedTokenForAngelWebSocket")]
@@ -271,6 +272,33 @@ namespace StockLogger.Controllers.API_Controllers
                 AuthToken = authtoken,
                 FeedToken = tokenData.FeedToken
             });
+        }
+
+        // GET https://localhost:44364/api/AngelCandel/getAuthTokenAngelOne
+        [HttpGet("getAuthTokenAngelOne")]
+        public async Task<IActionResult> GetAuthTokenAngelOne()
+        {
+            try
+            {
+                var authToken = await GetRefreshedAuthorizationTokenAsync();
+
+                if (string.IsNullOrEmpty(authToken))
+                    return BadRequest(new { message = "Failed to generate auth token." });
+
+                return Ok(new
+                {
+                    status = "success",
+                    token = authToken
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    status = "error",
+                    message = ex.Message
+                });
+            }
         }
 
         // POST https://localhost:44364/api/AngelCandel/getCandleDataForTest
@@ -398,7 +426,7 @@ namespace StockLogger.Controllers.API_Controllers
             requestMessage.Headers.Add("X-UserType", "USER");
             //requestMessage.Headers.Add("Authorization", "Bearer " + stockRequest.AuthorizationToken);
             requestMessage.Headers.Add("Authorization", "Bearer " + authtoken);
-            requestMessage.Headers.Add("X-PrivateKey", "DcsJlRJp"); // Your actual API Key
+            requestMessage.Headers.Add("X-PrivateKey", "n4uJPQNK"); // Your actual API Key
 
 
 
@@ -433,7 +461,7 @@ namespace StockLogger.Controllers.API_Controllers
                 {
                     miutesToAdd = 1;
                 }
-                else if(data.interval == "THREE_MINUTE")
+                else if (data.interval == "THREE_MINUTE")
                 {
                     miutesToAdd = 3;
                 }
@@ -640,7 +668,7 @@ namespace StockLogger.Controllers.API_Controllers
 
         // POST https://localhost:44364/api/AngelCandel/getCandleDataForTest5PaisaSeprated
         [HttpPost("getCandleDataForTest5PaisaSeprated")]
-        public async Task<IActionResult> GetCandleDataForTest5PaisaSeprated([FromBody] StockRequest stockRequest)
+        public async Task<IActionResult> GetCandleDataForTest5PaisaSeprated([FromBody] StockRequestModified stockRequestModified)
         {
             try
             {
@@ -652,18 +680,19 @@ namespace StockLogger.Controllers.API_Controllers
                     return BadRequest(new { Message = "Access token not found. Please generate it first using getAccessToken5Paisa API." });
                 }
 
-                var matchingStock = _stocks.FirstOrDefault(s => s.symboltoken == stockRequest.SymbolToken);
+                var matchingStock = _stocks.FirstOrDefault(s => s.symboltoken == stockRequestModified.SymbolToken);
 
-                var startDateOnly = stockRequest.StartDate.Date;
+                var startDateOnly = stockRequestModified.StartDate.Date;
+                var endDateOnly = stockRequestModified.EndDate.Date;
                 var startDateWithTime900 = startDateOnly.AddHours(9).AddMinutes(15);
-                var startDateWithTime330 = startDateOnly.AddHours(15).AddMinutes(20);
+                var endDateWithTime330 = endDateOnly.AddHours(15).AddMinutes(20);
 
                 var fromdate = startDateWithTime900.ToString("yyyy-MM-dd");
-                var todate = startDateWithTime330.ToString("yyyy-MM-dd");
+                var todate = endDateWithTime330.ToString("yyyy-MM-dd");
 
                 var client = _httpClient;
                 var requestMessage = new HttpRequestMessage(HttpMethod.Get,
-                    $"https://openapi.5paisa.com/V2/historical/N/C/{stockRequest.SymbolToken}/1m?from={fromdate}&end={fromdate}");
+                    $"https://openapi.5paisa.com/V2/historical/N/C/{stockRequestModified.SymbolToken}/{stockRequestModified.Duration}?from={fromdate}&end={todate}");
 
                 requestMessage.Headers.Add("Authorization", "Bearer " + AccessToken);
                 requestMessage.Headers.Add("5Paisa-API-Uid", "nosniff");
@@ -680,24 +709,48 @@ namespace StockLogger.Controllers.API_Controllers
                 List<Candel> ModifiedCandelDataList = new List<Candel>();
                 foreach (var rawCandel in rawCandelData)
                 {
-                    Candel newCandel = new Candel
+                    if(stockRequestModified.Duration == "1m")
                     {
-                        OpenTime = DateTime.Parse(rawCandel[0].ToString()),
-                        CloseTime = DateTime.Parse(rawCandel[0].ToString()).AddMinutes(1),
-                        StartPrice = Convert.ToDecimal(rawCandel[1]),
-                        HighestPrice = Convert.ToDecimal(rawCandel[2]),
-                        LowestPrice = Convert.ToDecimal(rawCandel[3]),
-                        EndPrice = Convert.ToDecimal(rawCandel[4]),
-                        Ticker = matchingStock.ticker,
-                        TickerId = matchingStock.id,
-                        Exchange = matchingStock.exchange,
-                        Volume = Convert.ToDecimal(rawCandel[5]),
-                    };
-                    newCandel.SetBullBearStatus();
-                    newCandel.SetPriceChange();
+                        Candel newCandel = new Candel
+                        {
+                            OpenTime = DateTime.Parse(rawCandel[0].ToString()),
+                            CloseTime = DateTime.Parse(rawCandel[0].ToString()).AddMinutes(1),
+                            StartPrice = Convert.ToDecimal(rawCandel[1]),
+                            HighestPrice = Convert.ToDecimal(rawCandel[2]),
+                            LowestPrice = Convert.ToDecimal(rawCandel[3]),
+                            EndPrice = Convert.ToDecimal(rawCandel[4]),
+                            Ticker = matchingStock.ticker,
+                            TickerId = matchingStock.id,
+                            Exchange = matchingStock.exchange,
+                            Volume = Convert.ToDecimal(rawCandel[5]),
+                        };
+                        newCandel.SetBullBearStatus();
+                        newCandel.SetPriceChange();
 
-                    if (newCandel.CloseTime < DateTime.Now)
-                        ModifiedCandelDataList.Add(newCandel);
+                        if (newCandel.CloseTime < DateTime.Now)
+                            ModifiedCandelDataList.Add(newCandel);
+                    }
+                    else if (stockRequestModified.Duration == "1d")
+                    {
+                        Candel newCandel = new Candel
+                        {
+                            OpenTime = DateTime.Parse(rawCandel[0].ToString()),
+                            CloseTime = DateTime.Parse(rawCandel[0].ToString()).AddMinutes(375),
+                            StartPrice = Convert.ToDecimal(rawCandel[1]),
+                            HighestPrice = Convert.ToDecimal(rawCandel[2]),
+                            LowestPrice = Convert.ToDecimal(rawCandel[3]),
+                            EndPrice = Convert.ToDecimal(rawCandel[4]),
+                            Ticker = matchingStock.ticker,
+                            TickerId = matchingStock.id,
+                            Exchange = matchingStock.exchange,
+                            Volume = Convert.ToDecimal(rawCandel[5]),
+                        };
+                        newCandel.SetBullBearStatus();
+                        newCandel.SetPriceChange();
+
+                        if (newCandel.CloseTime < DateTime.Now)
+                            ModifiedCandelDataList.Add(newCandel);
+                    }
                 }
 
                 return Ok(ModifiedCandelDataList);
@@ -874,7 +927,7 @@ namespace StockLogger.Controllers.API_Controllers
             requestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX"); // Replace with your actual MAC address
             requestMessage.Headers.Add("X-UserType", "USER");
             requestMessage.Headers.Add("Authorization", "Bearer " + stockRequest.AuthorizationToken);
-            requestMessage.Headers.Add("X-PrivateKey", "DcsJlRJp"); // Your actual API Key
+            requestMessage.Headers.Add("X-PrivateKey", "n4uJPQNK"); // Your actual API Key
 
             try
             {
@@ -893,7 +946,7 @@ namespace StockLogger.Controllers.API_Controllers
 
                 List<Candel> ModifiedCandelDataList = new List<Candel>();
 
-                if(rawCandelData == null)
+                if (rawCandelData == null)
                 {
                     return null;
                 }
@@ -919,11 +972,11 @@ namespace StockLogger.Controllers.API_Controllers
                     newCandel.SetBullBearStatus();
                     newCandel.SetPriceChange();
 
-                    if(newCandel.CloseTime < DateTime.Now)
+                    if (newCandel.CloseTime < DateTime.Now)
                     {
                         ModifiedCandelDataList.Add(newCandel);
                     }
-                    
+
                 }
 
                 return Ok(ModifiedCandelDataList);  // Return the fetched historical candle data
@@ -977,7 +1030,7 @@ namespace StockLogger.Controllers.API_Controllers
             requestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX"); // Replace with your actual MAC address
             requestMessage.Headers.Add("X-UserType", "USER");
             requestMessage.Headers.Add("Authorization", "Bearer " + token.AuthToken);
-            requestMessage.Headers.Add("X-PrivateKey", "DcsJlRJp"); // Your actual API Key
+            requestMessage.Headers.Add("X-PrivateKey", "n4uJPQNK"); // Your actual API Key
 
 
             try
@@ -1039,6 +1092,15 @@ namespace StockLogger.Controllers.API_Controllers
         public string AuthorizationToken { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
+    }
+
+    public class StockRequestModified
+    {
+        public string SymbolToken { get; set; }
+        public string AuthorizationToken { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public string Duration { get; set; }
     }
 }
 

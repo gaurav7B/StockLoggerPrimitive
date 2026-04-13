@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using StockLogger.BackgroundServices;
 using StockLogger.BackgroundServices.BackgroundStratergyServices;
 using StockLogger.BackgroundServices.BackgroundStratergyServices.HelperMethods;
+using StockLogger.BackgroundServices.Helper_methods;
 using StockLogger.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,16 +15,33 @@ builder.Services.AddDbContext<StockLoggerDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("StockLoggerDbConnection"),
     sqlServerOptions => sqlServerOptions.EnableRetryOnFailure()));
 
+builder.Services.AddScoped<CandleAnalysisMethods>();
+
+
 //StoreDataService
 
 //builder.Services.AddHttpClient<StoreDataService>();
 //builder.Services.AddHostedService<StoreDataService>();
 
+
+//-------------------------------------------------------------
+
 builder.Services.AddHttpClient<TokenMakerService>();
 builder.Services.AddHostedService<TokenMakerService>();
 
-builder.Services.AddHttpClient<RateLimitTestService>();
-builder.Services.AddHostedService<RateLimitTestService>();
+builder.Services.AddHttpClient<StoackDataPopulatorService>();
+builder.Services.AddHostedService<StoackDataPopulatorService>();
+
+builder.Services.AddHttpClient<ShortSeller>();
+builder.Services.AddHostedService<ShortSeller>();
+
+//builder.Services.AddHttpClient<OrderBookService>();
+//builder.Services.AddHostedService<OrderBookService>();
+
+//builder.Services.AddHttpClient<RateLimitTestService>();
+//builder.Services.AddHostedService<RateLimitTestService>();
+
+//-------------------------------------------------------------
 
 //builder.Services.AddHttpClient<CandelMakerService>();
 //builder.Services.AddHostedService<CandelMakerService>();

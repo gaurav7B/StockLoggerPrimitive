@@ -90,7 +90,7 @@ namespace StockLogger.Controllers.API_Controllers
             LTPrequestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX");
             LTPrequestMessage.Headers.Add("X-UserType", "USER");
             LTPrequestMessage.Headers.Add("Authorization", "Bearer " + authToken);
-            LTPrequestMessage.Headers.Add("X-PrivateKey", "GmTkiYil");
+            LTPrequestMessage.Headers.Add("X-PrivateKey", "n4uJPQNK");
 
 
             try
@@ -162,7 +162,7 @@ namespace StockLogger.Controllers.API_Controllers
             LTPrequestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX");
             LTPrequestMessage.Headers.Add("X-UserType", "USER");
             LTPrequestMessage.Headers.Add("Authorization", "Bearer " + authToken);
-            LTPrequestMessage.Headers.Add("X-PrivateKey", "GmTkiYil");
+            LTPrequestMessage.Headers.Add("X-PrivateKey", "n4uJPQNK");
 
 
             try
@@ -331,7 +331,7 @@ namespace StockLogger.Controllers.API_Controllers
             requestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX"); // Replace with your actual MAC address
             requestMessage.Headers.Add("X-UserType", "USER");
             requestMessage.Headers.Add("Authorization", "Bearer " + authToken);
-            requestMessage.Headers.Add("X-PrivateKey", "GmTkiYil"); // Your actual API Key
+            requestMessage.Headers.Add("X-PrivateKey", "n4uJPQNK"); // Your actual API Key
 
 
             try
@@ -360,7 +360,19 @@ namespace StockLogger.Controllers.API_Controllers
             public string tradingsymbol { get; set; }
             public string symboltoken { get; set; }
             public decimal CurrentPrice { get; set; }
-            public string UniqueOrderId { get; set; }
+            public string? UniqueOrderId { get; set; }
+            public decimal? TargetPrice { get; set; }
+            public int? Quantity { get; set; }
+        }
+
+        public class BuyDataMSI
+        {
+            public string tradingsymbol { get; set; }
+            public string symboltoken { get; set; }
+            public decimal CurrentPrice { get; set; }
+            public string? UniqueOrderId { get; set; }
+            public decimal? TargetPrice { get; set; }
+            public string Quantity { get; set; }
         }
 
         public class StockOrder
@@ -450,7 +462,7 @@ namespace StockLogger.Controllers.API_Controllers
             requestMessage2.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX"); // Replace with your actual MAC address
             requestMessage2.Headers.Add("X-UserType", "USER");
             requestMessage2.Headers.Add("Authorization", "Bearer " + authToken);
-            requestMessage2.Headers.Add("X-PrivateKey", "GmTkiYil"); // Your actual API Key
+            requestMessage2.Headers.Add("X-PrivateKey", "n4uJPQNK"); // Your actual API Key
 
             HttpResponseMessage response2 = await client.SendAsync(requestMessage2);
 
@@ -577,7 +589,7 @@ namespace StockLogger.Controllers.API_Controllers
             requestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX");
             requestMessage.Headers.Add("X-UserType", "USER");
             requestMessage.Headers.Add("Authorization", "Bearer " + authToken);
-            requestMessage.Headers.Add("X-PrivateKey", "GmTkiYil");
+            requestMessage.Headers.Add("X-PrivateKey", "n4uJPQNK");
 
 
             try
@@ -600,6 +612,211 @@ namespace StockLogger.Controllers.API_Controllers
 
         }
 
+        // POST https://localhost:44364/api/BuySell/ShortSellMSI
+        [HttpPost("ShortSellMSI")]
+        public async Task<IActionResult> ShortSellIntradayMSI([FromBody] SellData sellData)
+        {
+            string authToken = _cache.Get<string>("AccessTokenAngelOne");
+
+            var client = _httpClient;
+
+            var data = new
+            {
+                variety = "NORMAL", // ✅ Corrected
+                tradingsymbol = sellData.tradingsymbol,
+                symboltoken = sellData.symboltoken,
+                transactiontype = "SELL",
+                exchange = "NSE",
+                ordertype = "LIMIT",
+                producttype = "INTRADAY",
+                duration = "DAY",
+                price = sellData.CurrentPrice,
+                triggerprice = "0", // ✅ Added
+                squareoff = sellData.TargetPrice,    // ✅ Corrected
+                stoploss = "0",     // ✅ Corrected
+                quantity = sellData.Quantity
+            };
+
+            var jsonData = JsonConvert.SerializeObject(data);
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post,
+                "https://apiconnect.angelone.in/rest/secure/angelbroking/order/v1/placeOrder")
+            {
+                Content = new StringContent(jsonData, Encoding.UTF8, "application/json")
+            };
+
+            // Headers
+            requestMessage.Headers.Add("Accept", "application/json");
+            requestMessage.Headers.Add("X-SourceID", "WEB");
+            requestMessage.Headers.Add("X-ClientLocalIP", "192.168.56.177");
+            requestMessage.Headers.Add("X-ClientPublicIP", await GetPublicIPAsync());
+            requestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX");
+            requestMessage.Headers.Add("X-UserType", "USER");
+            requestMessage.Headers.Add("Authorization", "Bearer " + authToken);
+            requestMessage.Headers.Add("X-PrivateKey", "n4uJPQNK");
+
+            try
+            {
+                HttpResponseMessage response = await client.SendAsync(requestMessage);
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                    return BadRequest(new { message = "Order Failed", responseContent });
+
+                return Ok(new { message = "MSI Short Sell Order Placed Successfully", responseContent });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        // POST https://localhost:44364/api/BuySell/BuyMSI
+        [HttpPost("BuyMSI")]
+        public async Task<IActionResult> BuyMSI([FromBody] SellData sellData)
+        {
+            string authToken = _cache.Get<string>("AccessTokenAngelOne");
+
+            var client = _httpClient;
+
+            var data = new
+            {
+                variety = "NORMAL", // ✅ Corrected
+                tradingsymbol = sellData.tradingsymbol,
+                symboltoken = sellData.symboltoken,
+                transactiontype = "BUY",
+                exchange = "NSE",
+                ordertype = "LIMIT",
+                producttype = "INTRADAY",
+                duration = "DAY",
+                price = sellData.CurrentPrice,
+                triggerprice = "0", // ✅ Added
+                squareoff = "0",    // ✅ Corrected
+                stoploss = "0",     // ✅ Corrected
+                quantity = sellData.Quantity
+            };
+
+            var jsonData = JsonConvert.SerializeObject(data);
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post,
+                "https://apiconnect.angelone.in/rest/secure/angelbroking/order/v1/placeOrder")
+            {
+                Content = new StringContent(jsonData, Encoding.UTF8, "application/json")
+            };
+
+            // Headers
+            requestMessage.Headers.Add("Accept", "application/json");
+            requestMessage.Headers.Add("X-SourceID", "WEB");
+            requestMessage.Headers.Add("X-ClientLocalIP", "192.168.56.177");
+            requestMessage.Headers.Add("X-ClientPublicIP", await GetPublicIPAsync());
+            requestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX");
+            requestMessage.Headers.Add("X-UserType", "USER");
+            requestMessage.Headers.Add("Authorization", "Bearer " + authToken);
+            requestMessage.Headers.Add("X-PrivateKey", "n4uJPQNK");
+
+            try
+            {
+                HttpResponseMessage response = await client.SendAsync(requestMessage);
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                    return BadRequest(new { message = "Order Failed", responseContent });
+
+                return Ok(new { message = "MSI BUY Order Placed Successfully", responseContent });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        public class OrderBookResponse
+        {
+            public bool Status { get; set; }
+            public string Message { get; set; }
+            public string ErrorCode { get; set; }
+            public List<OrderData> Data { get; set; }
+        }
+
+        public class OrderData
+        {
+            public string Variety { get; set; }
+            public string OrderType { get; set; }
+            public string ProductType { get; set; }
+            public string Duration { get; set; }
+            public string Price { get; set; }
+            public string TriggerPrice { get; set; }
+            public string Quantity { get; set; }
+            public string DisclosedQuantity { get; set; }
+            public string SquareOff { get; set; }
+            public string StopLoss { get; set; }
+            public string TrailingStopLoss { get; set; }
+            public string TradingSymbol { get; set; }
+            public string TransactionType { get; set; }
+            public string Exchange { get; set; }
+            public string SymbolToken { get; set; }
+            public string InstrumentType { get; set; }
+            public string StrikePrice { get; set; }
+            public string OptionType { get; set; }
+            public string ExpiryDate { get; set; }
+            public string LotSize { get; set; }
+            public string CancelSize { get; set; }
+            public string AveragePrice { get; set; }
+            public string FilledShares { get; set; }
+            public string UnfilledShares { get; set; }
+            public string OrderId { get; set; }
+            public string Text { get; set; }
+            public string Status { get; set; }
+            public string OrderStatus { get; set; }
+            public string UpdateTime { get; set; }
+            public string ExchTime { get; set; }
+            public string ExchOrderUpdateTime { get; set; }
+            public string FillId { get; set; }
+            public string FillTime { get; set; }
+            public string ParentOrderId { get; set; }
+            public string UniqueOrderId { get; set; }
+            public string ExchangeOrderId { get; set; }
+        }
+
+        // GET https://localhost:44364/api/BuySell/GetOrderBook
+        [HttpGet("GetOrderBook")]
+        public async Task<IActionResult> GetOrderBook()
+        {
+            string authToken = _cache.Get<string>("AccessTokenAngelOne");
+            var client = _httpClient;
+
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get,
+                "https://apiconnect.angelone.in/rest/secure/angelbroking/order/v1/getOrderBook");
+
+            // Headers
+            requestMessage.Headers.Add("Accept", "application/json");
+            requestMessage.Headers.Add("X-SourceID", "WEB");
+            requestMessage.Headers.Add("X-ClientLocalIP", "192.168.56.177");
+            requestMessage.Headers.Add("X-ClientPublicIP", await GetPublicIPAsync());
+            requestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX");
+            requestMessage.Headers.Add("X-UserType", "USER");
+            requestMessage.Headers.Add("Authorization", "Bearer " + authToken);
+            requestMessage.Headers.Add("X-PrivateKey", "n4uJPQNK");
+
+            try
+            {
+                HttpResponseMessage response = await client.SendAsync(requestMessage);
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                if (!response.IsSuccessStatusCode)
+                    return BadRequest(new { message = "Failed to get order book", responseContent });
+
+                // Deserialize JSON into our model
+                var orderBook = JsonConvert.DeserializeObject<OrderBookResponse>(responseContent);
+
+                return Ok(new { message = "Order book received successfully", orderBook.Data });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
 
         // Helper method to fetch the JWT token
         private async Task<string> GetAuthorizationTokenAsync()
@@ -619,7 +836,8 @@ namespace StockLogger.Controllers.API_Controllers
 
             var loginJsonData = JsonConvert.SerializeObject(loginData);
             var loginClient = new HttpClient();
-            var loginRequestMessage = new HttpRequestMessage(HttpMethod.Post, "https://apiconnect.angelone.in/rest/auth/angelbroking/user/v1/loginByPassword")
+            //var loginRequestMessage = new HttpRequestMessage(HttpMethod.Post, "https://apiconnect.angelone.in/rest/auth/angelbroking/user/v1/loginByPassword")
+            var loginRequestMessage = new HttpRequestMessage(HttpMethod.Post, "")
             {
                 Content = new StringContent(loginJsonData, Encoding.UTF8, "application/json")
             };
@@ -631,7 +849,7 @@ namespace StockLogger.Controllers.API_Controllers
             loginRequestMessage.Headers.Add("X-ClientLocalIP", "192.168.56.177");  // Your local IP from ipconfig
             loginRequestMessage.Headers.Add("X-ClientPublicIP", publicIp);
             loginRequestMessage.Headers.Add("X-MACAddress", "XX-XX-XX-XX-XX-XX"); // Replace with your MAC address
-            loginRequestMessage.Headers.Add("X-PrivateKey", "GmTkiYil");          // Your actual API Key
+            loginRequestMessage.Headers.Add("X-PrivateKey", "n4uJPQNK");          // Your actual API Key
 
             try
             {

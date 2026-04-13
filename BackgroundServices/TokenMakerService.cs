@@ -1,8 +1,11 @@
 ﻿using Newtonsoft.Json;
+using StockLogger.BackgroundServices.Helper_methods;
 using StockLogger.Controllers.API_Controllers;
 using StockLogger.Models.Candel;
-using System.Text;
+using System.Diagnostics;
 using System.Net.Http;
+using System.Text;
+using static StockLogger.Controllers.API_Controllers.BuySellController;
 
 namespace StockLogger.BackgroundServices
 {
@@ -30,21 +33,48 @@ namespace StockLogger.BackgroundServices
             {
                 try
                 {
-                    // 1️ Get Access Token first
-                    var tokenResponse = await _httpClient.PostAsync(
-                        "https://localhost:44364/api/AngelCandel/getAccessToken5Paisa",
-                        null,
-                        stoppingToken
-                    );
+                    string accessTokenContent = string.Empty;
+                    string loginContent = string.Empty;
 
-                    var content = await tokenResponse.Content.ReadAsStringAsync(stoppingToken);
+                    try
+                    {
+                        var tokenResponse = await _httpClient.PostAsync(
+                            "https://localhost:44364/api/AngelCandel/getAccessToken5Paisa",
+                            null,
+                            stoppingToken
+                        );
+                        Console.WriteLine("tokenResponse" , tokenResponse);
+                        accessTokenContent = await tokenResponse.Content.ReadAsStringAsync(stoppingToken);
+                        Speaker.Speak("Angel One login successful");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("ex_5PAISA", ex);
+                    }
+
+                    try
+                    {
+                        var angelResponse = await _httpClient.PostAsync(
+                            "https://localhost:44364/api/AngelCandel/login2",
+                            null,
+                            stoppingToken
+                        );
+                        Console.WriteLine("angelResponse", angelResponse);
+                        loginContent = await angelResponse.Content.ReadAsStringAsync(stoppingToken);
+                        Speaker.Speak("5 Paisa login successful");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine("ex_ANGELONE", ex);
+                    }
 
                 }
                 catch (Exception ex)
                 {
+                    Console.WriteLine("ex", ex);
                 }
 
-                // Wait for 20 minutes before next execution
+                // Always wait for 20 minutes before next execution, even after failure
                 await Task.Delay(TimeSpan.FromMinutes(20), stoppingToken);
             }
         }
