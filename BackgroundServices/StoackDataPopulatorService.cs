@@ -1,17 +1,4 @@
-﻿//using Newtonsoft.Json;
-//using StockLogger.Models.Candel;
-//using System.Text;
-//using static StockLogger.Controllers.API_Controllers.BuySellController;
-
-//namespace StockLogger.BackgroundServices
-//{
-//    public class StoackDataPopulatorService
-//    {
-//    }
-//}
-
-
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using StockLogger.BackgroundServices.Helper_methods;
 using StockLogger.Controllers.API_Controllers;
 using StockLogger.Models.Candel;
@@ -148,6 +135,7 @@ namespace StockLogger.BackgroundServices
 
             using (var httpClient = new HttpClient())
             {
+                GlobalData.isAllStockDataPopulated = false;
                 // 1st pass
                 Speaker.Speak("Initiating First loop to populate Stock data");
                 foreach (var stock in _stocks)
@@ -171,6 +159,8 @@ namespace StockLogger.BackgroundServices
 
             }
 
+
+            GlobalData.isAllStockDataPopulated = true;
             Speaker.Speak($"{GlobalData.ListOfPreOrders.Count} Data in the list");
         }
     }

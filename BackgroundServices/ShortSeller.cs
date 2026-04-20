@@ -259,16 +259,18 @@ namespace StockLogger.BackgroundServices
                 //                 .ToList();
 
                 // Wait until 9:15:00 AM
-                var now = DateTime.Now;
-                var today915 = now.Date.AddHours(9).AddMinutes(15);
-                if (now < today915)
-                {
-                    var delay = today915 - now;
-                    Console.WriteLine($"⏳ Waiting {delay.TotalMinutes:F1} minutes until 9:15 AM...");
-                    Speaker.Speak("Waiting to buy stocks as data ia populating");
-                    await Task.Delay(delay, stoppingToken);
-                }
-                
+                //var now = DateTime.Now;
+                //var today915 = now.Date.AddHours(9).AddMinutes(15);
+                //if (now < today915)
+                //{
+                //    var delay = today915 - now;
+                //    Console.WriteLine($"⏳ Waiting {delay.TotalMinutes:F1} minutes until 9:15 AM...");
+                //    Speaker.Speak("Waiting to buy stocks as data ia populating");
+                //    await Task.Delay(delay, stoppingToken);
+                //}
+
+                await Task.Delay(TimeSpan.FromMinutes(7), stoppingToken);
+
                 Console.WriteLine("🚀 Starting OrderBookService at 9:15 AM...");
 
                 using (var httpClient = new HttpClient())
